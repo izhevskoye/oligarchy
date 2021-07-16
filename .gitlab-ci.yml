@@ -1,0 +1,48 @@
+image: instaffogmbh/rust-toolchain:0.2.0
+
+stages:
+  - test
+  - doc
+
+lint_and_test:
+  stage: test
+  cache:
+    paths:
+      - cargo/
+      - target/
+  before_script:
+    - apt-get update
+    - apt-get install -y libasound2-dev libudev-dev
+    - export CARGO_HOME="$CI_PROJECT_DIR/cargo"
+    - rm rust-toolchain .cargo/config.toml
+  script:
+    - rustfmt --check $(find src -name "*.rs")
+    - cargo deny -L error check
+    - cargo clippy --all-targets --all-features -- -D warnings
+    - cargo test
+  only:
+    refs:
+      - merge_requests
+      - master
+    changes:
+      - .gitlab-ci.yml
+      - Cargo.toml
+      - deny.toml
+      - "src/**/*.rs"
+
+pages:
+  stage: doc
+  before_script:
+    - export CARGO_HOME="$CI_PROJECT_DIR/cargo"
+    - rm rust-toolchain .cargo/config.toml
+  script:
+    - cargo doc --no-deps
+    - mv target/doc public
+    - echo '<meta http-equiv="refresh" content="0; url=oligarchy">' > public/index.html
+  artifacts:
+    paths:
+      - cargo/
+      - target/
+      - public
+  only:
+    - master

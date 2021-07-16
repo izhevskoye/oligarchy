@@ -1,0 +1,3 @@
+# Oligarchy
+
+An industrial simulator.
