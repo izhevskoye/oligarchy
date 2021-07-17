@@ -9,6 +9,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::Coal,
             amount: 0,
+            capacity: 20,
         })
         .id();
 
@@ -26,6 +27,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::Coke,
             amount: 0,
+            capacity: 20,
         })
         .id();
 
@@ -41,6 +43,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::Limestone,
             amount: 0,
+            capacity: 20,
         })
         .id();
 
@@ -58,6 +61,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::IronOre,
             amount: 0,
+            capacity: 20,
         })
         .id();
 
@@ -75,6 +79,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::Iron,
             amount: 0,
+            capacity: 20,
         })
         .id();
 
@@ -95,6 +100,7 @@ pub fn setup(mut commands: Commands) {
         .insert(Storage {
             resource: Resource::Steel,
             amount: 0,
+            capacity: 20,
         })
         .id();
 

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::game::storage::has_space_in_storage;
+
 use super::{
     assets::{BlastFurnace, Resource, Storage, StorageConsolidator},
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage},
@@ -14,7 +16,10 @@ pub fn blast_furnace(
             || !has_in_storage(&consolidator, &mut storage_query, Resource::IronOre)
             || !has_in_storage(&consolidator, &mut storage_query, Resource::Limestone)
         {
-            println!("Blast idle");
+            continue;
+        }
+
+        if !has_space_in_storage(&consolidator, &mut storage_query, Resource::Iron) {
             continue;
         }
 

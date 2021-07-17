@@ -17,6 +17,7 @@ pub struct Quarry {
 pub struct Storage {
     pub resource: Resource,
     pub amount: i64,
+    pub capacity: i64,
 }
 
 pub struct StorageConsolidator {

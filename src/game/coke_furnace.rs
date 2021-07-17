@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::{
     assets::{CokeFurnace, Resource, Storage, StorageConsolidator},
-    storage::{distribute_to_storage, fetch_from_storage},
+    storage::{distribute_to_storage, fetch_from_storage, has_space_in_storage},
 };
 
 pub fn coke_furnace(
@@ -10,7 +10,9 @@ pub fn coke_furnace(
     mut storage_query: Query<&mut Storage>,
 ) {
     for (_furnace, consolidator) in furnace_query.iter() {
-        if fetch_from_storage(&consolidator, &mut storage_query, Resource::Coal) {
+        if has_space_in_storage(&consolidator, &mut storage_query, Resource::Coke)
+            && fetch_from_storage(&consolidator, &mut storage_query, Resource::Coal)
+        {
             println!("Furnace Cooking");
             distribute_to_storage(&consolidator, &mut storage_query, Resource::Coke);
         }

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::game::storage::has_space_in_storage;
+
 use super::{
     assets::{Quarry, Storage, StorageConsolidator},
     storage::distribute_to_storage,
@@ -10,8 +12,9 @@ pub fn quarry(
     mut storage_query: Query<&mut Storage>,
 ) {
     for (quarry, consolidator) in quarry_query.iter() {
-        println!("Quarry Prodution");
-
-        distribute_to_storage(&consolidator, &mut storage_query, quarry.resource);
+        if has_space_in_storage(&consolidator, &mut storage_query, quarry.resource) {
+            println!("{:?} Quarry Production", quarry.resource);
+            distribute_to_storage(&consolidator, &mut storage_query, quarry.resource);
+        }
     }
 }
