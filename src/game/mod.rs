@@ -2,6 +2,7 @@ mod assets;
 mod blast_furnace;
 mod camera;
 mod coke_furnace;
+mod constants;
 mod oxygen_converter;
 mod quarry;
 mod setup;
@@ -24,9 +25,9 @@ impl Game {
             .add_plugins(DefaultPlugins)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_plugin(TilemapPlugin)
+            .add_startup_system(setup::setup_map.system())
             .add_system(camera::movement.system())
             .add_system(texture::set_texture_filters_to_nearest.system())
-            .add_startup_system(setup::setup.system())
             .add_system(quarry::quarry.system())
             .add_system(coke_furnace::coke_furnace.system())
             .add_system(blast_furnace::blast_furnace.system())

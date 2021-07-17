@@ -2581,6 +2581,8 @@ dependencies = [
  "bevy_ecs_tilemap",
  "env_logger 0.9.0",
  "log",
+ "num-derive",
+ "num-traits",
  "rand",
 ]
 
