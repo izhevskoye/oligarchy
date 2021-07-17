@@ -1,6 +1,10 @@
 use bevy::prelude::*;
+use bevy_ecs_tilemap::prelude::*;
 
-use super::assets::{Resource, Storage, StorageConsolidator};
+use super::{
+    assets::{RequiresUpdate, Resource, Storage, StorageConsolidator},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
+};
 
 pub fn distribute_to_storage(
     consolidator: &StorageConsolidator,
@@ -69,4 +73,25 @@ pub fn fetch_from_storage(
     }
 
     false
+}
+
+pub fn update_consolidators(
+    map_query: MapQuery,
+    storage_query: Query<(Entity, &Storage)>,
+    mut consolidator_query: Query<(&mut StorageConsolidator, &RequiresUpdate)>,
+) {
+    for (mut consolidator, update) in consolidator_query.iter_mut() {
+        let neighbors = map_query.get_tile_neighbors(update.position, MAP_ID, BUILDING_LAYER_ID);
+
+        let mut connected_storage = vec![];
+        for (_, neighbor) in neighbors.iter() {
+            if let Some(neighbor) = neighbor {
+                if storage_query.get(*neighbor).is_ok() {
+                    connected_storage.push(*neighbor);
+                }
+            }
+        }
+
+        consolidator.connected_storage = connected_storage;
+    }
 }

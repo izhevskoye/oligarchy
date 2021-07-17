@@ -32,6 +32,7 @@ impl Game {
             .add_system(coke_furnace::coke_furnace.system())
             .add_system(blast_furnace::blast_furnace.system())
             .add_system(oxygen_converter::oxygen_converter.system())
+            .add_system(storage::update_consolidators.system())
             .run();
     }
 }

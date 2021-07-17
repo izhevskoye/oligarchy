@@ -29,3 +29,7 @@ pub struct CokeFurnace;
 pub struct BlastFurnace;
 
 pub struct OxygenConverter;
+
+pub struct RequiresUpdate {
+    pub position: UVec2,
+}

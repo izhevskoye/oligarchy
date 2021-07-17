@@ -1,4 +1,4 @@
-use crate::game::assets::{BlastFurnace, CokeFurnace, OxygenConverter};
+use crate::game::assets::{BlastFurnace, CokeFurnace, OxygenConverter, RequiresUpdate};
 
 use super::{
     assets::{Quarry, Resource, Storage, StorageConsolidator},
@@ -9,9 +9,9 @@ use super::{
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
-const MAP_ID: u16 = 0;
-const LAYER_ID: u16 = 0;
-const BUILDING_LAYER_ID: u16 = 1;
+pub const MAP_ID: u16 = 0;
+pub const LAYER_ID: u16 = 0;
+pub const BUILDING_LAYER_ID: u16 = 1;
 
 pub fn setup_map(
     mut commands: Commands,
@@ -60,7 +60,7 @@ pub fn setup_map(
         LayerBuilder::<TileBundle>::new(&mut commands, map_settings, MAP_ID, BUILDING_LAYER_ID);
     map.add_layer(&mut commands, BUILDING_LAYER_ID, layer_entity);
 
-    let coal_storage = {
+    {
         let pos = UVec2::new(11, 10);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -94,11 +94,12 @@ pub fn setup_map(
                 resource: Resource::Coal,
             })
             .insert(StorageConsolidator {
-                connected_storage: vec![coal_storage],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
-    let coke_storage = {
+    {
         let pos = UVec2::new(13, 10);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -130,11 +131,12 @@ pub fn setup_map(
             .entity(entity)
             .insert(CokeFurnace)
             .insert(StorageConsolidator {
-                connected_storage: vec![coal_storage, coke_storage],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
-    let limestone_storage = {
+    {
         let pos = UVec2::new(14, 11);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -168,11 +170,12 @@ pub fn setup_map(
                 resource: Resource::Limestone,
             })
             .insert(StorageConsolidator {
-                connected_storage: vec![limestone_storage],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
-    let iron_ore_storage = {
+    {
         let pos = UVec2::new(15, 10);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -207,11 +210,12 @@ pub fn setup_map(
                 resource: Resource::IronOre,
             })
             .insert(StorageConsolidator {
-                connected_storage: vec![iron_ore_storage],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
-    let iron_storage = {
+    {
         let pos = UVec2::new(14, 9);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -244,16 +248,12 @@ pub fn setup_map(
             .entity(entity)
             .insert(BlastFurnace)
             .insert(StorageConsolidator {
-                connected_storage: vec![
-                    iron_storage,
-                    limestone_storage,
-                    coke_storage,
-                    iron_ore_storage,
-                ],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
-    let steel_storage = {
+    {
         let pos = UVec2::new(14, 7);
         let tile = Tile {
             texture_index: MapTile::Storage as u16,
@@ -286,8 +286,9 @@ pub fn setup_map(
             .entity(entity)
             .insert(OxygenConverter)
             .insert(StorageConsolidator {
-                connected_storage: vec![iron_storage, steel_storage],
-            });
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
     }
 
     map_query.build_layer(&mut commands, layer_builder, material_handle);
