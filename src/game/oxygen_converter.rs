@@ -13,7 +13,6 @@ pub fn oxygen_converter(
         if has_space_in_storage(&consolidator, &mut storage_query, Resource::Steel)
             && fetch_from_storage(&consolidator, &mut storage_query, Resource::Iron)
         {
-            println!("Oxygen Converter Working");
             distribute_to_storage(&consolidator, &mut storage_query, Resource::Steel);
         }
     }

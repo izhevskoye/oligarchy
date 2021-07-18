@@ -39,3 +39,23 @@ pub struct ExportStation {
 }
 
 pub struct Street;
+
+pub struct Car {
+    pub position: UVec2,
+    pub instructions: Vec<CarInstructions>,
+    pub current_instruction: usize,
+}
+
+pub enum CarInstructions {
+    GoTo(UVec2),
+    WaitForLoad(Resource),
+    WaitForUnload(Resource),
+}
+
+pub struct Destination {
+    pub destination: UVec2,
+}
+
+pub struct Waypoints {
+    pub waypoints: Vec<UVec2>,
+}

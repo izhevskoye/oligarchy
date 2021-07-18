@@ -1,6 +1,7 @@
 mod assets;
 mod blast_furnace;
 mod camera;
+mod car;
 mod coke_furnace;
 mod constants;
 mod export_station;
@@ -11,7 +12,7 @@ mod storage;
 mod street;
 mod texture;
 
-use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
+use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 
 #[derive(Default)]
@@ -37,6 +38,14 @@ impl Game {
             .add_system(storage::update_consolidators.system())
             .add_system(street::update_streets.system())
             .add_system(export_station::export_station.system())
+            .add_system(car::calculate_destination.system())
+            .add_system(car::car_instruction.system())
+            .add_system_set(
+                SystemSet::new()
+                    // This prints out "hello world" once every second
+                    .with_run_criteria(FixedTimestep::step(0.2))
+                    .with_system(car::drive_to_destination.system()),
+            )
             .run();
     }
 }

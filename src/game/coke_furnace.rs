@@ -13,7 +13,6 @@ pub fn coke_furnace(
         if has_space_in_storage(&consolidator, &mut storage_query, Resource::Coke)
             && fetch_from_storage(&consolidator, &mut storage_query, Resource::Coal)
         {
-            println!("Furnace Cooking");
             distribute_to_storage(&consolidator, &mut storage_query, Resource::Coke);
         }
     }

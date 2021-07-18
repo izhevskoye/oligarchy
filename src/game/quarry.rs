@@ -13,7 +13,6 @@ pub fn quarry(
 ) {
     for (quarry, consolidator) in quarry_query.iter() {
         if has_space_in_storage(&consolidator, &mut storage_query, quarry.resource) {
-            println!("{:?} Quarry Production", quarry.resource);
             distribute_to_storage(&consolidator, &mut storage_query, quarry.resource);
         }
     }

@@ -26,7 +26,20 @@ pub enum MapTile {
     StreetNorthSouth = 27,
     StreetNorthEastSouthWest,
     StreetNorthEastSouth,
-    StreetNorthEast = 42,
+    StreetNorthEast = 43,
     StreetNorthEastWest,
     StreetNorthWest,
+}
+
+#[derive(FromPrimitive, ToPrimitive)]
+pub enum VehicleTile {
+    Empty = 64,
+    GreenHorizontal = 82,
+    YellowHorizontal,
+    BlueVertical,
+    GreenVertical,
+    BlueHorizontal = 114,
+    RedHorizontal,
+    RedVertical,
+    YellowVertical,
 }

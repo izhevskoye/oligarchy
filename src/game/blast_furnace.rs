@@ -27,7 +27,6 @@ pub fn blast_furnace(
         fetch_from_storage(&consolidator, &mut storage_query, Resource::IronOre);
         fetch_from_storage(&consolidator, &mut storage_query, Resource::Limestone);
 
-        println!("Blast Furnace Cooking");
         distribute_to_storage(&consolidator, &mut storage_query, Resource::Iron);
     }
 }

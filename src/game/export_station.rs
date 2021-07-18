@@ -12,9 +12,7 @@ pub fn export_station(
     for (export, consolidator) in export_station.iter() {
         for resource in &export.goods {
             if fetch_from_storage(&consolidator, &mut storage_query, *resource) {
-                println!("Exporting {:?}", resource);
-            } else {
-                println!("Cannot export {:?}", resource);
+                log::info!("Exporting {:?}", resource);
             }
         }
     }

@@ -1,11 +1,12 @@
 use crate::game::assets::{
-    BlastFurnace, CokeFurnace, ExportStation, OxygenConverter, RequiresUpdate,
+    BlastFurnace, CarInstructions, CokeFurnace, ExportStation, OxygenConverter, RequiresUpdate,
 };
 
 use super::{
-    assets::{Quarry, Resource, Storage, StorageConsolidator, Street},
+    assets::{Car, Quarry, Resource, Storage, StorageConsolidator, Street},
     constants::{
-        MapTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE,
+        MapTile, VehicleTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_MAP_HEIGHT, TILE_MAP_WIDTH,
+        TILE_SIZE,
     },
 };
 use bevy::prelude::*;
@@ -14,6 +15,7 @@ use bevy_ecs_tilemap::prelude::*;
 pub const MAP_ID: u16 = 0;
 pub const LAYER_ID: u16 = 0;
 pub const BUILDING_LAYER_ID: u16 = 1;
+pub const VEHICLE_LAYER_ID: u16 = 2;
 
 pub fn setup_map(
     mut commands: Commands,
@@ -77,8 +79,7 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-        entity
-    };
+    }
 
     {
         let pos = UVec2::new(10, 10);
@@ -116,8 +117,7 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-        entity
-    };
+    }
 
     {
         let pos = UVec2::new(12, 10);
@@ -153,8 +153,7 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-        entity
-    };
+    }
 
     {
         let pos = UVec2::new(14, 12);
@@ -192,12 +191,27 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-
-        entity
-    };
+    }
 
     {
-        let pos = UVec2::new(16, 10);
+        let pos = UVec2::new(25, 10);
+        let tile = Tile {
+            texture_index: MapTile::Storage as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands.entity(entity).insert(Storage {
+            resource: Resource::IronOre,
+            amount: 0,
+            capacity: 20,
+        });
+    }
+
+    {
+        let pos = UVec2::new(26, 10);
         let tile = Tile {
             texture_index: MapTile::IronOreQuarry as u16,
             ..Default::default()
@@ -232,9 +246,7 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-
-        entity
-    };
+    }
 
     {
         let pos = UVec2::new(14, 10);
@@ -270,9 +282,7 @@ pub fn setup_map(
             amount: 0,
             capacity: 20,
         });
-
-        entity
-    };
+    }
 
     {
         let pos = UVec2::new(14, 8);
@@ -294,7 +304,24 @@ pub fn setup_map(
     }
 
     {
-        let pos = UVec2::new(14, 6);
+        let pos = UVec2::new(10, 1);
+        let tile = Tile {
+            texture_index: MapTile::Storage as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands.entity(entity).insert(Storage {
+            resource: Resource::Steel,
+            amount: 0,
+            capacity: 20,
+        });
+    }
+
+    {
+        let pos = UVec2::new(10, 0);
         let tile = Tile {
             texture_index: MapTile::ExportStation as u16,
             ..Default::default()
@@ -314,7 +341,39 @@ pub fn setup_map(
             .insert(RequiresUpdate { position: pos });
     }
 
-    for x in 0..16 {
+    for x in 16..25 {
+        let pos = UVec2::new(x, 10);
+        let tile = Tile {
+            texture_index: MapTile::StreetNorthEastSouthWest as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands
+            .entity(entity)
+            .insert(Street)
+            .insert(RequiresUpdate { position: pos });
+    }
+
+    for y in 5..10 {
+        let pos = UVec2::new(17, y);
+        let tile = Tile {
+            texture_index: MapTile::StreetNorthEastSouthWest as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands
+            .entity(entity)
+            .insert(Street)
+            .insert(RequiresUpdate { position: pos });
+    }
+
+    for x in 0..17 {
         let pos = UVec2::new(x, 5);
         let tile = Tile {
             texture_index: MapTile::StreetNorthEastSouthWest as u16,
@@ -330,7 +389,7 @@ pub fn setup_map(
             .insert(RequiresUpdate { position: pos });
     }
 
-    for y in 0..5 {
+    for y in 2..5 {
         let pos = UVec2::new(10, y);
         let tile = Tile {
             texture_index: MapTile::StreetNorthEastSouthWest as u16,
@@ -347,6 +406,100 @@ pub fn setup_map(
     }
 
     map_query.build_layer(&mut commands, layer_builder, material_handle);
+
+    // vehicles
+
+    let texture_handle = asset_server.load("oligarchy_tiles.png");
+    let (hw, hh) = (TILE_SIZE / 2.0, TILE_SIZE / 2.0);
+    let (wc, hc) = (TILE_MAP_WIDTH * 2.0, TILE_MAP_HEIGHT * 2.0);
+    let material_handle = materials.add(ColorMaterial::texture(texture_handle));
+
+    let mut map_settings = LayerSettings::new(
+        UVec2::new(MAP_WIDTH * 2, MAP_HEIGHT * 2),
+        UVec2::new(CHUNK_SIZE, CHUNK_SIZE),
+        Vec2::new(hw, hh),
+        Vec2::new(hw * wc, hh * hc),
+    );
+    map_settings.mesh_type = TilemapMeshType::Square;
+
+    let (mut layer_builder, layer_entity) = LayerBuilder::<TileBundle>::new(
+        &mut commands,
+        map_settings.clone(),
+        MAP_ID,
+        VEHICLE_LAYER_ID,
+    );
+    map.add_layer(&mut commands, VEHICLE_LAYER_ID, layer_entity);
+
+    layer_builder.fill(
+        UVec2::new(0, 0),
+        UVec2::new(
+            2 * CHUNK_SIZE * MAP_WIDTH - 2,
+            2 * CHUNK_SIZE * MAP_HEIGHT - 2,
+        ),
+        Tile {
+            texture_index: VehicleTile::Empty as u16,
+            ..Default::default()
+        }
+        .into(),
+    );
+
+    let pos = UVec2::new(0, 10);
+    let _ = layer_builder.set_tile(
+        pos,
+        Tile {
+            texture_index: VehicleTile::BlueVertical as u16,
+            ..Default::default()
+        }
+        .into(),
+    );
+
+    commands
+        .spawn()
+        .insert(Car {
+            position: pos,
+            instructions: vec![
+                CarInstructions::GoTo(UVec2::new(25, 10)),
+                CarInstructions::WaitForLoad(Resource::IronOre),
+                CarInstructions::GoTo(UVec2::new(15, 10)),
+                CarInstructions::WaitForUnload(Resource::IronOre),
+            ],
+            current_instruction: 0,
+        })
+        .insert(Storage {
+            resource: Resource::IronOre,
+            amount: 0,
+            capacity: 4,
+        });
+
+    let pos = UVec2::new(0, 10);
+    let _ = layer_builder.set_tile(
+        pos,
+        Tile {
+            texture_index: VehicleTile::BlueVertical as u16,
+            ..Default::default()
+        }
+        .into(),
+    );
+
+    commands
+        .spawn()
+        .insert(Car {
+            position: pos,
+            instructions: vec![
+                CarInstructions::GoTo(UVec2::new(14, 7)),
+                CarInstructions::WaitForLoad(Resource::Steel),
+                CarInstructions::GoTo(UVec2::new(10, 1)),
+                CarInstructions::WaitForUnload(Resource::Steel),
+            ],
+            current_instruction: 0,
+        })
+        .insert(Storage {
+            resource: Resource::Steel,
+            amount: 0,
+            capacity: 4,
+        });
+
+    map_query.build_layer(&mut commands, layer_builder, material_handle.clone());
 
     // Spawn Map
     // Required in order to use map_query to retrieve layers/tiles.

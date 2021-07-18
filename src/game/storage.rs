@@ -16,7 +16,6 @@ pub fn distribute_to_storage(
 
         if storage.resource == resource && storage.amount < storage.capacity {
             storage.amount += 1;
-            println!("Put {:?} into storage! {}", resource, storage.amount);
             return;
         }
     }
@@ -37,7 +36,6 @@ pub fn has_in_storage(
         }
     }
 
-    println!("No {:?} in storage!", resource);
     false
 }
 
@@ -67,7 +65,6 @@ pub fn fetch_from_storage(
 
         if storage.resource == resource && storage.amount > 0 {
             storage.amount -= 1;
-            println!("Get {:?} from storage! {}", resource, storage.amount);
             return true;
         }
     }

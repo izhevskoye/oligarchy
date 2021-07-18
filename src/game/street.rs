@@ -4,15 +4,16 @@ use bevy_ecs_tilemap::prelude::*;
 use super::{
     assets::{RequiresUpdate, Street},
     constants::MapTile,
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
 
-#[derive(Default)]
-struct NeighborStructure {
+#[derive(Default, Clone, Debug)]
+pub struct NeighborStructure {
     pub north: bool,
     pub south: bool,
     pub east: bool,
     pub west: bool,
+    pub source: Box<Option<NeighborStructure>>,
 }
 
 impl From<NeighborStructure> for u16 {
@@ -99,9 +100,74 @@ pub fn update_streets(
         ns.west = eval_neighbor(neighbors[2].1, &street_query);
         ns.east = eval_neighbor(neighbors[3].1, &street_query);
 
-        tile.texture_index = ns.into();
+        tile.texture_index = ns.clone().into();
 
         map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
+
+        {
+            let mut pos = pos * 2;
+            pos.y += 1;
+            let entity = map_query
+                .get_tile_entity(pos, MAP_ID, VEHICLE_LAYER_ID)
+                .unwrap();
+
+            commands.entity(entity).insert(NeighborStructure {
+                north: false,
+                east: false,
+                south: ns.south || (ns.east && !ns.west) || (!ns.south && ns.north),
+                west: ns.west,
+                source: Box::new(Some(ns.clone())),
+            });
+            map_query.notify_chunk_for_tile(pos, MAP_ID, VEHICLE_LAYER_ID);
+        }
+        {
+            let mut pos = pos * 2;
+            pos.y += 1;
+            pos.x += 1;
+            let entity = map_query
+                .get_tile_entity(pos, MAP_ID, VEHICLE_LAYER_ID)
+                .unwrap();
+
+            commands.entity(entity).insert(NeighborStructure {
+                north: ns.north,
+                east: false,
+                south: false,
+                west: ns.west || (ns.south && !ns.north) || ns.east,
+                source: Box::new(Some(ns.clone())),
+            });
+            map_query.notify_chunk_for_tile(pos, MAP_ID, VEHICLE_LAYER_ID);
+        }
+        {
+            let pos = pos * 2;
+            let entity = map_query
+                .get_tile_entity(pos, MAP_ID, VEHICLE_LAYER_ID)
+                .unwrap();
+
+            commands.entity(entity).insert(NeighborStructure {
+                north: false,
+                east: ns.east || ns.north || ns.west,
+                south: ns.south,
+                west: false,
+                source: Box::new(Some(ns.clone())),
+            });
+            map_query.notify_chunk_for_tile(pos, MAP_ID, VEHICLE_LAYER_ID);
+        }
+        {
+            let mut pos = pos * 2;
+            pos.x += 1;
+            let entity = map_query
+                .get_tile_entity(pos, MAP_ID, VEHICLE_LAYER_ID)
+                .unwrap();
+
+            commands.entity(entity).insert(NeighborStructure {
+                north: ns.north || (ns.west && !ns.east),
+                east: ns.east,
+                south: false,
+                west: false,
+                source: Box::new(Some(ns.clone())),
+            });
+            map_query.notify_chunk_for_tile(pos, MAP_ID, VEHICLE_LAYER_ID);
+        }
 
         commands.entity(entity).remove::<RequiresUpdate>();
     }
