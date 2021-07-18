@@ -1,7 +1,9 @@
-use crate::game::assets::{BlastFurnace, CokeFurnace, OxygenConverter, RequiresUpdate};
+use crate::game::assets::{
+    BlastFurnace, CokeFurnace, ExportStation, OxygenConverter, RequiresUpdate,
+};
 
 use super::{
-    assets::{Quarry, Resource, Storage, StorageConsolidator},
+    assets::{Quarry, Resource, Storage, StorageConsolidator, Street},
     constants::{
         MapTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE,
     },
@@ -81,7 +83,7 @@ pub fn setup_map(
     {
         let pos = UVec2::new(10, 10);
         let tile = Tile {
-            texture_index: MapTile::Quarry as u16,
+            texture_index: MapTile::CoalQuarry as u16,
             ..Default::default()
         };
         let _ = layer_builder.set_tile(pos, tile.into());
@@ -155,9 +157,9 @@ pub fn setup_map(
     };
 
     {
-        let pos = UVec2::new(13, 11);
+        let pos = UVec2::new(14, 12);
         let tile = Tile {
-            texture_index: MapTile::Quarry as u16,
+            texture_index: MapTile::LimestoneQuarry as u16,
             ..Default::default()
         };
         let _ = layer_builder.set_tile(pos, tile.into());
@@ -197,7 +199,7 @@ pub fn setup_map(
     {
         let pos = UVec2::new(16, 10);
         let tile = Tile {
-            texture_index: MapTile::Quarry as u16,
+            texture_index: MapTile::IronOreQuarry as u16,
             ..Default::default()
         };
         let _ = layer_builder.set_tile(pos, tile.into());
@@ -288,6 +290,59 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
+            .insert(RequiresUpdate { position: pos });
+    }
+
+    {
+        let pos = UVec2::new(14, 6);
+        let tile = Tile {
+            texture_index: MapTile::ExportStation as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands
+            .entity(entity)
+            .insert(ExportStation {
+                goods: vec![Resource::Steel],
+            })
+            .insert(StorageConsolidator {
+                connected_storage: vec![],
+            })
+            .insert(RequiresUpdate { position: pos });
+    }
+
+    for x in 0..16 {
+        let pos = UVec2::new(x, 5);
+        let tile = Tile {
+            texture_index: MapTile::StreetNorthEastSouthWest as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands
+            .entity(entity)
+            .insert(Street)
+            .insert(RequiresUpdate { position: pos });
+    }
+
+    for y in 0..5 {
+        let pos = UVec2::new(10, y);
+        let tile = Tile {
+            texture_index: MapTile::StreetNorthEastSouthWest as u16,
+            ..Default::default()
+        };
+        let _ = layer_builder.set_tile(pos, tile.into());
+
+        let entity = layer_builder.get_tile_entity(pos).unwrap();
+
+        commands
+            .entity(entity)
+            .insert(Street)
             .insert(RequiresUpdate { position: pos });
     }
 

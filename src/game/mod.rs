@@ -3,10 +3,12 @@ mod blast_furnace;
 mod camera;
 mod coke_furnace;
 mod constants;
+mod export_station;
 mod oxygen_converter;
 mod quarry;
 mod setup;
 mod storage;
+mod street;
 mod texture;
 
 use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
@@ -33,6 +35,8 @@ impl Game {
             .add_system(blast_furnace::blast_furnace.system())
             .add_system(oxygen_converter::oxygen_converter.system())
             .add_system(storage::update_consolidators.system())
+            .add_system(street::update_streets.system())
+            .add_system(export_station::export_station.system())
             .run();
     }
 }

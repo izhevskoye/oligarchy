@@ -33,3 +33,9 @@ pub struct OxygenConverter;
 pub struct RequiresUpdate {
     pub position: UVec2,
 }
+
+pub struct ExportStation {
+    pub goods: Vec<Resource>,
+}
+
+pub struct Street;
