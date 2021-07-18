@@ -147,6 +147,12 @@ pub fn drive_to_destination(
         // TODO: better :)
         if direction == Direction::North && car.position.x % 2 == 0 {
             direction = Direction::East;
+        } else if direction == Direction::South && car.position.x % 2 == 1 {
+            direction = Direction::West;
+        } else if direction == Direction::East && car.position.y % 2 == 1 {
+            direction = Direction::South;
+        } else if direction == Direction::West && car.position.y % 2 == 0 {
+            direction = Direction::North;
         }
 
         let entity = map_query
