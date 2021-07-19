@@ -3,6 +3,7 @@ use bevy::{
     prelude::*,
     render::camera::Camera,
 };
+use bevy_egui::EguiContext;
 
 // A simple camera system for moving and zooming the camera.
 pub fn movement(
@@ -12,7 +13,12 @@ pub fn movement(
     mut ev_scroll: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: Query<&mut Transform, With<Camera>>,
+    egui_context: ResMut<EguiContext>,
 ) {
+    if egui_context.ctx().wants_pointer_input() {
+        return;
+    }
+
     for mut transform in query.iter_mut() {
         let mut direction = Vec3::ZERO;
         let scale = transform.scale.x;

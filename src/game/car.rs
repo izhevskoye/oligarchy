@@ -20,7 +20,7 @@ pub fn car_instruction(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car), Without<Destination>>,
     mut storage_query: Query<&mut Storage>,
-    mut map_query: MapQuery,
+    map_query: MapQuery,
 ) {
     for (car_entity, mut car) in car_query.iter_mut() {
         match car.instructions[car.current_instruction] {
@@ -36,7 +36,7 @@ pub fn car_instruction(
             }
             CarInstructions::WaitForLoad(resource) => {
                 let full = {
-                    let mut storage = storage_query.get_mut(car_entity).unwrap();
+                    let storage = storage_query.get_mut(car_entity).unwrap();
 
                     storage.amount >= storage.capacity
                 };
@@ -67,7 +67,7 @@ pub fn car_instruction(
             }
             CarInstructions::WaitForUnload(resource) => {
                 let empty = {
-                    let mut storage = storage_query.get_mut(car_entity).unwrap();
+                    let storage = storage_query.get_mut(car_entity).unwrap();
 
                     storage.amount == 0
                 };
