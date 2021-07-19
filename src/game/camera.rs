@@ -5,6 +5,8 @@ use bevy::{
 };
 use bevy_egui::EguiContext;
 
+use super::assets::{SelectedTool, Tool};
+
 // A simple camera system for moving and zooming the camera.
 pub fn movement(
     time: Res<Time>,
@@ -14,8 +16,13 @@ pub fn movement(
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: Query<&mut Transform, With<Camera>>,
     egui_context: ResMut<EguiContext>,
+    selected_tool: Res<SelectedTool>,
 ) {
     if egui_context.ctx().wants_pointer_input() {
+        return;
+    }
+
+    if selected_tool.tool != Tool::None {
         return;
     }
 
