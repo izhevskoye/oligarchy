@@ -63,3 +63,13 @@ pub struct Waypoints {
 pub struct CurrentlySelected {
     pub entity: Option<Entity>,
 }
+
+#[derive(PartialEq, Eq, Debug)]
+pub enum Tool {
+    None,
+    Street,
+}
+
+pub struct SelectedTool {
+    pub tool: Tool,
+}
