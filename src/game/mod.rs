@@ -4,6 +4,7 @@ mod camera;
 mod car;
 mod coke_furnace;
 mod constants;
+mod current_selection;
 mod export_station;
 mod oxygen_converter;
 mod quarry;
@@ -16,6 +17,8 @@ use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude:
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
+use self::assets::{CurrentlySelected, Storage};
+
 #[derive(Default)]
 pub struct Game {}
 
@@ -26,6 +29,7 @@ impl Game {
             .init();
 
         App::build()
+            .insert_resource(CurrentlySelected { entity: None })
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -42,6 +46,7 @@ impl Game {
             .add_system(export_station::export_station.system())
             .add_system(car::calculate_destination.system())
             .add_system(car::car_instruction.system())
+            .add_system(current_selection::current_selection.system())
             .add_system_set(
                 SystemSet::new()
                     // This prints out "hello world" once every second
@@ -53,18 +58,29 @@ impl Game {
     }
 }
 
-fn ui_example(egui_context: ResMut<EguiContext>) {
+fn ui_example(
+    egui_context: ResMut<EguiContext>,
+    storage_query: Query<&Storage>,
+    currently_selected: Res<CurrentlySelected>,
+) {
     egui::Window::new("Hello").show(egui_context.ctx(), |ui| {
         ui.label("world");
     });
 
-    egui::SidePanel::left("side_panel")
-        .default_width(200.0)
-        .show(egui_context.ctx(), |ui| {
-            ui.heading("Side Panel");
+    if let Some(entity) = currently_selected.entity {
+        if let Ok(storage) = storage_query.get(entity) {
+            egui::SidePanel::left("side_panel")
+                .default_width(200.0)
+                .show(egui_context.ctx(), |ui| {
+                    ui.heading("Side Panel");
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-            });
-        });
+                    ui.horizontal(|ui| {
+                        ui.label(format!(
+                            "{:?} {} / {}",
+                            storage.resource, storage.amount, storage.capacity
+                        ));
+                    });
+                });
+        }
+    }
 }

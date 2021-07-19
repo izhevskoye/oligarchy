@@ -59,3 +59,7 @@ pub struct Destination {
 pub struct Waypoints {
     pub waypoints: Vec<UVec2>,
 }
+
+pub struct CurrentlySelected {
+    pub entity: Option<Entity>,
+}
