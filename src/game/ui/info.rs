@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
-use super::assets::{CurrentlySelected, Storage};
+use crate::game::assets::{CurrentlySelected, Storage};
 
 pub fn info_ui(
     egui_context: ResMut<EguiContext>,

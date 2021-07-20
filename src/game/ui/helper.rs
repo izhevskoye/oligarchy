@@ -1,7 +1,7 @@
 use bevy::{prelude::*, render::camera::Camera};
 use bevy_egui::EguiContext;
 
-use super::{
+use crate::game::{
     assets::ClickedTile,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
 };

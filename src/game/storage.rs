@@ -6,6 +6,8 @@ use super::{
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
+// TODO: distribute and take randomly from all available!
+
 pub fn distribute_to_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,

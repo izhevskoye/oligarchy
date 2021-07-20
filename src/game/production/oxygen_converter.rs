@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::{
+use crate::game::{
     assets::{OxygenConverter, Resource, Storage, StorageConsolidator},
     storage::{distribute_to_storage, fetch_from_storage, has_space_in_storage},
 };

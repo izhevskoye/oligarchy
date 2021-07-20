@@ -1,21 +1,15 @@
 mod assets;
-mod blast_furnace;
 mod camera;
 mod car;
-mod coke_furnace;
 mod constants;
-mod construction_ui;
 mod current_selection;
 mod current_tool;
-mod export_station;
-mod helper;
-mod info_ui;
-mod oxygen_converter;
-mod quarry;
+mod production;
 mod setup;
 mod storage;
 mod street;
 mod texture;
+mod ui;
 
 use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
@@ -43,9 +37,7 @@ impl Game {
             .add_startup_system(setup::setup_map.system())
             .add_system(camera::movement.system())
             .add_system(texture::set_texture_filters_to_nearest.system())
-            .add_system(construction_ui::construction_ui.system())
-            .add_system(info_ui::info_ui.system())
-            .add_system(helper::mouse_pos_to_tile.system())
+            .add_system_set(ui::ui_system())
             .add_system(storage::update_consolidators.system())
             .add_system(street::update_streets.system())
             .add_system(car::calculate_destination.system())
@@ -60,13 +52,9 @@ impl Game {
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(FixedTimestep::step(1.0))
-                    .with_system(export_station::export_station.system())
-                    .with_system(oxygen_converter::oxygen_converter.system())
-                    .with_system(blast_furnace::blast_furnace.system())
-                    .with_system(quarry::quarry.system())
-                    .with_system(coke_furnace::coke_furnace.system())
                     .with_system(car::car_instruction.system()),
             )
+            .add_system_set(production::production_system())
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(FixedTimestep::step(0.2))

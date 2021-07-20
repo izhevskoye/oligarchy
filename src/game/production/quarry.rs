@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 
-use crate::game::storage::has_space_in_storage;
-
-use super::{
+use crate::game::{
     assets::{Quarry, Storage, StorageConsolidator},
-    storage::distribute_to_storage,
+    storage::{distribute_to_storage, has_space_in_storage},
 };
 
 pub fn quarry(

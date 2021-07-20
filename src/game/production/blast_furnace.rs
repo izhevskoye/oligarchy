@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 
-use crate::game::storage::has_space_in_storage;
-
-use super::{
+use crate::game::{
     assets::{BlastFurnace, Resource, Storage, StorageConsolidator},
-    storage::{distribute_to_storage, fetch_from_storage, has_in_storage},
+    storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
 };
 
 pub fn blast_furnace(

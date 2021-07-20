@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::{
+use crate::game::{
     assets::{ExportStation, Storage, StorageConsolidator},
     storage::fetch_from_storage,
 };

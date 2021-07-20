@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
-use super::assets::{Resource, SelectedTool, Tool};
+use crate::game::assets::{Resource, SelectedTool, Tool};
 
 pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: ResMut<SelectedTool>) {
     egui::Window::new("Construction").show(egui_context.ctx(), |ui| {
