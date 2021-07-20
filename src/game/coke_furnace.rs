@@ -6,10 +6,10 @@ use super::{
 };
 
 pub fn coke_furnace(
-    furnace_query: Query<(&CokeFurnace, &StorageConsolidator)>,
+    furnace_query: Query<&StorageConsolidator, With<CokeFurnace>>,
     mut storage_query: Query<&mut Storage>,
 ) {
-    for (_furnace, consolidator) in furnace_query.iter() {
+    for consolidator in furnace_query.iter() {
         if has_space_in_storage(&consolidator, &mut storage_query, Resource::Coke)
             && fetch_from_storage(&consolidator, &mut storage_query, Resource::Coal)
         {

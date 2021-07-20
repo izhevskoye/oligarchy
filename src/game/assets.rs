@@ -20,6 +20,7 @@ pub struct Storage {
     pub capacity: i64,
 }
 
+#[derive(Default)]
 pub struct StorageConsolidator {
     pub connected_storage: Vec<Entity>,
 }
@@ -68,8 +69,19 @@ pub struct CurrentlySelected {
 pub enum Tool {
     None,
     Street,
+    Storage(Resource),
+    Quarry(Resource),
+    CokeFurnace,
+    BlastFurnace,
+    OxygenConverter,
+    ExportStation,
 }
 
 pub struct SelectedTool {
     pub tool: Tool,
+}
+
+#[derive(Default)]
+pub struct ClickedTile {
+    pub pos: Option<UVec2>,
 }

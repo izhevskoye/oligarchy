@@ -12,7 +12,7 @@ pub fn distribute_to_storage(
     resource: Resource,
 ) {
     for storage in consolidator.connected_storage.iter() {
-        let ref mut storage = storage_query.get_mut(*storage).unwrap();
+        let mut storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount < storage.capacity {
             storage.amount += 1;
@@ -29,7 +29,7 @@ pub fn has_in_storage(
     resource: Resource,
 ) -> bool {
     for storage in consolidator.connected_storage.iter() {
-        let ref mut storage = storage_query.get_mut(*storage).unwrap();
+        let storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount > 0 {
             return true;
@@ -45,7 +45,7 @@ pub fn has_space_in_storage(
     resource: Resource,
 ) -> bool {
     for storage in consolidator.connected_storage.iter() {
-        let ref mut storage = storage_query.get_mut(*storage).unwrap();
+        let storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount < storage.capacity {
             return true;
@@ -61,7 +61,7 @@ pub fn fetch_from_storage(
     resource: Resource,
 ) -> bool {
     for storage in consolidator.connected_storage.iter() {
-        let ref mut storage = storage_query.get_mut(*storage).unwrap();
+        let mut storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount > 0 {
             storage.amount -= 1;

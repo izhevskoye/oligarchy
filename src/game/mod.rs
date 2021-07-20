@@ -4,9 +4,12 @@ mod camera;
 mod car;
 mod coke_furnace;
 mod constants;
+mod construction_ui;
 mod current_selection;
 mod current_tool;
 mod export_station;
+mod helper;
+mod info_ui;
 mod oxygen_converter;
 mod quarry;
 mod setup;
@@ -16,9 +19,9 @@ mod texture;
 
 use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::EguiPlugin;
 
-use self::assets::{CurrentlySelected, SelectedTool, Storage, Tool};
+use self::assets::{ClickedTile, CurrentlySelected, SelectedTool, Tool};
 
 #[derive(Default)]
 pub struct Game {}
@@ -32,6 +35,7 @@ impl Game {
         App::build()
             .insert_resource(CurrentlySelected { entity: None })
             .insert_resource(SelectedTool { tool: Tool::None })
+            .init_resource::<ClickedTile>()
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -39,11 +43,20 @@ impl Game {
             .add_startup_system(setup::setup_map.system())
             .add_system(camera::movement.system())
             .add_system(texture::set_texture_filters_to_nearest.system())
+            .add_system(construction_ui::construction_ui.system())
+            .add_system(info_ui::info_ui.system())
+            .add_system(helper::mouse_pos_to_tile.system())
             .add_system(storage::update_consolidators.system())
             .add_system(street::update_streets.system())
             .add_system(car::calculate_destination.system())
             .add_system(current_selection::current_selection.system())
-            .add_system(current_tool::current_tool.system())
+            .add_system(current_tool::street_placement.system())
+            .add_system(current_tool::storage_placement.system())
+            .add_system(current_tool::quarry_placement.system())
+            .add_system(current_tool::coke_furnace_placement.system())
+            .add_system(current_tool::blast_furnace_placement.system())
+            .add_system(current_tool::oxygen_converter_placement.system())
+            .add_system(current_tool::export_station_placement.system())
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(FixedTimestep::step(1.0))
@@ -59,41 +72,6 @@ impl Game {
                     .with_run_criteria(FixedTimestep::step(0.2))
                     .with_system(car::drive_to_destination.system()),
             )
-            .add_system(ui_example.system())
             .run();
-    }
-}
-
-fn ui_example(
-    egui_context: ResMut<EguiContext>,
-    storage_query: Query<&Storage>,
-    currently_selected: Res<CurrentlySelected>,
-    mut selected_tool: ResMut<SelectedTool>,
-) {
-    egui::Window::new("Hello").show(egui_context.ctx(), |ui| {
-        ui.label("world");
-        if ui.small_button("None").clicked() {
-            selected_tool.tool = Tool::None;
-        }
-        if ui.small_button("Street").clicked() {
-            selected_tool.tool = Tool::Street;
-        }
-    });
-
-    if let Some(entity) = currently_selected.entity {
-        if let Ok(storage) = storage_query.get(entity) {
-            egui::SidePanel::left("side_panel")
-                .default_width(200.0)
-                .show(egui_context.ctx(), |ui| {
-                    ui.heading("Side Panel");
-
-                    ui.horizontal(|ui| {
-                        ui.label(format!(
-                            "{:?} {} / {}",
-                            storage.resource, storage.amount, storage.capacity
-                        ));
-                    });
-                });
-        }
     }
 }

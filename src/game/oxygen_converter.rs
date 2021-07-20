@@ -6,10 +6,10 @@ use super::{
 };
 
 pub fn oxygen_converter(
-    converter_query: Query<(&OxygenConverter, &StorageConsolidator)>,
+    converter_query: Query<&StorageConsolidator, With<OxygenConverter>>,
     mut storage_query: Query<&mut Storage>,
 ) {
-    for (_converter, consolidator) in converter_query.iter() {
+    for consolidator in converter_query.iter() {
         if has_space_in_storage(&consolidator, &mut storage_query, Resource::Steel)
             && fetch_from_storage(&consolidator, &mut storage_query, Resource::Iron)
         {

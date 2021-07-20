@@ -173,12 +173,9 @@ pub fn drive_to_destination(
                 car.position.y += 1;
             } else {
                 // we are on correct tile
-                waypoint.waypoints = waypoint.waypoints[1..]
-                    .iter()
-                    .map(|v| v.clone())
-                    .collect::<Vec<UVec2>>();
+                waypoint.waypoints = waypoint.waypoints[1..].iter().copied().collect();
 
-                if waypoint.waypoints.len() == 0 {
+                if waypoint.waypoints.is_empty() {
                     commands.entity(car_entity).remove::<Waypoints>();
                 }
             }

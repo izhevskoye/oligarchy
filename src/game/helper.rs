@@ -1,25 +1,26 @@
 use bevy::{prelude::*, render::camera::Camera};
-use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiContext;
 
 use super::{
-    assets::CurrentlySelected,
+    assets::ClickedTile,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-pub fn current_selection(
-    mouse_input: Res<Input<MouseButton>>,
+pub fn mouse_pos_to_tile(
+    egui_context: ResMut<EguiContext>,
     windows: Res<Windows>,
     query: Query<&Transform, With<Camera>>,
-    egui_context: ResMut<EguiContext>,
-    map_query: MapQuery,
-    mut currently_selected: ResMut<CurrentlySelected>,
+    mouse_input: Res<Input<MouseButton>>,
+    mut clicked_tile: ResMut<ClickedTile>,
 ) {
     let transform = query.single().unwrap();
+    if egui_context.ctx().wants_pointer_input() {
+        clicked_tile.pos = None;
+        return;
+    }
 
-    if egui_context.ctx().wants_pointer_input() || !mouse_input.pressed(MouseButton::Left) {
-        currently_selected.entity = None;
+    if !mouse_input.pressed(MouseButton::Left) {
+        clicked_tile.pos = None;
         return;
     }
 
@@ -37,15 +38,9 @@ pub fn current_selection(
         || y < 0
         || y >= (MAP_HEIGHT * CHUNK_SIZE - 1) as i32
     {
+        clicked_tile.pos = None;
         return;
     }
-    let pos = UVec2::new(x as u32, y as u32);
 
-    let entity = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID);
-
-    if let Ok(entity) = entity {
-        currently_selected.entity = Some(entity);
-    } else {
-        currently_selected.entity = None;
-    }
+    clicked_tile.pos = Some(UVec2::new(x as u32, y as u32));
 }
