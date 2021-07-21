@@ -135,6 +135,8 @@ pub fn drive_to_destination(
             Direction::None
         };
 
+        // TODO: do not move onto other car!
+
         // TODO: better :)
         if direction == Direction::North && car.position.x % 2 == 0 {
             direction = Direction::East;

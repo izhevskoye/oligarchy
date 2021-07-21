@@ -21,7 +21,13 @@ pub fn storage_placement(
     if let Tool::Storage(resource) = selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
-                let entity = get_entity(&mut commands, &mut map_query, pos, MapTile::Storage);
+                let entity = get_entity(
+                    &mut commands,
+                    &mut map_query,
+                    pos,
+                    MapTile::Storage,
+                    BUILDING_LAYER_ID,
+                );
 
                 commands
                     .entity(entity)
