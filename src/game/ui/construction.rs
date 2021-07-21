@@ -23,6 +23,10 @@ pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: Res
                     selected_tool.tool = Tool::ExportStation;
                 }
                 ui.end_row();
+
+                if ui.small_button("Car").clicked() {
+                    selected_tool.tool = Tool::Car;
+                }
             });
 
             ui.heading("Storage");

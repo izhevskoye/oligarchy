@@ -15,7 +15,7 @@ use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude:
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use self::assets::{ClickedTile, CurrentlySelected, SelectedTool, Tool};
+use self::assets::{ClickedTile, CurrentlySelected, SelectedTool};
 
 #[derive(Default)]
 pub struct Game {}
@@ -27,8 +27,8 @@ impl Game {
             .init();
 
         App::build()
-            .insert_resource(CurrentlySelected { entity: None })
-            .insert_resource(SelectedTool { tool: Tool::None })
+            .init_resource::<CurrentlySelected>()
+            .init_resource::<SelectedTool>()
             .init_resource::<ClickedTile>()
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)

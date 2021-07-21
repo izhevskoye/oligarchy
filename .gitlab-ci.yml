@@ -12,7 +12,7 @@ lint_and_test:
       - target/
   before_script:
     - apt-get update
-    - apt-get install -y libasound2-dev libudev-dev
+    - apt-get install -y libasound2-dev libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
     - export CARGO_HOME="$CI_PROJECT_DIR/cargo"
     - rm rust-toolchain .cargo/config.toml
   script:

@@ -7,6 +7,7 @@ use crate::game::{
         Tool,
     },
     constants::MapTile,
+    setup::BUILDING_LAYER_ID,
 };
 
 use super::get_entity;
@@ -19,7 +20,13 @@ pub fn oxygen_converter_placement(
 ) {
     if Tool::OxygenConverter == selected_tool.tool && !clicked_tile.occupied_building {
         if let Some(pos) = clicked_tile.pos {
-            let entity = get_entity(&mut commands, &mut map_query, pos, MapTile::OxygenConverter);
+            let entity = get_entity(
+                &mut commands,
+                &mut map_query,
+                pos,
+                MapTile::OxygenConverter,
+                BUILDING_LAYER_ID,
+            );
 
             commands
                 .entity(entity)

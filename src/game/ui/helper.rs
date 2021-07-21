@@ -4,23 +4,46 @@ use bevy_egui::EguiContext;
 
 use crate::game::{
     assets::{ClickedTile, Occupied},
-    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    constants::{VehicleTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
+
+fn eval_pos(x: f32, y: f32, modifier: i32) -> Option<UVec2> {
+    let tile_size = TILE_SIZE / modifier as f32;
+    let x = (x / tile_size).floor() as i32;
+    let y = (y / tile_size).floor() as i32;
+
+    if x < 0
+        || x >= (MAP_WIDTH * CHUNK_SIZE - 1) as i32 * modifier
+        || y < 0
+        || y >= (MAP_HEIGHT * CHUNK_SIZE - 1) as i32 * modifier
+    {
+        return None;
+    }
+
+    Some(UVec2::new(x as u32, y as u32))
+}
 
 pub fn mouse_pos_to_tile(
     egui_context: ResMut<EguiContext>,
     windows: Res<Windows>,
-    query: Query<&Transform, With<Camera>>,
     mouse_input: Res<Input<MouseButton>>,
     mut clicked_tile: ResMut<ClickedTile>,
-    occupied_query: Query<&Occupied>,
+    queries: (
+        Query<&Transform, With<Camera>>,
+        Query<&Occupied>,
+        Query<&Tile>,
+    ),
     map_query: MapQuery,
 ) {
+    let (transform, occupied_query, tile_query) = queries;
+
     clicked_tile.pos = None;
     clicked_tile.occupied_building = false;
+    clicked_tile.vehicle_pos = None;
+    clicked_tile.occupied_vehicle = false;
 
-    let transform = query.single().unwrap();
+    let transform = transform.single().unwrap();
     if egui_context.ctx().wants_pointer_input() {
         return;
     }
@@ -35,24 +58,28 @@ pub fn mouse_pos_to_tile(
     let x = (pos.x - (win.width() / 2.0)) * transform.scale.x + transform.translation.x;
     let y = (pos.y - (win.height() / 2.0)) * transform.scale.y + transform.translation.y;
 
-    let x = (x / TILE_SIZE).floor() as i32;
-    let y = (y / TILE_SIZE).floor() as i32;
+    clicked_tile.pos = eval_pos(x, y, 1);
+    clicked_tile.vehicle_pos = eval_pos(x, y, 2);
 
-    if x < 0
-        || x >= (MAP_WIDTH * CHUNK_SIZE - 1) as i32
-        || y < 0
-        || y >= (MAP_HEIGHT * CHUNK_SIZE - 1) as i32
-    {
-        clicked_tile.pos = None;
-        return;
+    if let Some(pos) = clicked_tile.pos {
+        clicked_tile.occupied_building =
+            if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+                occupied_query.get(entity).is_ok()
+            } else {
+                false
+            };
     }
 
-    let pos = UVec2::new(x as u32, y as u32);
-    clicked_tile.pos = Some(pos);
-    clicked_tile.occupied_building =
-        if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
-            occupied_query.get(entity).is_ok()
-        } else {
-            false
-        };
+    if let Some(vehicle_pos) = clicked_tile.vehicle_pos {
+        clicked_tile.occupied_vehicle =
+            if let Ok(entity) = map_query.get_tile_entity(vehicle_pos, MAP_ID, VEHICLE_LAYER_ID) {
+                if let Ok(tile) = tile_query.get(entity) {
+                    tile.texture_index != VehicleTile::Empty as u16
+                } else {
+                    false
+                }
+            } else {
+                false
+            };
+    }
 }

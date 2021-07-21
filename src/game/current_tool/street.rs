@@ -26,6 +26,7 @@ pub fn street_placement(
             &mut map_query,
             pos,
             MapTile::StreetNorthEastSouthWest,
+            BUILDING_LAYER_ID,
         );
 
         commands

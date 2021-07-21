@@ -71,6 +71,7 @@ pub struct Waypoints {
     pub waypoints: Vec<UVec2>,
 }
 
+#[derive(Default)]
 pub struct CurrentlySelected {
     pub entity: Option<Entity>,
 }
@@ -85,16 +86,25 @@ pub enum Tool {
     BlastFurnace,
     OxygenConverter,
     ExportStation,
+    Car,
 }
 
 pub struct SelectedTool {
     pub tool: Tool,
 }
 
+impl Default for SelectedTool {
+    fn default() -> Self {
+        Self { tool: Tool::None }
+    }
+}
+
 #[derive(Default)]
 pub struct ClickedTile {
     pub pos: Option<UVec2>,
+    pub vehicle_pos: Option<UVec2>,
     pub occupied_building: bool,
+    pub occupied_vehicle: bool,
 }
 
 pub struct Occupied;

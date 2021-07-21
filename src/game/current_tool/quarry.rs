@@ -7,6 +7,7 @@ use crate::game::{
         Tool,
     },
     constants::MapTile,
+    setup::BUILDING_LAYER_ID,
 };
 
 use super::get_entity;
@@ -26,7 +27,8 @@ pub fn quarry_placement(
                     Resource::IronOre => MapTile::IronOreQuarry,
                     _ => panic!("Invalid Quarry type"),
                 };
-                let entity = get_entity(&mut commands, &mut map_query, pos, tile);
+                let entity =
+                    get_entity(&mut commands, &mut map_query, pos, tile, BUILDING_LAYER_ID);
 
                 commands
                     .entity(entity)
