@@ -1,4 +1,5 @@
 mod blast_furnace;
+mod bulldoze;
 mod car;
 mod coke_furnace;
 mod export_station;
@@ -11,7 +12,10 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use num_traits::ToPrimitive;
 
-use super::setup::MAP_ID;
+use super::{
+    assets::{RequiresUpdate, Street},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
+};
 
 fn get_entity<T: ToPrimitive>(
     commands: &mut Commands,
@@ -39,6 +43,24 @@ fn get_entity<T: ToPrimitive>(
     }
 }
 
+fn update_neighbor_streets(
+    commands: &mut Commands,
+    map_query: &mut MapQuery,
+    pos: UVec2,
+    street_query: Query<&Street>,
+) {
+    let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
+    for (pos, neighbor) in neighbors[0..4].iter() {
+        if let Some(neighbor) = neighbor {
+            if street_query.get(*neighbor).is_ok() {
+                commands.entity(*neighbor).insert(RequiresUpdate {
+                    position: pos.as_u32(),
+                });
+            }
+        }
+    }
+}
+
 pub fn current_tool_system() -> SystemSet {
     SystemSet::new()
         .with_system(street::street_placement.system())
@@ -49,4 +71,5 @@ pub fn current_tool_system() -> SystemSet {
         .with_system(oxygen_converter::oxygen_converter_placement.system())
         .with_system(export_station::export_station_placement.system())
         .with_system(car::car_placement.system())
+        .with_system(bulldoze::bulldoze.system())
 }

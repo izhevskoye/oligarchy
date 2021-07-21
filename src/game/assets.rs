@@ -79,6 +79,7 @@ pub struct CurrentlySelected {
 #[derive(PartialEq, Eq, Debug)]
 pub enum Tool {
     None,
+    Bulldoze,
     Street,
     Storage(Resource),
     Quarry(Resource),

@@ -14,11 +14,14 @@ pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: Res
                 if ui.small_button("None").clicked() {
                     selected_tool.tool = Tool::None;
                 }
-                if ui.small_button("Street").clicked() {
-                    selected_tool.tool = Tool::Street;
+                if ui.small_button("Bulldoze").clicked() {
+                    selected_tool.tool = Tool::Bulldoze;
                 }
                 ui.end_row();
 
+                if ui.small_button("Street").clicked() {
+                    selected_tool.tool = Tool::Street;
+                }
                 if ui.small_button("Export Station").clicked() {
                     selected_tool.tool = Tool::ExportStation;
                 }
