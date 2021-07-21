@@ -1,9 +1,11 @@
 use bevy::{prelude::*, render::camera::Camera};
+use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiContext;
 
 use crate::game::{
-    assets::ClickedTile,
+    assets::{ClickedTile, Occupied},
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 pub fn mouse_pos_to_tile(
@@ -12,15 +14,18 @@ pub fn mouse_pos_to_tile(
     query: Query<&Transform, With<Camera>>,
     mouse_input: Res<Input<MouseButton>>,
     mut clicked_tile: ResMut<ClickedTile>,
+    occupied_query: Query<&Occupied>,
+    map_query: MapQuery,
 ) {
+    clicked_tile.pos = None;
+    clicked_tile.occupied_building = false;
+
     let transform = query.single().unwrap();
     if egui_context.ctx().wants_pointer_input() {
-        clicked_tile.pos = None;
         return;
     }
 
     if !mouse_input.pressed(MouseButton::Left) {
-        clicked_tile.pos = None;
         return;
     }
 
@@ -42,5 +47,12 @@ pub fn mouse_pos_to_tile(
         return;
     }
 
-    clicked_tile.pos = Some(UVec2::new(x as u32, y as u32));
+    let pos = UVec2::new(x as u32, y as u32);
+    clicked_tile.pos = Some(pos);
+    clicked_tile.occupied_building =
+        if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+            occupied_query.get(entity).is_ok()
+        } else {
+            false
+        };
 }

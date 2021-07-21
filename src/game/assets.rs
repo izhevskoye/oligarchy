@@ -84,4 +84,7 @@ pub struct SelectedTool {
 #[derive(Default)]
 pub struct ClickedTile {
     pub pos: Option<UVec2>,
+    pub occupied_building: bool,
 }
+
+pub struct Occupied;

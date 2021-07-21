@@ -1,5 +1,6 @@
 use crate::game::assets::{
-    BlastFurnace, CarInstructions, CokeFurnace, ExportStation, OxygenConverter, RequiresUpdate,
+    BlastFurnace, CarInstructions, CokeFurnace, ExportStation, Occupied, OxygenConverter,
+    RequiresUpdate,
 };
 
 use super::{
@@ -74,11 +75,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Coal,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Coal,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -99,7 +103,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -112,11 +117,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Coke,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Coke,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -135,7 +143,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -148,11 +157,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Limestone,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Limestone,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -173,7 +185,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -186,11 +199,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::IronOre,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::IronOre,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -203,11 +219,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::IronOre,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::IronOre,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -228,7 +247,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -241,11 +261,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Iron,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Iron,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -264,7 +287,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -277,11 +301,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Steel,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Steel,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -300,7 +327,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     {
@@ -313,11 +341,14 @@ pub fn setup_map(
 
         let entity = layer_builder.get_tile_entity(pos).unwrap();
 
-        commands.entity(entity).insert(Storage {
-            resource: Resource::Steel,
-            amount: 0,
-            capacity: 20,
-        });
+        commands
+            .entity(entity)
+            .insert(Storage {
+                resource: Resource::Steel,
+                amount: 0,
+                capacity: 20,
+            })
+            .insert(Occupied);
     }
 
     {
@@ -338,7 +369,8 @@ pub fn setup_map(
             .insert(StorageConsolidator {
                 connected_storage: vec![],
             })
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     for x in 16..25 {
@@ -354,7 +386,8 @@ pub fn setup_map(
         commands
             .entity(entity)
             .insert(Street)
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     for y in 5..10 {
@@ -370,7 +403,8 @@ pub fn setup_map(
         commands
             .entity(entity)
             .insert(Street)
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     for x in 0..17 {
@@ -386,7 +420,8 @@ pub fn setup_map(
         commands
             .entity(entity)
             .insert(Street)
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     for y in 2..5 {
@@ -402,7 +437,8 @@ pub fn setup_map(
         commands
             .entity(entity)
             .insert(Street)
-            .insert(RequiresUpdate { position: pos });
+            .insert(RequiresUpdate { position: pos })
+            .insert(Occupied);
     }
 
     map_query.build_layer(&mut commands, layer_builder, material_handle);
