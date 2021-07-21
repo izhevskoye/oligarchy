@@ -493,6 +493,7 @@ pub fn setup_map(
         .spawn()
         .insert(Car {
             position: pos,
+            direction: crate::game::assets::Direction::North,
             instructions: vec![
                 CarInstructions::GoTo(UVec2::new(25, 10)),
                 CarInstructions::WaitForLoad(Resource::IronOre),
@@ -521,6 +522,7 @@ pub fn setup_map(
         .spawn()
         .insert(Car {
             position: pos,
+            direction: crate::game::assets::Direction::North,
             instructions: vec![
                 CarInstructions::GoTo(UVec2::new(14, 7)),
                 CarInstructions::WaitForLoad(Resource::Steel),

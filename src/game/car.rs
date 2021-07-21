@@ -2,19 +2,10 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::{Car, CarInstructions, Destination, Storage, Waypoints},
+    assets::{Car, CarInstructions, Destination, Direction, Storage, Waypoints},
     constants::VehicleTile,
     setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
-
-#[derive(PartialEq, Eq, Debug)]
-enum Direction {
-    None,
-    North,
-    East,
-    South,
-    West,
-}
 
 pub fn car_instruction(
     mut commands: Commands,
@@ -163,6 +154,10 @@ pub fn drive_to_destination(
             tile.texture_index = VehicleTile::Empty as u16;
             map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
 
+            if direction != Direction::None {
+                car.direction = direction;
+            }
+
             if direction == Direction::West {
                 car.position.x -= 1;
             } else if direction == Direction::East {
@@ -185,7 +180,14 @@ pub fn drive_to_destination(
                 .unwrap();
 
             let mut tile = tile_query.get_mut(entity).unwrap();
-            tile.texture_index = VehicleTile::BlueVertical as u16;
+            tile.texture_index =
+                if car.direction == Direction::North || car.direction == Direction::South {
+                    VehicleTile::BlueVertical
+                } else {
+                    VehicleTile::BlueHorizontal
+                } as u16;
+            tile.flip_y = car.direction == Direction::South;
+            tile.flip_x = car.direction == Direction::East;
 
             map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
         }

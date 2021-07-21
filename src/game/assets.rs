@@ -41,8 +41,18 @@ pub struct ExportStation {
 
 pub struct Street;
 
+#[derive(PartialEq, Eq, Copy, Clone)]
+pub enum Direction {
+    North,
+    South,
+    West,
+    East,
+    None,
+}
+
 pub struct Car {
     pub position: UVec2,
+    pub direction: Direction,
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
 }
