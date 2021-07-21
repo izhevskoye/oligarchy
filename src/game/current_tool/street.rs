@@ -4,10 +4,10 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     assets::{ClickedTile, Occupied, RequiresUpdate, SelectedTool, Street, Tool},
     constants::MapTile,
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    setup::BUILDING_LAYER_ID,
 };
 
-use super::get_entity;
+use super::{get_entity, update_neighbor_streets};
 
 pub fn street_placement(
     mut commands: Commands,
@@ -35,15 +35,6 @@ pub fn street_placement(
             .insert(RequiresUpdate { position: pos })
             .insert(Occupied);
 
-        let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
-        for (pos, neighbor) in neighbors[0..4].iter() {
-            if let Some(neighbor) = neighbor {
-                if street_query.get(*neighbor).is_ok() {
-                    commands.entity(*neighbor).insert(RequiresUpdate {
-                        position: pos.as_u32(),
-                    });
-                }
-            }
-        }
+        update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
     }
 }
