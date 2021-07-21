@@ -61,6 +61,7 @@ impl InfoUI for OxygenConverter {
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn info_ui(
     egui_context: ResMut<EguiContext>,
     queries: (

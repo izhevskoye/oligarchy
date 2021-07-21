@@ -458,12 +458,8 @@ pub fn setup_map(
     );
     map_settings.mesh_type = TilemapMeshType::Square;
 
-    let (mut layer_builder, layer_entity) = LayerBuilder::<TileBundle>::new(
-        &mut commands,
-        map_settings.clone(),
-        MAP_ID,
-        VEHICLE_LAYER_ID,
-    );
+    let (mut layer_builder, layer_entity) =
+        LayerBuilder::<TileBundle>::new(&mut commands, map_settings, MAP_ID, VEHICLE_LAYER_ID);
     map.add_layer(&mut commands, VEHICLE_LAYER_ID, layer_entity);
 
     layer_builder.fill(
@@ -537,7 +533,7 @@ pub fn setup_map(
             capacity: 4,
         });
 
-    map_query.build_layer(&mut commands, layer_builder, material_handle.clone());
+    map_query.build_layer(&mut commands, layer_builder, material_handle);
 
     // Spawn Map
     // Required in order to use map_query to retrieve layers/tiles.
