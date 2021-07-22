@@ -1,19 +1,22 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use rand::{prelude::SliceRandom, thread_rng};
 
 use super::{
     assets::{RequiresUpdate, Resource, Storage, StorageConsolidator},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-// TODO: distribute and take randomly from all available!
-
 pub fn distribute_to_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
     resource: Resource,
 ) {
-    for storage in consolidator.connected_storage.iter() {
+    let mut entities = consolidator.connected_storage.clone();
+    let mut random = thread_rng();
+    entities.shuffle(&mut random);
+
+    for storage in entities.iter() {
         let mut storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount < storage.capacity {
@@ -62,7 +65,11 @@ pub fn fetch_from_storage(
     storage_query: &mut Query<&mut Storage>,
     resource: Resource,
 ) -> bool {
-    for storage in consolidator.connected_storage.iter() {
+    let mut entities = consolidator.connected_storage.clone();
+    let mut random = thread_rng();
+    entities.shuffle(&mut random);
+
+    for storage in entities.iter() {
         let mut storage = storage_query.get_mut(*storage).unwrap();
 
         if storage.resource == resource && storage.amount > 0 {
