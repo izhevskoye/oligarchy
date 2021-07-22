@@ -57,7 +57,8 @@ pub fn car_instruction(
                                 false
                             }
                         } else {
-                            log::error!("Car waiting at location that is not a storage");
+                            log::warn!("Car waiting at location that is not a storage");
+                            car.current_instruction += 1;
                             false
                         }
                     };
@@ -83,14 +84,18 @@ pub fn car_instruction(
                         .unwrap();
 
                     let transfer_item = {
-                        let mut map_storage = storage_query.get_mut(entity).unwrap();
-
-                        if resource == map_storage.resource
-                            && map_storage.amount < map_storage.capacity
-                        {
-                            map_storage.amount += 1;
-                            true
+                        if let Ok(mut map_storage) = storage_query.get_mut(entity) {
+                            if resource == map_storage.resource
+                                && map_storage.amount < map_storage.capacity
+                            {
+                                map_storage.amount += 1;
+                                true
+                            } else {
+                                false
+                            }
                         } else {
+                            log::warn!("Car wants to unload at a location that is not a storage");
+                            car.current_instruction += 1;
                             false
                         }
                     };
