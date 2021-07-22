@@ -1,63 +1,20 @@
-use bevy::prelude::*;
+use bevy::{ecs::query::QueryEntityError, prelude::*};
 use bevy_egui::{egui, EguiContext};
-use egui::Ui;
 
-use crate::game::assets::{
-    BlastFurnace, CokeFurnace, CurrentlySelected, ExportStation, OxygenConverter, Quarry, Storage,
+use crate::game::{
+    assets::{
+        BlastFurnace, CokeFurnace, CurrentlySelected, ExportStation, InfoUI, Name, OxygenConverter,
+        Quarry, Storage,
+    },
+    car::Car,
 };
 
-trait InfoUI {
-    fn ui(&self, _ui: &mut Ui) {}
-}
-
-impl InfoUI for Storage {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label(format!(
-                "{:?} {} / {}",
-                self.resource, self.amount, self.capacity
-            ));
-        });
-    }
-}
-
-impl InfoUI for ExportStation {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label(format!("Export Station for {:?}", self.goods));
-        });
-    }
-}
-
-impl InfoUI for Quarry {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label(format!("{:?} Quarry", self.resource));
-        });
-    }
-}
-
-impl InfoUI for CokeFurnace {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Coke Furnace");
-        });
-    }
-}
-
-impl InfoUI for BlastFurnace {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Blast Furnace");
-        });
-    }
-}
-
-impl InfoUI for OxygenConverter {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Oxygen Converter");
-        });
+fn query_resolve<'a, T>(items: &mut Vec<&'a dyn InfoUI>, item: Result<&'a T, QueryEntityError>)
+where
+    T: 'a + InfoUI,
+{
+    if let Ok(item) = item {
+        items.push(item);
     }
 }
 
@@ -65,6 +22,8 @@ impl InfoUI for OxygenConverter {
 pub fn info_ui(
     egui_context: ResMut<EguiContext>,
     queries: (
+        Query<&Name>,
+        Query<&Car>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Quarry>,
@@ -75,29 +34,26 @@ pub fn info_ui(
     currently_selected: Res<CurrentlySelected>,
 ) {
     if let Some(entity) = currently_selected.entity {
-        let item: Option<&dyn InfoUI> = if let Ok(item) = queries.0.get(entity) {
-            Some(item)
-        } else if let Ok(item) = queries.1.get(entity) {
-            Some(item)
-        } else if let Ok(item) = queries.2.get(entity) {
-            Some(item)
-        } else if let Ok(item) = queries.3.get(entity) {
-            Some(item)
-        } else if let Ok(item) = queries.4.get(entity) {
-            Some(item)
-        } else if let Ok(item) = queries.5.get(entity) {
-            Some(item)
-        } else {
-            None
-        };
+        let mut items: Vec<&dyn InfoUI> = vec![];
 
-        if let Some(item) = item {
+        query_resolve(&mut items, queries.0.get(entity));
+        query_resolve(&mut items, queries.1.get(entity));
+        query_resolve(&mut items, queries.2.get(entity));
+        query_resolve(&mut items, queries.3.get(entity));
+        query_resolve(&mut items, queries.4.get(entity));
+        query_resolve(&mut items, queries.5.get(entity));
+        query_resolve(&mut items, queries.6.get(entity));
+        query_resolve(&mut items, queries.7.get(entity));
+
+        if !items.is_empty() {
             egui::SidePanel::left("side_panel")
                 .default_width(200.0)
                 .show(egui_context.ctx(), |ui| {
                     ui.heading("Info");
 
-                    item.ui(ui);
+                    for item in items {
+                        item.ui(ui);
+                    }
                 });
         }
     }

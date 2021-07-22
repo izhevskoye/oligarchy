@@ -31,7 +31,14 @@ pub fn export_station_placement(
             commands
                 .entity(entity)
                 .insert(ExportStation {
-                    goods: vec![Resource::Steel],
+                    goods: vec![
+                        Resource::Steel,
+                        Resource::Coal,
+                        Resource::Coke,
+                        Resource::Limestone,
+                        Resource::Iron,
+                        Resource::IronOre,
+                    ],
                 })
                 .insert(StorageConsolidator::default())
                 .insert(RequiresUpdate { position: pos })
