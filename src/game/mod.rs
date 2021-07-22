@@ -11,7 +11,7 @@ mod street;
 mod texture;
 mod ui;
 
-use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
+use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
@@ -40,20 +40,16 @@ impl Game {
             .add_system_set(ui::ui_system())
             .add_system(storage::update_consolidators.system())
             .add_system(street::update_streets.system())
-            .add_system(car::calculate_destination.system())
-            .add_system(current_selection::current_selection.system())
-            .add_system_set(current_tool::current_tool_system())
-            .add_system_set(
-                SystemSet::new()
-                    .with_run_criteria(FixedTimestep::step(1.0))
-                    .with_system(car::car_instruction.system()),
+            .add_system(
+                current_selection::current_selection
+                    .system()
+                    .label("current_selection"),
             )
+            .add_system_set(current_tool::current_tool_system().after("current_selection"))
             .add_system_set(production::production_system())
-            .add_system_set(
-                SystemSet::new()
-                    .with_run_criteria(FixedTimestep::step(0.2))
-                    .with_system(car::drive_to_destination.system()),
-            )
+            .add_system_set(car::calculate_system())
+            .add_system_set(car::instruction_system())
+            .add_system_set(car::drive_system())
             .run();
     }
 }

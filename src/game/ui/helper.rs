@@ -4,7 +4,7 @@ use bevy_egui::EguiContext;
 
 use crate::game::{
     assets::{ClickedTile, Occupied},
-    constants::{VehicleTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
     setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
 
@@ -29,14 +29,10 @@ pub fn mouse_pos_to_tile(
     windows: Res<Windows>,
     mouse_input: Res<Input<MouseButton>>,
     mut clicked_tile: ResMut<ClickedTile>,
-    queries: (
-        Query<&Transform, With<Camera>>,
-        Query<&Occupied>,
-        Query<&Tile>,
-    ),
+    queries: (Query<&Transform, With<Camera>>, Query<&Occupied>),
     map_query: MapQuery,
 ) {
-    let (transform, occupied_query, tile_query) = queries;
+    let (transform, occupied_query) = queries;
 
     clicked_tile.pos = None;
     clicked_tile.occupied_building = false;
@@ -48,38 +44,32 @@ pub fn mouse_pos_to_tile(
         return;
     }
 
-    if !mouse_input.pressed(MouseButton::Left) {
+    if !mouse_input.just_pressed(MouseButton::Left) {
         return;
     }
 
     let win = windows.get_primary().expect("no primary window");
 
-    let pos = win.cursor_position().unwrap();
-    let x = (pos.x - (win.width() / 2.0)) * transform.scale.x + transform.translation.x;
-    let y = (pos.y - (win.height() / 2.0)) * transform.scale.y + transform.translation.y;
+    if let Some(pos) = win.cursor_position() {
+        let x = (pos.x - (win.width() / 2.0)) * transform.scale.x + transform.translation.x;
+        let y = (pos.y - (win.height() / 2.0)) * transform.scale.y + transform.translation.y;
 
-    clicked_tile.pos = eval_pos(x, y, 1);
-    clicked_tile.vehicle_pos = eval_pos(x, y, 2);
+        clicked_tile.pos = eval_pos(x, y, 1);
+        clicked_tile.vehicle_pos = eval_pos(x, y, 2);
 
-    if let Some(pos) = clicked_tile.pos {
-        clicked_tile.occupied_building =
-            if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
-                occupied_query.get(entity).is_ok()
-            } else {
-                false
-            };
-    }
-
-    if let Some(vehicle_pos) = clicked_tile.vehicle_pos {
-        clicked_tile.occupied_vehicle =
-            if let Ok(entity) = map_query.get_tile_entity(vehicle_pos, MAP_ID, VEHICLE_LAYER_ID) {
-                if let Ok(tile) = tile_query.get(entity) {
-                    tile.texture_index != VehicleTile::Empty as u16
+        if let Some(pos) = clicked_tile.pos {
+            clicked_tile.occupied_building =
+                if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+                    occupied_query.get(entity).is_ok()
                 } else {
                     false
-                }
-            } else {
-                false
-            };
+                };
+        }
+
+        if let Some(vehicle_pos) = clicked_tile.vehicle_pos {
+            clicked_tile.occupied_vehicle = map_query
+                .get_tile_entity(vehicle_pos, MAP_ID, VEHICLE_LAYER_ID)
+                .is_ok();
+        }
     }
 }

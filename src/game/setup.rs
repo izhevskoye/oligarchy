@@ -1,10 +1,10 @@
-use crate::game::assets::{
-    BlastFurnace, CarInstructions, CokeFurnace, ExportStation, Occupied, OxygenConverter,
-    RequiresUpdate,
-};
+use crate::game::car::{Car, CarInstructions};
 
 use super::{
-    assets::{Car, Quarry, Resource, Storage, StorageConsolidator, Street},
+    assets::{
+        BlastFurnace, CokeFurnace, Direction, ExportStation, Occupied, OxygenConverter, Quarry,
+        RequiresUpdate, Resource, Storage, StorageConsolidator, Street,
+    },
     constants::{
         MapTile, VehicleTile, CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_MAP_HEIGHT, TILE_MAP_WIDTH,
         TILE_SIZE,
@@ -462,20 +462,7 @@ pub fn setup_map(
         LayerBuilder::<TileBundle>::new(&mut commands, map_settings, MAP_ID, VEHICLE_LAYER_ID);
     map.add_layer(&mut commands, VEHICLE_LAYER_ID, layer_entity);
 
-    layer_builder.fill(
-        UVec2::new(0, 0),
-        UVec2::new(
-            2 * CHUNK_SIZE * MAP_WIDTH - 2,
-            2 * CHUNK_SIZE * MAP_HEIGHT - 2,
-        ),
-        Tile {
-            texture_index: VehicleTile::Empty as u16,
-            ..Default::default()
-        }
-        .into(),
-    );
-
-    let pos = UVec2::new(0, 10);
+    let pos = UVec2::new(1, 10);
     let _ = layer_builder.set_tile(
         pos,
         Tile {
@@ -489,7 +476,7 @@ pub fn setup_map(
         .spawn()
         .insert(Car {
             position: pos,
-            direction: crate::game::assets::Direction::North,
+            direction: Direction::North,
             instructions: vec![
                 CarInstructions::GoTo(UVec2::new(25, 10)),
                 CarInstructions::WaitForLoad(Resource::IronOre),

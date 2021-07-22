@@ -1,51 +1,39 @@
-use bevy::{prelude::*, render::camera::Camera};
+use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-use bevy_egui::EguiContext;
 
 use super::{
-    assets::CurrentlySelected,
-    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    assets::{ClickedTile, CurrentlySelected},
+    car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 pub fn current_selection(
-    mouse_input: Res<Input<MouseButton>>,
-    windows: Res<Windows>,
-    query: Query<&Transform, With<Camera>>,
-    egui_context: ResMut<EguiContext>,
+    clicked_tile: Res<ClickedTile>,
     map_query: MapQuery,
+    car_query: Query<(Entity, &Car)>,
     mut currently_selected: ResMut<CurrentlySelected>,
 ) {
-    let transform = query.single().unwrap();
-
-    if egui_context.ctx().wants_pointer_input() || !mouse_input.pressed(MouseButton::Left) {
-        currently_selected.entity = None;
+    if currently_selected.locked {
         return;
     }
 
-    let win = windows.get_primary().expect("no primary window");
-
-    let pos = win.cursor_position().unwrap();
-    let x = (pos.x - (win.width() / 2.0)) * transform.scale.x + transform.translation.x;
-    let y = (pos.y - (win.height() / 2.0)) * transform.scale.y + transform.translation.y;
-
-    let x = (x / TILE_SIZE).floor() as i32;
-    let y = (y / TILE_SIZE).floor() as i32;
-
-    if x < 0
-        || x >= (MAP_WIDTH * CHUNK_SIZE - 1) as i32
-        || y < 0
-        || y >= (MAP_HEIGHT * CHUNK_SIZE - 1) as i32
-    {
-        return;
+    if clicked_tile.occupied_vehicle {
+        if let Some(pos) = clicked_tile.vehicle_pos {
+            // TODO: improve
+            for (entity, car) in car_query.iter() {
+                if car.position == pos {
+                    currently_selected.entity = Some(entity);
+                    return;
+                }
+            }
+        }
     }
-    let pos = UVec2::new(x as u32, y as u32);
 
-    let entity = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID);
-
-    if let Ok(entity) = entity {
-        currently_selected.entity = Some(entity);
-    } else {
-        currently_selected.entity = None;
+    if clicked_tile.occupied_building {
+        if let Some(pos) = clicked_tile.pos {
+            if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+                currently_selected.entity = Some(entity);
+            }
+        }
     }
 }
