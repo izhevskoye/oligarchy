@@ -26,7 +26,11 @@ pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: Res
                     selected_tool.tool = Tool::ExportStation;
                 }
                 ui.end_row();
+            });
 
+            ui.heading("Cars");
+
+            egui::Grid::new("cars").show(ui, |ui| {
                 if ui.small_button("Steel Truck").clicked() {
                     selected_tool.tool = Tool::Car(Resource::Steel);
                 }
