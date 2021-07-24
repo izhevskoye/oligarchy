@@ -85,12 +85,11 @@ fn eval_neighbor(entity: Option<Entity>, street_query: &Query<&Street>) -> bool 
 }
 
 pub fn update_streets(
-    mut commands: Commands,
-    mut tile_query: Query<(Entity, &mut Tile, &RequiresUpdate), With<Street>>,
+    mut tile_query: Query<(&mut Tile, &RequiresUpdate), With<Street>>,
     street_query: Query<&Street>,
-    mut map_query: MapQuery,
+    map_query: MapQuery,
 ) {
-    for (entity, mut tile, update) in tile_query.iter_mut() {
+    for (mut tile, update) in tile_query.iter_mut() {
         let mut ns = NeighborStructure::default();
         let pos = UVec2::new(update.position.x, update.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
@@ -101,9 +100,6 @@ pub fn update_streets(
         ns.east = eval_neighbor(neighbors[3].1, &street_query);
 
         tile.texture_index = ns.clone().into();
-
-        map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
-
-        commands.entity(entity).remove::<RequiresUpdate>();
+        tile.visible = true;
     }
 }

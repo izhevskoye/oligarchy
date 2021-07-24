@@ -5,7 +5,6 @@ use crate::game::{
     assets::{
         ClickedTile, Occupied, RequiresUpdate, SelectedTool, Storage, StorageConsolidator, Tool,
     },
-    constants::MapTile,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -21,13 +20,7 @@ pub fn storage_placement(
     if let Tool::Storage(resource) = selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
-                let entity = get_entity(
-                    &mut commands,
-                    &mut map_query,
-                    pos,
-                    MapTile::Storage,
-                    BUILDING_LAYER_ID,
-                );
+                let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
                 commands
                     .entity(entity)
@@ -36,6 +29,7 @@ pub fn storage_placement(
                         amount: 0,
                         capacity: 20,
                     })
+                    .insert(RequiresUpdate { position: pos })
                     .insert(Occupied);
 
                 let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);

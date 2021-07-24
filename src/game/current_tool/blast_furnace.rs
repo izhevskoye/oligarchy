@@ -6,7 +6,6 @@ use crate::game::{
         BlastFurnace, ClickedTile, Occupied, RequiresUpdate, SelectedTool, StorageConsolidator,
         Tool,
     },
-    constants::MapTile,
     setup::BUILDING_LAYER_ID,
 };
 
@@ -20,13 +19,7 @@ pub fn blast_furnace_placement(
 ) {
     if Tool::BlastFurnace == selected_tool.tool && !clicked_tile.occupied_building {
         if let Some(pos) = clicked_tile.pos {
-            let entity = get_entity(
-                &mut commands,
-                &mut map_query,
-                pos,
-                MapTile::BlastFurnace,
-                BUILDING_LAYER_ID,
-            );
+            let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
             commands
                 .entity(entity)

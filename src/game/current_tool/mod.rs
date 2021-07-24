@@ -10,18 +10,16 @@ mod street;
 
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-use num_traits::ToPrimitive;
 
 use super::{
     assets::{RequiresUpdate, Street},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-fn get_entity<T: ToPrimitive>(
+fn get_entity(
     commands: &mut Commands,
     map_query: &mut MapQuery,
     pos: UVec2,
-    map_tile: T,
     layer_id: u16,
 ) -> Entity {
     if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, layer_id) {
@@ -33,7 +31,7 @@ fn get_entity<T: ToPrimitive>(
                 commands,
                 pos,
                 Tile {
-                    texture_index: map_tile.to_u16().unwrap(),
+                    visible: false,
                     ..Default::default()
                 },
                 MAP_ID,

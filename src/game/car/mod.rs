@@ -4,6 +4,7 @@ mod instructions;
 
 use bevy::{core::FixedTimestep, prelude::*};
 use bevy_egui::egui::Ui;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 use super::assets::{Direction, InfoUI, Resource};
@@ -16,7 +17,7 @@ pub struct Waypoints {
     pub waypoints: Vec<UVec2>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum CarInstructions {
     Nop,
     GoTo(UVec2),
@@ -35,6 +36,7 @@ impl fmt::Display for CarInstructions {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Car {
     pub position: UVec2,
     pub direction: Direction,

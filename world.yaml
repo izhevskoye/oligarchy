@@ -1,0 +1,33 @@
+---
+buildings:
+  - pos:
+      - 12
+      - 19
+    building:
+      Quarry:
+        resource: Coal
+    name: ~
+  - pos:
+      - 13
+      - 19
+    building:
+      Storage:
+        resource: Coal
+        amount: 8
+        capacity: 20
+    name: ~
+  - pos:
+      - 14
+      - 19
+    building:
+      CokeFurnace: ~
+    name: ~
+  - pos:
+      - 15
+      - 19
+    building:
+      Storage:
+        resource: Coke
+        amount: 6
+        capacity: 20
+    name: ~
