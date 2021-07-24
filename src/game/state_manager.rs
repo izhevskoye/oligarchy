@@ -14,7 +14,8 @@ use super::{
         RequiresUpdate, Storage, StorageConsolidator, Street,
     },
     car::Car,
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
+    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -52,8 +53,9 @@ struct GameState {
     pub entities: Vec<GameEntity>,
 }
 
+#[allow(clippy::type_complexity)]
 fn save_game(
-    queries: (
+    queries: &(
         Query<&Name>,
         Query<&Quarry>,
         Query<&Storage>,
@@ -181,7 +183,7 @@ fn save_game(
     let _ = file.write_all(serde_yaml::to_string(&state).unwrap().as_bytes());
 }
 
-fn load_game(commands: &mut Commands, map_query: &mut MapQuery) {
+fn load_game(commands: &mut Commands, map_query: &mut MapQuery, car_query: &Query<(Entity, &Car)>) {
     let path = Path::new("world.yaml");
     let mut file = File::open(&path).unwrap();
 
@@ -191,8 +193,42 @@ fn load_game(commands: &mut Commands, map_query: &mut MapQuery) {
     let state: Result<GameState, serde_yaml::Error> = serde_yaml::from_str(&content);
 
     match state {
-        Ok(state) => load_state(commands, map_query, state),
+        Ok(state) => {
+            reset_state(commands, map_query, car_query);
+            load_state(commands, map_query, state);
+        }
         Err(why) => log::error!("Could not load state: {}", why),
+    }
+}
+
+fn reset_state(
+    commands: &mut Commands,
+    map_query: &mut MapQuery,
+    car_query: &Query<(Entity, &Car)>,
+) {
+    map_query.despawn_layer_tiles(commands, MAP_ID, BUILDING_LAYER_ID);
+    map_query.despawn_layer_tiles(commands, MAP_ID, VEHICLE_LAYER_ID);
+
+    for (entity, _car) in car_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    for x in 0..MAP_WIDTH {
+        for y in 0..MAP_HEIGHT {
+            map_query.notify_chunk_for_tile(
+                UVec2::new(x * CHUNK_SIZE, y * CHUNK_SIZE),
+                MAP_ID,
+                BUILDING_LAYER_ID,
+            );
+
+            for i in 1..2 {
+                map_query.notify_chunk_for_tile(
+                    UVec2::new(x * CHUNK_SIZE * i, y * CHUNK_SIZE * i),
+                    MAP_ID,
+                    VEHICLE_LAYER_ID,
+                );
+            }
+        }
     }
 }
 
@@ -268,6 +304,7 @@ fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameStat
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn save_ui(
     mut commands: Commands,
     queries: (
@@ -288,10 +325,10 @@ pub fn save_ui(
         .anchor(Align2::RIGHT_BOTTOM, [-10.0, -10.0])
         .show(egui_context.ctx(), |ui| {
             if ui.button("save").clicked() {
-                save_game(queries, &mut map_query);
+                save_game(&queries, &mut map_query);
             }
             if ui.button("load").clicked() {
-                load_game(&mut commands, &mut map_query);
+                load_game(&mut commands, &mut map_query, &queries.8);
             }
         });
 }
