@@ -13,6 +13,7 @@ use super::{
         BlastFurnace, CokeFurnace, ExportStation, Name, Occupied, OxygenConverter, Quarry,
         RequiresUpdate, Storage, StorageConsolidator, Street,
     },
+    car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -28,16 +29,27 @@ enum Building {
 }
 
 #[derive(Serialize, Deserialize)]
+struct Vehicle {
+    car: Car,
+    storage: Storage,
+}
+
+#[derive(Serialize, Deserialize)]
+enum GameEntityType {
+    Building(Building),
+    Vehicle(Vehicle),
+}
+
+#[derive(Serialize, Deserialize)]
 struct GameEntity {
     pub pos: UVec2,
-    pub building: Building,
+    pub entity: GameEntityType,
     pub name: Option<Name>,
 }
 
 #[derive(Default, Serialize, Deserialize)]
 struct GameState {
-    pub buildings: Vec<GameEntity>,
-    // TODO: vehicles!
+    pub entities: Vec<GameEntity>,
 }
 
 fn save_game(
@@ -50,12 +62,10 @@ fn save_game(
         Query<&ExportStation>,
         Query<&OxygenConverter>,
         Query<&Street>,
+        Query<(Entity, &Car)>,
     ),
     map_query: &mut MapQuery,
 ) {
-    let (_, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
-    let size = layer.get_layer_size_in_tiles();
-
     let (
         name_query,
         quarry_query,
@@ -65,10 +75,34 @@ fn save_game(
         export_station_query,
         oxygen_converter_query,
         street_query,
+        car_query,
     ) = queries;
 
     let mut state = GameState::default();
 
+    for (entity, car) in car_query.iter() {
+        let pos = car.position;
+
+        let name = if let Ok(name) = name_query.get(entity) {
+            Some(name.clone())
+        } else {
+            None
+        };
+
+        let storage = storage_query.get(entity).unwrap();
+
+        state.entities.push(GameEntity {
+            pos,
+            name: name.clone(),
+            entity: GameEntityType::Vehicle(Vehicle {
+                car: car.clone(),
+                storage: storage.clone(),
+            }),
+        });
+    }
+
+    let (_, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
+    let size = layer.get_layer_size_in_tiles();
     for y in 0..size.y {
         for x in 0..size.x {
             let pos = UVec2::new(x, y);
@@ -81,58 +115,60 @@ fn save_game(
                 };
 
                 if let Ok(building) = quarry_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::Quarry(building.clone()),
+                        entity: GameEntityType::Building(Building::Quarry(building.clone())),
                     });
                 }
 
                 if let Ok(building) = storage_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::Storage(building.clone()),
+                        entity: GameEntityType::Building(Building::Storage(building.clone())),
                     });
                 }
 
                 if let Ok(building) = coke_furnace_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::CokeFurnace(building.clone()),
+                        entity: GameEntityType::Building(Building::CokeFurnace(building.clone())),
                     });
                 }
 
                 if let Ok(building) = blast_furnace_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::BlastFurnace(building.clone()),
+                        entity: GameEntityType::Building(Building::BlastFurnace(building.clone())),
                     });
                 }
 
                 if let Ok(building) = export_station_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::ExportStation(building.clone()),
+                        entity: GameEntityType::Building(Building::ExportStation(building.clone())),
                     });
                 }
 
                 if let Ok(building) = oxygen_converter_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::OxygenConverter(building.clone()),
+                        entity: GameEntityType::Building(Building::OxygenConverter(
+                            building.clone(),
+                        )),
                     });
                 }
 
                 if let Ok(building) = street_query.get(entity) {
-                    state.buildings.push(GameEntity {
+                    state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        building: Building::Street(building.clone()),
+                        entity: GameEntityType::Building(Building::Street(building.clone())),
                     });
                 }
             }
@@ -152,63 +188,80 @@ fn load_game(commands: &mut Commands, map_query: &mut MapQuery) {
     let mut content = String::new();
     let _ = file.read_to_string(&mut content);
 
-    let state: GameState = serde_yaml::from_str(&content).unwrap();
+    let state: Result<GameState, serde_yaml::Error> = serde_yaml::from_str(&content);
 
-    for game_entity in state.buildings {
+    match state {
+        Ok(state) => load_state(commands, map_query, state),
+        Err(why) => log::error!("Could not load state: {}", why),
+    }
+}
+
+fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameState) {
+    for game_entity in state.entities {
         let tile = Tile {
             visible: false,
             ..Default::default()
         };
 
-        // TODO: not needed?
-        // map_query.notify_chunk_for_tile(game_entity.pos, MAP_ID, BUILDING_LAYER_ID);
+        match game_entity.entity {
+            GameEntityType::Vehicle(vehicle) => {
+                commands
+                    .spawn()
+                    .insert(RequiresUpdate {
+                        position: game_entity.pos,
+                    })
+                    .insert(vehicle.car)
+                    .insert(vehicle.storage);
+            }
+            GameEntityType::Building(building) => {
+                if let Ok(entity) =
+                    map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID)
+                {
+                    commands
+                        .entity(entity)
+                        .insert(RequiresUpdate {
+                            position: game_entity.pos,
+                        })
+                        .insert(Occupied);
 
-        if let Ok(entity) =
-            map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID)
-        {
-            commands
-                .entity(entity)
-                .insert(RequiresUpdate {
-                    position: game_entity.pos,
-                })
-                .insert(Occupied);
-
-            match game_entity.building {
-                Building::Quarry(c) => {
-                    commands
-                        .entity(entity)
-                        .insert(c)
-                        .insert(StorageConsolidator::default());
-                }
-                Building::Street(c) => {
-                    commands.entity(entity).insert(c);
-                }
-                Building::OxygenConverter(c) => {
-                    commands
-                        .entity(entity)
-                        .insert(c)
-                        .insert(StorageConsolidator::default());
-                }
-                Building::Storage(c) => {
-                    commands.entity(entity).insert(c);
-                }
-                Building::BlastFurnace(c) => {
-                    commands
-                        .entity(entity)
-                        .insert(c)
-                        .insert(StorageConsolidator::default());
-                }
-                Building::CokeFurnace(c) => {
-                    commands
-                        .entity(entity)
-                        .insert(c)
-                        .insert(StorageConsolidator::default());
-                }
-                Building::ExportStation(c) => {
-                    commands
-                        .entity(entity)
-                        .insert(c)
-                        .insert(StorageConsolidator::default());
+                    match building {
+                        Building::Quarry(c) => {
+                            commands
+                                .entity(entity)
+                                .insert(c)
+                                .insert(StorageConsolidator::default());
+                        }
+                        Building::Street(c) => {
+                            commands.entity(entity).insert(c);
+                        }
+                        Building::OxygenConverter(c) => {
+                            commands
+                                .entity(entity)
+                                .insert(c)
+                                .insert(StorageConsolidator::default());
+                        }
+                        Building::Storage(c) => {
+                            commands.entity(entity).insert(c);
+                        }
+                        Building::BlastFurnace(c) => {
+                            commands
+                                .entity(entity)
+                                .insert(c)
+                                .insert(StorageConsolidator::default());
+                        }
+                        Building::CokeFurnace(c) => {
+                            commands
+                                .entity(entity)
+                                .insert(c)
+                                .insert(StorageConsolidator::default());
+                        }
+                        Building::ExportStation(c) => {
+                            commands
+                                .entity(entity)
+                                .insert(c)
+                                .insert(StorageConsolidator::default());
+                        }
+                    }
                 }
             }
         }
@@ -226,6 +279,7 @@ pub fn save_ui(
         Query<&ExportStation>,
         Query<&OxygenConverter>,
         Query<&Street>,
+        Query<(Entity, &Car)>,
     ),
     egui_context: ResMut<EguiContext>,
     mut map_query: MapQuery,

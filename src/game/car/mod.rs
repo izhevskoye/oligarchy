@@ -3,11 +3,16 @@ mod drive_to_destination;
 mod instructions;
 
 use bevy::{core::FixedTimestep, prelude::*};
+use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::egui::Ui;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-use super::assets::{Direction, InfoUI, Resource};
+use super::{
+    assets::{Direction, InfoUI, RequiresUpdate, Resource},
+    constants::VehicleTile,
+    setup::{MAP_ID, VEHICLE_LAYER_ID},
+};
 
 pub struct Destination {
     pub destination: UVec2,
@@ -36,7 +41,7 @@ impl fmt::Display for CarInstructions {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Car {
     pub position: UVec2,
     pub direction: Direction,
@@ -69,4 +74,29 @@ pub fn instruction_system() -> SystemSet {
 pub fn calculate_system() -> SystemSet {
     // TODO: refactor time
     SystemSet::new().with_system(calculate_destination::calculate_destination.system())
+}
+
+pub fn update_car(
+    mut commands: Commands,
+    car_query: Query<(Entity, &Car), With<RequiresUpdate>>,
+    mut map_query: MapQuery,
+) {
+    for (entity, car) in car_query.iter() {
+        commands.entity(entity).remove::<RequiresUpdate>();
+
+        let tile = Tile {
+            texture_index: if car.direction == Direction::North || car.direction == Direction::South
+            {
+                VehicleTile::BlueVertical
+            } else {
+                VehicleTile::BlueHorizontal
+            } as u16,
+            flip_y: car.direction == Direction::South,
+            flip_x: car.direction == Direction::East,
+            ..Default::default()
+        };
+
+        let _ = map_query.set_tile(&mut commands, car.position, tile, MAP_ID, VEHICLE_LAYER_ID);
+        map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
+    }
 }

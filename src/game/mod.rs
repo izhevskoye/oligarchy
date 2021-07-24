@@ -75,13 +75,12 @@ impl Game {
             .add_system_set(production::production_system())
             .add_system_set(car::calculate_system())
             .add_system_set(car::instruction_system())
-            .add_system_set(car::drive_system())
+            .add_system_set(car::drive_system().before(Label::Update))
             .add_system(state_manager::save_ui.system().before(Label::Update))
             .add_system_set(
                 SystemSet::new()
                     .label(Label::Update)
                     .before(Label::UpdateEnd)
-                    // TODO: why no work
                     .with_system(asset_tiles::quarry_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::coke_furnace_update.system())
@@ -89,7 +88,8 @@ impl Game {
                     .with_system(asset_tiles::export_station_update.system())
                     .with_system(asset_tiles::oxygen_converter_update.system())
                     .with_system(street::update_streets.system())
-                    .with_system(storage::update_consolidators.system()),
+                    .with_system(storage::update_consolidators.system())
+                    .with_system(car::update_car.system()),
             )
             .add_system(remove_update.system().label(Label::UpdateEnd))
             .run();
