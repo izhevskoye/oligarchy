@@ -58,6 +58,7 @@ pub fn program_ui(
                         currently_selected.locked = false;
                     }
 
+                    // TODO: radio changes instruction
                     ui.radio_value(&mut edit_instruction.resource, Resource::Coal, "Coal");
                     ui.radio_value(&mut edit_instruction.resource, Resource::Coke, "Coke");
                     ui.radio_value(

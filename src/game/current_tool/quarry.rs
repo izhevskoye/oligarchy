@@ -3,10 +3,8 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        ClickedTile, Occupied, Quarry, RequiresUpdate, Resource, SelectedTool, StorageConsolidator,
-        Tool,
+        ClickedTile, Occupied, Quarry, RequiresUpdate, SelectedTool, StorageConsolidator, Tool,
     },
-    constants::MapTile,
     setup::BUILDING_LAYER_ID,
 };
 
@@ -21,14 +19,7 @@ pub fn quarry_placement(
     if let Tool::Quarry(resource) = selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
-                let tile = match resource {
-                    Resource::Coal => MapTile::CoalQuarry,
-                    Resource::Limestone => MapTile::LimestoneQuarry,
-                    Resource::IronOre => MapTile::IronOreQuarry,
-                    _ => panic!("Invalid Quarry type"),
-                };
-                let entity =
-                    get_entity(&mut commands, &mut map_query, pos, tile, BUILDING_LAYER_ID);
+                let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
                 commands
                     .entity(entity)

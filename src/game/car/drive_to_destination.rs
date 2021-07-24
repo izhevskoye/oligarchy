@@ -2,8 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::Direction,
-    constants::VehicleTile,
+    assets::{Direction, RequiresUpdate},
     setup::{MAP_ID, VEHICLE_LAYER_ID},
 };
 
@@ -86,25 +85,9 @@ pub fn drive_to_destination(
                 car.direction = direction;
             }
 
-            let _ = map_query.set_tile(
-                &mut commands,
-                car.position,
-                Tile {
-                    texture_index: if car.direction == Direction::North
-                        || car.direction == Direction::South
-                    {
-                        VehicleTile::BlueVertical
-                    } else {
-                        VehicleTile::BlueHorizontal
-                    } as u16,
-                    flip_y: car.direction == Direction::South,
-                    flip_x: car.direction == Direction::East,
-                    ..Default::default()
-                },
-                MAP_ID,
-                VEHICLE_LAYER_ID,
-            );
-            map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
+            commands.entity(car_entity).insert(RequiresUpdate {
+                position: car.position,
+            });
         }
     }
 }

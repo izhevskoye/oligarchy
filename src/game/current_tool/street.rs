@@ -3,7 +3,6 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{ClickedTile, Occupied, RequiresUpdate, SelectedTool, Street, Tool},
-    constants::MapTile,
     setup::BUILDING_LAYER_ID,
 };
 
@@ -21,13 +20,7 @@ pub fn street_placement(
     }
 
     if let Some(pos) = clicked_tile.pos {
-        let entity = get_entity(
-            &mut commands,
-            &mut map_query,
-            pos,
-            MapTile::StreetNorthEastSouthWest,
-            BUILDING_LAYER_ID,
-        );
+        let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
         commands
             .entity(entity)

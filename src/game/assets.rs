@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub enum Resource {
     Coal,
     Coke,
@@ -11,10 +13,12 @@ pub enum Resource {
     Steel,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Quarry {
     pub resource: Resource,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Storage {
     pub resource: Resource,
     pub amount: i64,
@@ -26,23 +30,28 @@ pub struct StorageConsolidator {
     pub connected_storage: Vec<Entity>,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct CokeFurnace;
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct BlastFurnace;
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct OxygenConverter;
 
 pub struct RequiresUpdate {
     pub position: UVec2,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ExportStation {
     pub goods: Vec<Resource>,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Street;
 
-#[derive(PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub enum Direction {
     North,
     South,
@@ -91,6 +100,7 @@ pub struct ClickedTile {
 
 pub struct Occupied;
 
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Name(String);
 
 pub trait InfoUI {

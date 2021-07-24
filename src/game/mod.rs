@@ -1,3 +1,4 @@
+mod asset_tiles;
 mod assets;
 mod camera;
 mod car;
@@ -6,6 +7,7 @@ mod current_selection;
 mod current_tool;
 mod production;
 mod setup;
+mod state_manager;
 mod storage;
 mod street;
 mod texture;
@@ -15,10 +17,32 @@ use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use self::assets::{ClickedTile, CurrentlySelected, SelectedTool};
+use self::{
+    assets::{ClickedTile, CurrentlySelected, RequiresUpdate, SelectedTool},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
+};
+
+fn remove_update(
+    mut commands: Commands,
+    query: Query<(Entity, &RequiresUpdate)>,
+    mut map_query: MapQuery,
+) {
+    for (entity, update) in query.iter() {
+        commands.entity(entity).remove::<RequiresUpdate>();
+        // TODO: is it always a building?
+        map_query.notify_chunk_for_tile(update.position, MAP_ID, BUILDING_LAYER_ID);
+    }
+}
 
 #[derive(Default)]
 pub struct Game {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub enum Label {
+    Update,
+    UpdateEnd,
+    CurrentSelection,
+}
 
 impl Game {
     pub fn run(&self) {
@@ -38,18 +62,36 @@ impl Game {
             .add_system(camera::movement.system())
             .add_system(texture::set_texture_filters_to_nearest.system())
             .add_system_set(ui::ui_system())
-            .add_system(storage::update_consolidators.system())
-            .add_system(street::update_streets.system())
             .add_system(
                 current_selection::current_selection
                     .system()
-                    .label("current_selection"),
+                    .label(Label::CurrentSelection),
             )
-            .add_system_set(current_tool::current_tool_system().after("current_selection"))
+            .add_system_set(
+                current_tool::current_tool_system()
+                    .after(Label::CurrentSelection)
+                    .before(Label::Update),
+            )
             .add_system_set(production::production_system())
             .add_system_set(car::calculate_system())
             .add_system_set(car::instruction_system())
-            .add_system_set(car::drive_system())
+            .add_system_set(car::drive_system().before(Label::Update))
+            .add_system(state_manager::save_ui.system().before(Label::Update))
+            .add_system_set(
+                SystemSet::new()
+                    .label(Label::Update)
+                    .before(Label::UpdateEnd)
+                    .with_system(asset_tiles::quarry_update.system())
+                    .with_system(asset_tiles::storage_update.system())
+                    .with_system(asset_tiles::coke_furnace_update.system())
+                    .with_system(asset_tiles::blast_furnace_update.system())
+                    .with_system(asset_tiles::export_station_update.system())
+                    .with_system(asset_tiles::oxygen_converter_update.system())
+                    .with_system(street::update_streets.system())
+                    .with_system(storage::update_consolidators.system())
+                    .with_system(car::update_car.system()),
+            )
+            .add_system(remove_update.system().label(Label::UpdateEnd))
             .run();
     }
 }

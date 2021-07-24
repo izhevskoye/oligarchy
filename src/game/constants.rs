@@ -5,7 +5,7 @@ pub const MAP_WIDTH: u32 = 3;
 pub const MAP_HEIGHT: u32 = 3;
 pub const CHUNK_SIZE: u32 = 16;
 
-#[derive(FromPrimitive, ToPrimitive)]
+#[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
     WaterDeep,
     Water,

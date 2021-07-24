@@ -44,6 +44,7 @@ pub fn car_instruction(
                 if full {
                     car.current_instruction += 1;
                 } else {
+                    // TODO: crash here possible
                     let entity = map_query
                         .get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
                         .unwrap();

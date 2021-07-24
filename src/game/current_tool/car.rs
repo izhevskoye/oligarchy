@@ -20,13 +20,12 @@ pub fn car_placement(
         if !clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {
                 // make sure tile is set
-                get_entity(
-                    &mut commands,
-                    &mut map_query,
-                    pos,
-                    VehicleTile::BlueVertical,
-                    VEHICLE_LAYER_ID,
-                );
+                let entity = get_entity(&mut commands, &mut map_query, pos, VEHICLE_LAYER_ID);
+
+                commands.entity(entity).insert(Tile {
+                    texture_index: VehicleTile::BlueVertical as u16,
+                    ..Default::default()
+                });
 
                 commands
                     .spawn()
