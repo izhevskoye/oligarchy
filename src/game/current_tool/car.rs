@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Direction, SelectedTool, Storage, Tool},
+    assets::{ClickedTile, Direction, Editable, SelectedTool, Storage, Tool},
     car::{Car, CarInstructions},
     constants::VehicleTile,
     setup::VEHICLE_LAYER_ID,
@@ -39,7 +39,8 @@ pub fn car_placement(
                         resource,
                         amount: 0,
                         capacity: 4,
-                    });
+                    })
+                    .insert(Editable);
             }
         }
     }

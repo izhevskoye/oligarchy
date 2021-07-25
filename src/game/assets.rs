@@ -60,12 +60,6 @@ pub enum Direction {
     None,
 }
 
-#[derive(Default)]
-pub struct CurrentlySelected {
-    pub entity: Option<Entity>,
-    pub locked: bool,
-}
-
 #[derive(PartialEq, Eq, Debug)]
 pub enum Tool {
     None,
@@ -102,6 +96,8 @@ pub struct Occupied;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Name(String);
+
+pub struct Editable;
 
 pub trait InfoUI {
     fn ui(&self, _ui: &mut Ui) {}

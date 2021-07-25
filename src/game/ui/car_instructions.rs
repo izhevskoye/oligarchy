@@ -2,8 +2,9 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{ClickedTile, CurrentlySelected, Resource},
+    assets::{ClickedTile, Resource},
     car::{Car, CarInstructions},
+    current_selection::CurrentlySelected,
 };
 
 #[derive(Copy, Clone)]
@@ -23,6 +24,13 @@ impl Default for EditInstruction {
     }
 }
 
+impl EditInstruction {
+    fn confirm_selection(&mut self) {
+        self.select_mode = false;
+        self.index = None;
+    }
+}
+
 pub fn program_ui(
     egui_context: ResMut<EguiContext>,
     mut car_query: Query<&mut Car>,
@@ -36,6 +44,10 @@ pub fn program_ui(
         return;
     }
 
+    if !currently_selected.editing {
+        return;
+    }
+
     if let Some(entity) = currently_selected.entity {
         if let Ok(mut car) = car_query.get_mut(entity) {
             open = true;
@@ -45,20 +57,38 @@ pub fn program_ui(
 
                 if let Some(pos) = clicked_tile.pos {
                     car.instructions[selected_index] = CarInstructions::GoTo(pos);
-                    edit_instruction.select_mode = false;
                     currently_selected.locked = false;
+                    edit_instruction.confirm_selection();
                 }
 
                 egui::Window::new("Instruction").show(egui_context.ctx(), |ui| {
-                    ui.heading(format!("{}", instruction));
+                    ui.heading(format!("Current: {}", instruction));
 
                     if ui.button("Idle").clicked() {
                         car.instructions[selected_index] = CarInstructions::Nop;
-                        edit_instruction.select_mode = false;
                         currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
                     }
 
-                    // TODO: radio changes instruction
+                    if ui.button("Wait For Unload").clicked() {
+                        car.instructions[selected_index] =
+                            CarInstructions::WaitForUnload(edit_instruction.resource);
+                        currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
+                    }
+
+                    if ui.button("Wait for Load").clicked() {
+                        car.instructions[selected_index] =
+                            CarInstructions::WaitForLoad(edit_instruction.resource);
+                        currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
+                    }
+
+                    if ui.button("Go to").clicked() {
+                        edit_instruction.select_mode = true;
+                        currently_selected.locked = true;
+                    }
+
                     ui.radio_value(&mut edit_instruction.resource, Resource::Coal, "Coal");
                     ui.radio_value(&mut edit_instruction.resource, Resource::Coke, "Coke");
                     ui.radio_value(
@@ -74,23 +104,9 @@ pub fn program_ui(
                     ui.radio_value(&mut edit_instruction.resource, Resource::Iron, "Iron");
                     ui.radio_value(&mut edit_instruction.resource, Resource::Steel, "Steel");
 
-                    if ui.button("Wait For Unload").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::WaitForUnload(edit_instruction.resource);
-                        edit_instruction.select_mode = false;
+                    if ui.button("Abort").clicked() {
+                        edit_instruction.confirm_selection();
                         currently_selected.locked = false;
-                    }
-
-                    if ui.button("Wait for Load").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::WaitForLoad(edit_instruction.resource);
-                        edit_instruction.select_mode = false;
-                        currently_selected.locked = false;
-                    }
-
-                    if ui.button("Go to").clicked() {
-                        edit_instruction.select_mode = true;
-                        currently_selected.locked = true;
                     }
                 });
             }

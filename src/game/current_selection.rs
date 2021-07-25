@@ -2,10 +2,17 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::{ClickedTile, CurrentlySelected},
+    assets::ClickedTile,
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
+
+#[derive(Default)]
+pub struct CurrentlySelected {
+    pub entity: Option<Entity>,
+    pub locked: bool,
+    pub editing: bool,
+}
 
 pub fn current_selection(
     clicked_tile: Res<ClickedTile>,
@@ -13,7 +20,7 @@ pub fn current_selection(
     car_query: Query<(Entity, &Car)>,
     mut currently_selected: ResMut<CurrentlySelected>,
 ) {
-    if currently_selected.locked {
+    if currently_selected.locked || currently_selected.editing {
         return;
     }
 
