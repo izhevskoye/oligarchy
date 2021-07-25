@@ -68,7 +68,7 @@ pub fn drive_to_destination(
             true
         };
 
-        if !can_drive_to_new_pos {
+        if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
         }
 

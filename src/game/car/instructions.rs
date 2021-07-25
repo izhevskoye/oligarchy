@@ -6,11 +6,12 @@ use crate::game::{
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-use super::{Car, CarInstructions, Destination};
+use super::{Car, CarInstructions, Destination, Waypoints};
 
+#[allow(clippy::type_complexity)]
 pub fn car_instruction(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &mut Car), Without<Destination>>,
+    mut car_query: Query<(Entity, &mut Car), (Without<Destination>, Without<Waypoints>)>,
     mut storage_query: Query<&mut Storage>,
     map_query: MapQuery,
 ) {
