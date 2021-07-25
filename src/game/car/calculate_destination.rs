@@ -62,7 +62,7 @@ pub fn calculate_destination(
             PathCacheConfig {
                 chunk_size: 3,
                 ..Default::default()
-            }, // config
+            },
         );
 
         *pathfinding = Some(cache);
