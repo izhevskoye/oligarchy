@@ -8,6 +8,7 @@ use crate::game::{
 
 use super::{Car, CarInstructions, Destination, Waypoints};
 
+#[allow(clippy::type_complexity)]
 pub fn car_instruction(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car), (Without<Destination>, Without<Waypoints>)>,
