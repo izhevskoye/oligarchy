@@ -36,35 +36,47 @@ pub fn car_instruction(
             }
             CarInstructions::WaitForLoad(resource) => {
                 let full = {
-                    let storage = storage_query.get_mut(car_entity).unwrap();
-
-                    storage.amount >= storage.capacity
+                    match storage_query.get_mut(car_entity) {
+                        Ok(storage) => storage.amount >= storage.capacity,
+                        _ => {
+                            log::warn!("Car has no storage but should wait for loading");
+                            car.current_instruction += 1;
+                            continue;
+                        }
+                    }
                 };
 
                 if full {
                     car.current_instruction += 1;
                 } else {
-                    // TODO: crash here possible
-                    let entity = map_query
-                        .get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
-                        .unwrap();
-
                     let has_item = {
-                        if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                            if resource == map_storage.resource && map_storage.amount > 0 {
-                                map_storage.amount -= 1;
-                                true
-                            } else {
-                                false
+                        let mut result = None;
+
+                        if let Ok(entity) =
+                            map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
+                        {
+                            if let Ok(mut map_storage) = storage_query.get_mut(entity) {
+                                if resource == map_storage.resource && map_storage.amount > 0 {
+                                    map_storage.amount -= 1;
+                                    result = Some(true)
+                                } else {
+                                    result = Some(false)
+                                }
                             }
+                        }
+
+                        if let Some(result) = result {
+                            result
                         } else {
                             log::warn!("Car waiting at location that is not a storage");
                             car.current_instruction += 1;
-                            false
+                            continue;
                         }
                     };
 
                     if has_item {
+                        // save unwrap here because we checked above and has_item is false if
+                        // it does not exist
                         let mut storage = storage_query.get_mut(car_entity).unwrap();
                         storage.amount += 1;
                     }
@@ -72,36 +84,49 @@ pub fn car_instruction(
             }
             CarInstructions::WaitForUnload(resource) => {
                 let empty = {
-                    let storage = storage_query.get_mut(car_entity).unwrap();
-
-                    storage.amount == 0
+                    match storage_query.get_mut(car_entity) {
+                        Ok(storage) => storage.amount == 0,
+                        _ => {
+                            log::warn!("Car has no storage but should wait for unloading");
+                            car.current_instruction += 1;
+                            continue;
+                        }
+                    }
                 };
 
                 if empty {
                     car.current_instruction += 1;
                 } else {
-                    let entity = map_query
-                        .get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
-                        .unwrap();
-
                     let transfer_item = {
-                        if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                            if resource == map_storage.resource
-                                && map_storage.amount < map_storage.capacity
-                            {
-                                map_storage.amount += 1;
-                                true
-                            } else {
-                                false
+                        let mut result = None;
+
+                        if let Ok(entity) =
+                            map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
+                        {
+                            if let Ok(mut map_storage) = storage_query.get_mut(entity) {
+                                if resource == map_storage.resource
+                                    && map_storage.amount < map_storage.capacity
+                                {
+                                    map_storage.amount += 1;
+                                    result = Some(true)
+                                } else {
+                                    result = Some(false)
+                                }
                             }
+                        }
+
+                        if let Some(result) = result {
+                            result
                         } else {
                             log::warn!("Car wants to unload at a location that is not a storage");
                             car.current_instruction += 1;
-                            false
+                            continue;
                         }
                     };
 
                     if transfer_item {
+                        // save unwrap here because we checked above and transfer_item is false if
+                        // it does not exist
                         let mut storage = storage_query.get_mut(car_entity).unwrap();
                         storage.amount -= 1;
                     }

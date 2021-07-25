@@ -73,12 +73,10 @@ pub fn drive_to_destination(
         }
 
         if can_drive_to_new_pos {
-            let entity = map_query
-                .get_tile_entity(car.position, MAP_ID, VEHICLE_LAYER_ID)
-                .unwrap();
-
-            map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
-            commands.entity(entity).despawn_recursive();
+            if let Ok(entity) = map_query.get_tile_entity(car.position, MAP_ID, VEHICLE_LAYER_ID) {
+                map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
+                commands.entity(entity).despawn_recursive();
+            }
 
             car.position = new_car_position;
             if direction != Direction::None {
