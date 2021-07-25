@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{Occupied, Street},
+    assets::{Occupied, RequiresUpdate, Street},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -41,20 +41,15 @@ pub fn calculate_destination(
     mut car_query: Query<(Entity, &Car, &Destination)>,
     street_query: Query<(), With<Street>>,
     occupied_query: Query<(), With<Occupied>>,
+    update_query: Query<&RequiresUpdate, With<Tile>>,
     map_query: MapQuery,
-    // TODO: invalidate when new things are placed
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,
 ) {
-    if car_query.iter().find(|_| true).is_none() {
-        return;
-    }
-
-    let (_entity, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
-
-    let size = layer.get_layer_size_in_tiles();
-
     if pathfinding.is_none() {
-        log::info!("Redo pathfinding cache");
+        log::info!("Building pathfinding cache");
+        let (_entity, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
+        let size = layer.get_layer_size_in_tiles();
+
         let cache = PathCache::new(
             (size.x as usize, size.y as usize),
             cost_fn(&map_query, &street_query, &occupied_query),
@@ -62,37 +57,59 @@ pub fn calculate_destination(
             PathCacheConfig {
                 chunk_size: 3,
                 ..Default::default()
-            }, // config
+            },
         );
 
         *pathfinding = Some(cache);
-    }
+    } else {
+        // safe unwrap due because it is always created above
+        let pathfinding = pathfinding.as_mut().unwrap();
 
-    if let Some(pathfinding) = pathfinding.as_ref() {
-        for (car_entity, car, destination) in car_query.iter_mut() {
-            log::info!("Calculating pathfinding");
-            let path = pathfinding.find_path(
-                (car.position.x as usize / 2, car.position.y as usize / 2),
-                (
-                    destination.destination.x as usize,
-                    destination.destination.y as usize,
-                ),
+        let changes: Vec<(usize, usize)> = update_query
+            .iter()
+            .map(|update| (update.position.x as usize, update.position.y as usize))
+            .collect();
+
+        if !changes.is_empty() {
+            log::info!("Updating pathfinding cache");
+            pathfinding.tiles_changed(
+                &changes,
                 cost_fn(&map_query, &street_query, &occupied_query),
             );
+        }
+    }
 
-            if let Some(path) = path {
-                let waypoints = path
-                    .into_iter()
-                    .map(|(x, y)| UVec2::new(x as u32, y as u32))
-                    .collect();
+    if !car_query.iter().any(|_| true) {
+        return;
+    }
 
-                commands
-                    .entity(car_entity)
-                    .insert(Waypoints { waypoints })
-                    .remove::<Destination>();
-            } else {
-                // TODO:
-            }
+    // safe unwrap due because it is always created above
+    let pathfinding = pathfinding.as_ref().unwrap();
+
+    for (car_entity, car, destination) in car_query.iter_mut() {
+        log::info!("Calculating pathfinding");
+        let path = pathfinding.find_path(
+            (car.position.x as usize / 2, car.position.y as usize / 2),
+            (
+                destination.destination.x as usize,
+                destination.destination.y as usize,
+            ),
+            cost_fn(&map_query, &street_query, &occupied_query),
+        );
+
+        if let Some(path) = path {
+            let waypoints = path
+                .into_iter()
+                .map(|(x, y)| UVec2::new(x as u32, y as u32))
+                .collect();
+
+            commands
+                .entity(car_entity)
+                .insert(Waypoints { waypoints })
+                .remove::<Destination>();
+        } else {
+            log::error!("No path found for car!");
+            commands.entity(car_entity).remove::<Destination>();
         }
     }
 }

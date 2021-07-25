@@ -14,6 +14,8 @@ use super::{
     setup::{MAP_ID, VEHICLE_LAYER_ID},
 };
 
+pub use calculate_destination::calculate_destination;
+
 pub struct Destination {
     pub destination: UVec2,
 }
@@ -69,11 +71,6 @@ pub fn instruction_system() -> SystemSet {
     SystemSet::new()
         .with_run_criteria(FixedTimestep::step(1.0))
         .with_system(instructions::car_instruction.system())
-}
-
-pub fn calculate_system() -> SystemSet {
-    // TODO: refactor time
-    SystemSet::new().with_system(calculate_destination::calculate_destination.system())
 }
 
 pub fn update_car(

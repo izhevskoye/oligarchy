@@ -74,7 +74,7 @@ impl Game {
                     .before(Label::Update),
             )
             .add_system_set(production::production_system())
-            .add_system_set(car::calculate_system())
+            .add_system(car::calculate_destination.system().before(Label::UpdateEnd))
             .add_system_set(car::instruction_system())
             .add_system_set(car::drive_system().before(Label::Update))
             .add_system(state_manager::save_ui.system().before(Label::Update))
