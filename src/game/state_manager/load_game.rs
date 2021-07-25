@@ -3,12 +3,12 @@ use std::{fs::File, io::prelude::*, path::Path};
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
-use super::{Building, GameEntityType, GameState};
 use crate::game::{
-    assets::{Occupied, RequiresUpdate, StorageConsolidator},
+    assets::{Editable, Occupied, RequiresUpdate, StorageConsolidator},
     car::Car,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
     setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
+    state_manager::{Building, GameEntityType, GameState},
 };
 
 pub fn load_game(
@@ -85,7 +85,8 @@ fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameStat
                         position: game_entity.pos,
                     })
                     .insert(vehicle.car)
-                    .insert(vehicle.storage);
+                    .insert(vehicle.storage)
+                    .insert(Editable);
             }
             GameEntityType::Building(building) => {
                 if let Ok(entity) =

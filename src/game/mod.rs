@@ -18,7 +18,8 @@ use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
 use self::{
-    assets::{ClickedTile, CurrentlySelected, RequiresUpdate, SelectedTool},
+    assets::{ClickedTile, RequiresUpdate, SelectedTool},
+    current_selection::CurrentlySelected,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
