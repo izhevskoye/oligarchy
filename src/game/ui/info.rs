@@ -2,7 +2,8 @@ use bevy::{ecs::query::QueryEntityError, prelude::*};
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{Editable, ExportStation, InfoUI, Name, Storage},
+    assets::{Building, Editable, ExportStation, InfoUI, Name, Storage},
+    building_specifications::BuildingSpecifications,
     car::Car,
     current_selection::CurrentlySelected,
 };
@@ -16,12 +17,12 @@ where
     }
 }
 
-// TODO: Building info needed!
-
 #[allow(clippy::type_complexity)]
 pub fn info_ui(
+    buildings: Res<BuildingSpecifications>,
     egui_context: ResMut<EguiContext>,
     queries: (
+        Query<&Building>,
         Query<&Editable>,
         Query<&Name>,
         Query<&Car>,
@@ -33,10 +34,16 @@ pub fn info_ui(
     if let Some(entity) = currently_selected.entity {
         let mut items: Vec<&dyn InfoUI> = vec![];
 
-        query_resolve(&mut items, queries.1.get(entity));
+        if let Ok(building) = queries.0.get(entity) {
+            let building = buildings.get(&building.id).unwrap();
+
+            items.push(building);
+        }
+
         query_resolve(&mut items, queries.2.get(entity));
         query_resolve(&mut items, queries.3.get(entity));
         query_resolve(&mut items, queries.4.get(entity));
+        query_resolve(&mut items, queries.5.get(entity));
 
         if !items.is_empty() {
             egui::SidePanel::left("side_panel")
@@ -48,7 +55,7 @@ pub fn info_ui(
                         item.ui(ui);
                     }
 
-                    if queries.0.get(entity).is_ok() {
+                    if queries.1.get(entity).is_ok() {
                         let label = if currently_selected.editing {
                             "close edit"
                         } else {

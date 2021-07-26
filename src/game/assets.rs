@@ -146,10 +146,8 @@ impl InfoUI for ExportStation {
     }
 }
 
-impl InfoUI for Building {
+impl InfoUI for BuildingSpecification {
     fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label(format!("{:?}", self.id));
-        });
+        ui.heading(&self.name);
     }
 }
