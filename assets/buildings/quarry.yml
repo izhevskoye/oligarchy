@@ -1,0 +1,17 @@
+"quarry.coal":
+  name: Coal Quarry
+  tile: 5
+  products:
+    - resource: Coal
+
+"quarry.iron_ore":
+  name: Iron Ore Quarry
+  tile: 6
+  products:
+    - resource: IronOre
+
+"quarry.limestone":
+  name: Limestone Quarry
+  tile: 7
+  products:
+    - resource: Limestone

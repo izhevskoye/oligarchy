@@ -4,9 +4,16 @@ use bevy_egui::{
     EguiContext,
 };
 
-use crate::game::assets::{Resource, SelectedTool, Tool};
+use crate::game::{
+    assets::{Resource, SelectedTool, Tool},
+    building_specifications::BuildingSpecifications,
+};
 
-pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: ResMut<SelectedTool>) {
+pub fn construction_ui(
+    egui_context: ResMut<EguiContext>,
+    mut selected_tool: ResMut<SelectedTool>,
+    buildings: Res<BuildingSpecifications>,
+) {
     egui::Window::new("Construction")
         .anchor(Align2::RIGHT_TOP, [-10.0, 10.0])
         .show(egui_context.ctx(), |ui| {
@@ -84,23 +91,6 @@ pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: Res
                 ui.end_row();
             });
 
-            ui.heading("Quarry");
-
-            egui::Grid::new("quarry").show(ui, |ui| {
-                if ui.small_button("Coal Quarry").clicked() {
-                    selected_tool.tool = Tool::Quarry(Resource::Coal);
-                }
-                if ui.small_button("Iron Ore Quarry").clicked() {
-                    selected_tool.tool = Tool::Quarry(Resource::IronOre);
-                }
-                ui.end_row();
-
-                if ui.small_button("Limestone Quarry").clicked() {
-                    selected_tool.tool = Tool::Quarry(Resource::Limestone);
-                }
-                ui.end_row();
-            });
-
             ui.heading("Furnace");
 
             egui::Grid::new("furnace").show(ui, |ui| {
@@ -115,6 +105,20 @@ pub fn construction_ui(egui_context: ResMut<EguiContext>, mut selected_tool: Res
                     selected_tool.tool = Tool::OxygenConverter;
                 }
                 ui.end_row();
+            });
+
+            ui.heading("Buildings");
+
+            egui::Grid::new("buildings").show(ui, |ui| {
+                for (index, (id, building)) in buildings.iter().enumerate() {
+                    if ui.small_button(&building.name).clicked() {
+                        selected_tool.tool = Tool::Building(id.clone());
+                    }
+
+                    if index != 0 && index % 1 == 0 {
+                        ui.end_row();
+                    }
+                }
             });
         });
 }

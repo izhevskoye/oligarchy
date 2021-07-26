@@ -13,9 +13,29 @@ pub enum Resource {
     Steel,
 }
 
+#[derive(Deserialize)]
+pub struct BuildingSpecification {
+    pub name: String,
+    pub tile: u16,
+    pub products: Vec<Product>,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Quarry {
+pub struct Building {
+    pub id: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Product {
     pub resource: Resource,
+    // TODO:
+    // pub rate: i64,
+}
+
+// TODO: implicit through spec instead?
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ProductionBuilding {
+    pub products: Vec<Product>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -66,12 +86,12 @@ pub enum Tool {
     Bulldoze,
     Street,
     Storage(Resource),
-    Quarry(Resource),
     CokeFurnace,
     BlastFurnace,
     OxygenConverter,
     ExportStation,
     Car(Resource),
+    Building(String),
 }
 
 pub struct SelectedTool {
@@ -128,10 +148,10 @@ impl InfoUI for ExportStation {
     }
 }
 
-impl InfoUI for Quarry {
+impl InfoUI for Building {
     fn ui(&self, ui: &mut Ui) {
         ui.horizontal(|ui| {
-            ui.label(format!("{:?} Quarry", self.resource));
+            ui.label(format!("{:?}", self.id));
         });
     }
 }

@@ -3,20 +3,21 @@ use bevy_ecs_tilemap::prelude::*;
 
 use super::{
     assets::{
-        BlastFurnace, CokeFurnace, ExportStation, OxygenConverter, Quarry, RequiresUpdate,
-        Resource, Storage,
+        BlastFurnace, Building, CokeFurnace, ExportStation, OxygenConverter, RequiresUpdate,
+        Storage,
     },
+    building_specifications::BuildingSpecifications,
     constants::MapTile,
 };
 
-pub fn quarry_update(mut query: Query<(&mut Tile, &Quarry), With<RequiresUpdate>>) {
-    for (mut tile, quarry) in query.iter_mut() {
-        tile.texture_index = match quarry.resource {
-            Resource::Limestone => MapTile::LimestoneQuarry,
-            Resource::Coal => MapTile::CoalQuarry,
-            Resource::IronOre => MapTile::IronOreQuarry,
-            _ => panic!("Invalid Quarry Type"),
-        } as u16;
+pub fn building_update(
+    mut query: Query<(&mut Tile, &Building), With<RequiresUpdate>>,
+    buildings: Res<BuildingSpecifications>,
+) {
+    for (mut tile, building) in query.iter_mut() {
+        let building = buildings.get(&building.id).unwrap();
+
+        tile.texture_index = building.tile;
         tile.visible = true;
     }
 }

@@ -1,11 +1,13 @@
 mod asset_tiles;
 mod assets;
+mod building_specifications;
 mod camera;
 mod car;
 mod constants;
 mod current_selection;
 mod current_tool;
 mod production;
+mod remove_update;
 mod setup;
 mod state_manager;
 mod storage;
@@ -17,23 +19,10 @@ use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use self::{
-    assets::{ClickedTile, RequiresUpdate, SelectedTool},
+use crate::game::{
+    assets::{ClickedTile, SelectedTool},
     current_selection::CurrentlySelected,
-    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
-
-fn remove_update(
-    mut commands: Commands,
-    query: Query<(Entity, &RequiresUpdate)>,
-    mut map_query: MapQuery,
-) {
-    for (entity, update) in query.iter() {
-        commands.entity(entity).remove::<RequiresUpdate>();
-        // TODO: is it always a building?
-        map_query.notify_chunk_for_tile(update.position, MAP_ID, BUILDING_LAYER_ID);
-    }
-}
 
 #[derive(Default)]
 pub struct Game {}
@@ -55,6 +44,7 @@ impl Game {
             .init_resource::<CurrentlySelected>()
             .init_resource::<SelectedTool>()
             .init_resource::<ClickedTile>()
+            .insert_resource(building_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -82,7 +72,7 @@ impl Game {
                 SystemSet::new()
                     .label(Label::Update)
                     .before(Label::UpdateEnd)
-                    .with_system(asset_tiles::quarry_update.system())
+                    .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::coke_furnace_update.system())
                     .with_system(asset_tiles::blast_furnace_update.system())
@@ -92,7 +82,11 @@ impl Game {
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::update_car.system()),
             )
-            .add_system(remove_update.system().label(Label::UpdateEnd))
+            .add_system(
+                remove_update::remove_update
+                    .system()
+                    .label(Label::UpdateEnd),
+            )
             .run();
     }
 }

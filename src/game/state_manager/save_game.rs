@@ -5,9 +5,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use super::{Building, GameEntity, GameEntityType, GameState, Vehicle};
 use crate::game::{
-    assets::{
-        BlastFurnace, CokeFurnace, ExportStation, Name, OxygenConverter, Quarry, Storage, Street,
-    },
+    assets::{BlastFurnace, CokeFurnace, ExportStation, Name, OxygenConverter, Storage, Street},
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -16,7 +14,6 @@ use crate::game::{
 pub fn save_game(
     queries: &(
         Query<&Name>,
-        Query<&Quarry>,
         Query<&Storage>,
         Query<&CokeFurnace>,
         Query<&BlastFurnace>,
@@ -29,7 +26,6 @@ pub fn save_game(
 ) {
     let (
         name_query,
-        quarry_query,
         storage_query,
         coke_furnace_query,
         blast_furnace_query,
@@ -74,14 +70,6 @@ pub fn save_game(
                 } else {
                     None
                 };
-
-                if let Ok(building) = quarry_query.get(entity) {
-                    state.entities.push(GameEntity {
-                        pos,
-                        name: name.clone(),
-                        entity: GameEntityType::Building(Building::Quarry(building.clone())),
-                    });
-                }
 
                 if let Ok(building) = storage_query.get(entity) {
                     state.entities.push(GameEntity {

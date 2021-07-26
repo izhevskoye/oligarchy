@@ -100,12 +100,7 @@ fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameStat
                         .insert(Occupied);
 
                     match building {
-                        Building::Quarry(c) => {
-                            commands
-                                .entity(entity)
-                                .insert(c)
-                                .insert(StorageConsolidator::default());
-                        }
+                        // TODO: Building
                         Building::Street(c) => {
                             commands.entity(entity).insert(c);
                         }

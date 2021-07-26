@@ -3,8 +3,7 @@ use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
     assets::{
-        BlastFurnace, CokeFurnace, Editable, ExportStation, InfoUI, Name, OxygenConverter, Quarry,
-        Storage,
+        BlastFurnace, CokeFurnace, Editable, ExportStation, InfoUI, Name, OxygenConverter, Storage,
     },
     car::Car,
     current_selection::CurrentlySelected,
@@ -19,6 +18,8 @@ where
     }
 }
 
+// TODO: Building info needed!
+
 #[allow(clippy::type_complexity)]
 pub fn info_ui(
     egui_context: ResMut<EguiContext>,
@@ -28,7 +29,6 @@ pub fn info_ui(
         Query<&Car>,
         Query<&Storage>,
         Query<&ExportStation>,
-        Query<&Quarry>,
         Query<&CokeFurnace>,
         Query<&BlastFurnace>,
         Query<&OxygenConverter>,
@@ -45,7 +45,6 @@ pub fn info_ui(
         query_resolve(&mut items, queries.5.get(entity));
         query_resolve(&mut items, queries.6.get(entity));
         query_resolve(&mut items, queries.7.get(entity));
-        query_resolve(&mut items, queries.8.get(entity));
 
         if !items.is_empty() {
             egui::SidePanel::left("side_panel")

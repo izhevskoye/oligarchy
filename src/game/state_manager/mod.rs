@@ -10,15 +10,12 @@ use bevy_egui::{
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
-    assets::{
-        BlastFurnace, CokeFurnace, ExportStation, Name, OxygenConverter, Quarry, Storage, Street,
-    },
+    assets::{BlastFurnace, CokeFurnace, ExportStation, Name, OxygenConverter, Storage, Street},
     car::Car,
 };
 
 #[derive(Serialize, Deserialize)]
 pub enum Building {
-    Quarry(Quarry),
     Storage(Storage),
     CokeFurnace(CokeFurnace),
     BlastFurnace(BlastFurnace),
@@ -56,7 +53,6 @@ pub fn save_ui(
     mut commands: Commands,
     queries: (
         Query<&Name>,
-        Query<&Quarry>,
         Query<&Storage>,
         Query<&CokeFurnace>,
         Query<&BlastFurnace>,
@@ -75,7 +71,7 @@ pub fn save_ui(
                 save_game::save_game(&queries, &mut map_query);
             }
             if ui.button("load").clicked() {
-                load_game::load_game(&mut commands, &mut map_query, &queries.8);
+                load_game::load_game(&mut commands, &mut map_query, &queries.7);
             }
         });
 }
