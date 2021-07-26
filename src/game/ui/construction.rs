@@ -91,22 +91,6 @@ pub fn construction_ui(
                 ui.end_row();
             });
 
-            ui.heading("Furnace");
-
-            egui::Grid::new("furnace").show(ui, |ui| {
-                if ui.small_button("Coke Furnace").clicked() {
-                    selected_tool.tool = Tool::CokeFurnace;
-                }
-                if ui.small_button("Blast Furnace").clicked() {
-                    selected_tool.tool = Tool::BlastFurnace;
-                }
-                ui.end_row();
-                if ui.small_button("Oxygen Converter").clicked() {
-                    selected_tool.tool = Tool::OxygenConverter;
-                }
-                ui.end_row();
-            });
-
             ui.heading("Buildings");
 
             egui::Grid::new("buildings").show(ui, |ui| {
@@ -115,7 +99,7 @@ pub fn construction_ui(
                         selected_tool.tool = Tool::Building(id.clone());
                     }
 
-                    if index != 0 && index % 1 == 0 {
+                    if (index + 1) % 2 == 0 {
                         ui.end_row();
                     }
                 }

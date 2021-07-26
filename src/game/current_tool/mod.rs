@@ -1,10 +1,7 @@
-mod blast_furnace;
 mod building;
 mod bulldoze;
 mod car;
-mod coke_furnace;
 mod export_station;
-mod oxygen_converter;
 mod storage;
 mod street;
 
@@ -63,9 +60,6 @@ pub fn current_tool_system() -> SystemSet {
     SystemSet::new()
         .with_system(street::street_placement.system())
         .with_system(storage::storage_placement.system())
-        .with_system(coke_furnace::coke_furnace_placement.system())
-        .with_system(blast_furnace::blast_furnace_placement.system())
-        .with_system(oxygen_converter::oxygen_converter_placement.system())
         .with_system(export_station::export_station_placement.system())
         .with_system(car::car_placement.system())
         .with_system(building::building_placement.system())

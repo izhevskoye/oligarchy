@@ -74,10 +74,7 @@ impl Game {
                     .before(Label::UpdateEnd)
                     .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::storage_update.system())
-                    .with_system(asset_tiles::coke_furnace_update.system())
-                    .with_system(asset_tiles::blast_furnace_update.system())
                     .with_system(asset_tiles::export_station_update.system())
-                    .with_system(asset_tiles::oxygen_converter_update.system())
                     .with_system(street::update_streets.system())
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::update_car.system()),

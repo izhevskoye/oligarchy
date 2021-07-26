@@ -15,3 +15,29 @@
   tile: 7
   products:
     - resource: Limestone
+
+"coke_furnace":
+  name: Coke Furnace
+  tile: 9
+  products:
+    - resource: Coke
+      requisites:
+        - Coal
+
+"blast_furnace":
+  name: Blast Furnace
+  tile: 4
+  products:
+    - resource: Iron
+      requisites:
+        - Coke
+        - Limestone
+        - IronOre
+
+"oxygen_converter":
+  name: Oxygen Converter
+  tile: 8
+  products:
+    - resource: Steel
+      requisites:
+        - Iron

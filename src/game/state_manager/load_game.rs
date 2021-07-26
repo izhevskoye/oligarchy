@@ -104,26 +104,8 @@ fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameStat
                         Building::Street(c) => {
                             commands.entity(entity).insert(c);
                         }
-                        Building::OxygenConverter(c) => {
-                            commands
-                                .entity(entity)
-                                .insert(c)
-                                .insert(StorageConsolidator::default());
-                        }
                         Building::Storage(c) => {
                             commands.entity(entity).insert(c);
-                        }
-                        Building::BlastFurnace(c) => {
-                            commands
-                                .entity(entity)
-                                .insert(c)
-                                .insert(StorageConsolidator::default());
-                        }
-                        Building::CokeFurnace(c) => {
-                            commands
-                                .entity(entity)
-                                .insert(c)
-                                .insert(StorageConsolidator::default());
                         }
                         Building::ExportStation(c) => {
                             commands

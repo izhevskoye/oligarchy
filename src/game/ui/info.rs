@@ -2,9 +2,7 @@ use bevy::{ecs::query::QueryEntityError, prelude::*};
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{
-        BlastFurnace, CokeFurnace, Editable, ExportStation, InfoUI, Name, OxygenConverter, Storage,
-    },
+    assets::{Editable, ExportStation, InfoUI, Name, Storage},
     car::Car,
     current_selection::CurrentlySelected,
 };
@@ -29,9 +27,6 @@ pub fn info_ui(
         Query<&Car>,
         Query<&Storage>,
         Query<&ExportStation>,
-        Query<&CokeFurnace>,
-        Query<&BlastFurnace>,
-        Query<&OxygenConverter>,
     ),
     mut currently_selected: ResMut<CurrentlySelected>,
 ) {
@@ -42,9 +37,6 @@ pub fn info_ui(
         query_resolve(&mut items, queries.2.get(entity));
         query_resolve(&mut items, queries.3.get(entity));
         query_resolve(&mut items, queries.4.get(entity));
-        query_resolve(&mut items, queries.5.get(entity));
-        query_resolve(&mut items, queries.6.get(entity));
-        query_resolve(&mut items, queries.7.get(entity));
 
         if !items.is_empty() {
             egui::SidePanel::left("side_panel")

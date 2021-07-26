@@ -5,7 +5,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use super::{Building, GameEntity, GameEntityType, GameState, Vehicle};
 use crate::game::{
-    assets::{BlastFurnace, CokeFurnace, ExportStation, Name, OxygenConverter, Storage, Street},
+    assets::{ExportStation, Name, Storage, Street},
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -15,25 +15,13 @@ pub fn save_game(
     queries: &(
         Query<&Name>,
         Query<&Storage>,
-        Query<&CokeFurnace>,
-        Query<&BlastFurnace>,
         Query<&ExportStation>,
-        Query<&OxygenConverter>,
         Query<&Street>,
         Query<(Entity, &Car)>,
     ),
     map_query: &mut MapQuery,
 ) {
-    let (
-        name_query,
-        storage_query,
-        coke_furnace_query,
-        blast_furnace_query,
-        export_station_query,
-        oxygen_converter_query,
-        street_query,
-        car_query,
-    ) = queries;
+    let (name_query, storage_query, export_station_query, street_query, car_query) = queries;
 
     let mut state = GameState::default();
 
@@ -79,37 +67,11 @@ pub fn save_game(
                     });
                 }
 
-                if let Ok(building) = coke_furnace_query.get(entity) {
-                    state.entities.push(GameEntity {
-                        pos,
-                        name: name.clone(),
-                        entity: GameEntityType::Building(Building::CokeFurnace(building.clone())),
-                    });
-                }
-
-                if let Ok(building) = blast_furnace_query.get(entity) {
-                    state.entities.push(GameEntity {
-                        pos,
-                        name: name.clone(),
-                        entity: GameEntityType::Building(Building::BlastFurnace(building.clone())),
-                    });
-                }
-
                 if let Ok(building) = export_station_query.get(entity) {
                     state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
                         entity: GameEntityType::Building(Building::ExportStation(building.clone())),
-                    });
-                }
-
-                if let Ok(building) = oxygen_converter_query.get(entity) {
-                    state.entities.push(GameEntity {
-                        pos,
-                        name: name.clone(),
-                        entity: GameEntityType::Building(Building::OxygenConverter(
-                            building.clone(),
-                        )),
                     });
                 }
 
