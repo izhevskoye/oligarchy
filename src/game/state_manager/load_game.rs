@@ -4,17 +4,19 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Editable, Occupied, RequiresUpdate, StorageConsolidator},
+    assets::{Editable, Occupied, ProductionBuilding, RequiresUpdate, StorageConsolidator},
+    building_specifications::BuildingSpecifications,
     car::Car,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
     setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
-    state_manager::{Building, GameEntityType, GameState},
+    state_manager::{BuildingEntity, GameEntityType, GameState},
 };
 
 pub fn load_game(
     commands: &mut Commands,
     map_query: &mut MapQuery,
     car_query: &Query<(Entity, &Car)>,
+    buildings: &Res<BuildingSpecifications>,
 ) {
     let path = Path::new("world.yaml");
     let mut file = match File::open(&path) {
@@ -33,7 +35,7 @@ pub fn load_game(
     match state {
         Ok(state) => {
             reset_state(commands, map_query, car_query);
-            load_state(commands, map_query, state);
+            load_state(commands, map_query, state, buildings);
         }
         Err(why) => log::error!("Could not load state: {}", why),
     }
@@ -70,7 +72,12 @@ fn reset_state(
     }
 }
 
-fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameState) {
+fn load_state(
+    commands: &mut Commands,
+    map_query: &mut MapQuery,
+    state: GameState,
+    buildings: &Res<BuildingSpecifications>,
+) {
     for game_entity in state.entities {
         let tile = Tile {
             visible: false,
@@ -100,14 +107,26 @@ fn load_state(commands: &mut Commands, map_query: &mut MapQuery, state: GameStat
                         .insert(Occupied);
 
                     match building {
-                        // TODO: Building
-                        Building::Street(c) => {
+                        BuildingEntity::Building(c) => {
+                            let building = buildings.get(&c.id).unwrap();
+                            commands.entity(entity).insert(c);
+
+                            if !building.products.is_empty() {
+                                commands
+                                    .entity(entity)
+                                    .insert(StorageConsolidator::default())
+                                    .insert(ProductionBuilding {
+                                        products: building.products.clone(),
+                                    });
+                            }
+                        }
+                        BuildingEntity::Street(c) => {
                             commands.entity(entity).insert(c);
                         }
-                        Building::Storage(c) => {
+                        BuildingEntity::Storage(c) => {
                             commands.entity(entity).insert(c);
                         }
-                        Building::ExportStation(c) => {
+                        BuildingEntity::ExportStation(c) => {
                             commands
                                 .entity(entity)
                                 .insert(c)

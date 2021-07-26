@@ -30,7 +30,6 @@ pub fn drive_to_destination(
             Direction::None
         };
 
-        // TODO: better :)
         if direction == Direction::North && car.position.x % 2 == 0 {
             direction = Direction::East;
         } else if direction == Direction::South && car.position.x % 2 == 1 {

@@ -10,15 +10,17 @@ use bevy_egui::{
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
-    assets::{ExportStation, Name, Storage, Street},
+    assets::{Building, ExportStation, Name, Storage, Street},
+    building_specifications::BuildingSpecifications,
     car::Car,
 };
 
 #[derive(Serialize, Deserialize)]
-pub enum Building {
+pub enum BuildingEntity {
     Storage(Storage),
     ExportStation(ExportStation),
     Street(Street),
+    Building(Building),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -29,7 +31,7 @@ pub struct Vehicle {
 
 #[derive(Serialize, Deserialize)]
 pub enum GameEntityType {
-    Building(Building),
+    Building(BuildingEntity),
     Vehicle(Vehicle),
 }
 
@@ -50,13 +52,15 @@ pub fn save_ui(
     mut commands: Commands,
     queries: (
         Query<&Name>,
+        Query<(Entity, &Car)>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Street>,
-        Query<(Entity, &Car)>,
+        Query<&Building>,
     ),
     egui_context: ResMut<EguiContext>,
     mut map_query: MapQuery,
+    buildings: Res<BuildingSpecifications>,
 ) {
     egui::Window::new("Game")
         .anchor(Align2::RIGHT_BOTTOM, [-10.0, -10.0])
@@ -65,7 +69,7 @@ pub fn save_ui(
                 save_game::save_game(&queries, &mut map_query);
             }
             if ui.button("load").clicked() {
-                load_game::load_game(&mut commands, &mut map_query, &queries.4);
+                load_game::load_game(&mut commands, &mut map_query, &queries.1, &buildings);
             }
         });
 }

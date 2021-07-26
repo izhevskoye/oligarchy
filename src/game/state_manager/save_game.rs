@@ -3,25 +3,27 @@ use std::{fs::File, io::prelude::*, path::Path};
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
-use super::{Building, GameEntity, GameEntityType, GameState, Vehicle};
 use crate::game::{
-    assets::{ExportStation, Name, Storage, Street},
+    assets::{Building, ExportStation, Name, Storage, Street},
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
+    state_manager::{BuildingEntity, GameEntity, GameEntityType, GameState, Vehicle},
 };
 
 #[allow(clippy::type_complexity)]
 pub fn save_game(
     queries: &(
         Query<&Name>,
+        Query<(Entity, &Car)>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Street>,
-        Query<(Entity, &Car)>,
+        Query<&Building>,
     ),
     map_query: &mut MapQuery,
 ) {
-    let (name_query, storage_query, export_station_query, street_query, car_query) = queries;
+    let (name_query, car_query, storage_query, export_station_query, street_query, building_query) =
+        queries;
 
     let mut state = GameState::default();
 
@@ -59,11 +61,21 @@ pub fn save_game(
                     None
                 };
 
+                if let Ok(building) = building_query.get(entity) {
+                    state.entities.push(GameEntity {
+                        pos,
+                        name: name.clone(),
+                        entity: GameEntityType::Building(BuildingEntity::Building(
+                            building.clone(),
+                        )),
+                    });
+                }
+
                 if let Ok(building) = storage_query.get(entity) {
                     state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        entity: GameEntityType::Building(Building::Storage(building.clone())),
+                        entity: GameEntityType::Building(BuildingEntity::Storage(building.clone())),
                     });
                 }
 
@@ -71,7 +83,9 @@ pub fn save_game(
                     state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        entity: GameEntityType::Building(Building::ExportStation(building.clone())),
+                        entity: GameEntityType::Building(BuildingEntity::ExportStation(
+                            building.clone(),
+                        )),
                     });
                 }
 
@@ -79,7 +93,7 @@ pub fn save_game(
                     state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
-                        entity: GameEntityType::Building(Building::Street(building.clone())),
+                        entity: GameEntityType::Building(BuildingEntity::Street(building.clone())),
                     });
                 }
             }
