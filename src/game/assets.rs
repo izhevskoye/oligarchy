@@ -13,12 +13,39 @@ pub enum Resource {
     Steel,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Quarry {
-    pub resource: Resource,
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BuildingSpecification {
+    pub name: String,
+    pub tile: u16,
+    pub products: Vec<Product>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Building {
+    pub id: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Product {
+    pub resource: Resource,
+    // TODO:
+    // pub rate: i64,
+    #[serde(default)]
+    pub requisites: Vec<Resource>,
+}
+
+// TODO: implicit through spec instead?
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ProductionBuilding {
+    pub products: Vec<Product>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Storage {
     pub resource: Resource,
     pub amount: i64,
@@ -30,25 +57,18 @@ pub struct StorageConsolidator {
     pub connected_storage: Vec<Entity>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct CokeFurnace;
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct BlastFurnace;
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct OxygenConverter;
-
 pub struct RequiresUpdate {
     pub position: UVec2,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct ExportStation {
     pub goods: Vec<Resource>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Street;
 
 #[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
@@ -66,12 +86,9 @@ pub enum Tool {
     Bulldoze,
     Street,
     Storage(Resource),
-    Quarry(Resource),
-    CokeFurnace,
-    BlastFurnace,
-    OxygenConverter,
     ExportStation,
     Car(Resource),
+    Building(String),
 }
 
 pub struct SelectedTool {
@@ -95,6 +112,7 @@ pub struct ClickedTile {
 pub struct Occupied;
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Name(String);
 
 pub struct Editable;
@@ -128,34 +146,8 @@ impl InfoUI for ExportStation {
     }
 }
 
-impl InfoUI for Quarry {
+impl InfoUI for BuildingSpecification {
     fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label(format!("{:?} Quarry", self.resource));
-        });
-    }
-}
-
-impl InfoUI for CokeFurnace {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Coke Furnace");
-        });
-    }
-}
-
-impl InfoUI for BlastFurnace {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Blast Furnace");
-        });
-    }
-}
-
-impl InfoUI for OxygenConverter {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Oxygen Converter");
-        });
+        ui.heading(&self.name);
     }
 }
