@@ -5,6 +5,7 @@ mod instructions;
 use bevy::{core::FixedTimestep, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::egui::Ui;
+use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -22,6 +23,30 @@ pub struct Destination {
 
 pub struct Waypoints {
     pub waypoints: Vec<UVec2>,
+    pub blocked_ticks: i64,
+}
+
+impl Waypoints {
+    pub fn new(waypoints: Vec<UVec2>) -> Self {
+        Self {
+            waypoints,
+            blocked_ticks: 0,
+        }
+    }
+
+    pub fn mark_unblocked(&mut self) {
+        self.blocked_ticks = 0;
+    }
+
+    pub fn mark_blocked(&mut self) {
+        self.blocked_ticks += 1;
+    }
+
+    pub fn considered_deadlocked(&self) -> bool {
+        let mut random = thread_rng();
+
+        random.gen_range(0..20) <= self.blocked_ticks - 10
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]

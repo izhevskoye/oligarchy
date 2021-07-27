@@ -105,7 +105,7 @@ pub fn calculate_destination(
 
             commands
                 .entity(car_entity)
-                .insert(Waypoints { waypoints })
+                .insert(Waypoints::new(waypoints))
                 .remove::<Destination>();
         } else {
             log::error!("No path found for car!");
