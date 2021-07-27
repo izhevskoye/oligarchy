@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use rand::{thread_rng, Rng};
 
 use crate::game::{
     assets::{Direction, RequiresUpdate},
@@ -105,6 +106,14 @@ pub fn drive_to_destination(
                 Direction::South => c_pos + IVec2::new(1, 0),
                 Direction::None => c_pos + IVec2::new(1, 0),
             };
+
+            let mut random = thread_rng();
+            // randomize sometimes to prevent some deadlock situations
+            if random.gen_range(0..3) == 0 {
+                move_away_position.x += random.gen_range(-3..3);
+                move_away_position.y += random.gen_range(-3..3);
+            }
+
             if move_away_position.x < 0 {
                 move_away_position.x = 0;
             }

@@ -45,7 +45,7 @@ impl Waypoints {
     pub fn considered_deadlocked(&self) -> bool {
         let mut random = thread_rng();
 
-        random.gen_range(0..20) <= self.blocked_ticks - 10
+        random.gen_range(0..20) <= self.blocked_ticks - 25
     }
 }
 
