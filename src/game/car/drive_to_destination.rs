@@ -69,6 +69,9 @@ pub fn drive_to_destination(
 
         if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
+            waypoint.mark_blocked();
+        } else {
+            waypoint.mark_unblocked();
         }
 
         if can_drive_to_new_pos {
@@ -85,6 +88,38 @@ pub fn drive_to_destination(
             commands.entity(car_entity).insert(RequiresUpdate {
                 position: car.position,
             });
+        }
+
+        if waypoint.considered_deadlocked() {
+            log::error!("Car considered deadlocked. Moving away.");
+
+            let (_entity, layer) = map_query.get_layer(MAP_ID, VEHICLE_LAYER_ID).unwrap();
+            let size = layer.get_layer_size_in_tiles().as_i32();
+
+            // move into opposite
+            let c_pos = c_pos.as_i32();
+            let mut move_away_position = match direction {
+                Direction::West => c_pos + IVec2::new(0, 1),
+                Direction::East => c_pos + IVec2::new(0, -1),
+                Direction::North => c_pos + IVec2::new(-1, 0),
+                Direction::South => c_pos + IVec2::new(1, 0),
+                Direction::None => c_pos + IVec2::new(1, 0),
+            };
+            if move_away_position.x < 0 {
+                move_away_position.x = 0;
+            }
+            if move_away_position.x >= size.x {
+                move_away_position.x = size.x;
+            }
+            if move_away_position.y < 0 {
+                move_away_position.y = 0;
+            }
+            if move_away_position.y >= size.y {
+                move_away_position.y = size.y;
+            }
+
+            waypoint.waypoints = vec![move_away_position.as_u32()];
+            waypoint.mark_unblocked();
         }
     }
 }
