@@ -103,6 +103,7 @@ impl Default for SelectedTool {
 
 #[derive(Default)]
 pub struct ClickedTile {
+    pub dragging: bool,
     pub pos: Option<UVec2>,
     pub vehicle_pos: Option<UVec2>,
     pub occupied_building: bool,

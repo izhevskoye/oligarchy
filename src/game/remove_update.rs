@@ -8,12 +8,15 @@ use super::{
 
 pub fn remove_update(
     mut commands: Commands,
-    query: Query<(Entity, &RequiresUpdate)>,
+    query: Query<(Entity, &RequiresUpdate, Option<&Tile>)>,
     mut map_query: MapQuery,
 ) {
-    for (entity, update) in query.iter() {
+    for (entity, update, tile) in query.iter() {
         commands.entity(entity).remove::<RequiresUpdate>();
+
         // TODO: is it always a building?
-        map_query.notify_chunk_for_tile(update.position, MAP_ID, BUILDING_LAYER_ID);
+        if tile.is_some() {
+            map_query.notify_chunk_for_tile(update.position, MAP_ID, BUILDING_LAYER_ID);
+        }
     }
 }

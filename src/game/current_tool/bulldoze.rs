@@ -17,6 +17,10 @@ pub fn bulldoze(
     street_query: Query<&Street>,
     car_query: Query<(Entity, &Car)>,
 ) {
+    if clicked_tile.dragging {
+        return;
+    }
+
     if Tool::Bulldoze == selected_tool.tool {
         if clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {

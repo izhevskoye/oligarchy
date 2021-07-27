@@ -71,7 +71,7 @@ pub fn calculate_destination(
             .collect();
 
         if !changes.is_empty() {
-            log::info!("Updating pathfinding cache");
+            log::info!("Updating pathfinding cache: {:?}", changes);
             pathfinding.tiles_changed(
                 &changes,
                 cost_fn(&map_query, &street_query, &occupied_query),

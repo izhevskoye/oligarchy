@@ -16,6 +16,10 @@ pub fn car_placement(
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
 ) {
+    if clicked_tile.dragging {
+        return;
+    }
+
     if let Tool::Car(resource) = selected_tool.tool {
         if !clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {

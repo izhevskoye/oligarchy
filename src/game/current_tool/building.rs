@@ -19,6 +19,10 @@ pub fn building_placement(
     clicked_tile: Res<ClickedTile>,
     buildings: Res<BuildingSpecifications>,
 ) {
+    if clicked_tile.dragging {
+        return;
+    }
+
     if let Tool::Building(id) = &selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {

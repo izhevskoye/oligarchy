@@ -44,7 +44,7 @@ pub fn mouse_pos_to_tile(
         return;
     }
 
-    if !mouse_input.just_pressed(MouseButton::Left) {
+    if !mouse_input.pressed(MouseButton::Left) {
         return;
     }
 
@@ -56,6 +56,7 @@ pub fn mouse_pos_to_tile(
 
         clicked_tile.pos = eval_pos(x, y, 1);
         clicked_tile.vehicle_pos = eval_pos(x, y, 2);
+        clicked_tile.dragging = !mouse_input.just_pressed(MouseButton::Left);
 
         if let Some(pos) = clicked_tile.pos {
             clicked_tile.occupied_building =

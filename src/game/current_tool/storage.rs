@@ -17,6 +17,10 @@ pub fn storage_placement(
     consolidator_query: Query<Entity, With<StorageConsolidator>>,
     clicked_tile: Res<ClickedTile>,
 ) {
+    if clicked_tile.dragging {
+        return;
+    }
+
     if let Tool::Storage(resource) = selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
