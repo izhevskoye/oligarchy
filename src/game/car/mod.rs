@@ -30,6 +30,8 @@ pub enum CarInstructions {
     GoTo(UVec2),
     WaitForLoad(Resource),
     WaitForUnload(Resource),
+    Load(Resource),
+    Unload(Resource),
 }
 
 impl fmt::Display for CarInstructions {
@@ -39,6 +41,8 @@ impl fmt::Display for CarInstructions {
             CarInstructions::GoTo(position) => write!(f, "Drive to {}", position),
             CarInstructions::WaitForLoad(resource) => write!(f, "Wait to load {:?}", resource),
             CarInstructions::WaitForUnload(resource) => write!(f, "Wait to unload {:?}", resource),
+            CarInstructions::Load(resource) => write!(f, "Load {:?}", resource),
+            CarInstructions::Unload(resource) => write!(f, "Unload {:?}", resource),
         }
     }
 }

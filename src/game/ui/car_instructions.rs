@@ -70,9 +70,23 @@ pub fn program_ui(
                         edit_instruction.confirm_selection();
                     }
 
+                    if ui.button("Unload").clicked() {
+                        car.instructions[selected_index] =
+                            CarInstructions::Unload(edit_instruction.resource);
+                        currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
+                    }
+
                     if ui.button("Wait For Unload").clicked() {
                         car.instructions[selected_index] =
                             CarInstructions::WaitForUnload(edit_instruction.resource);
+                        currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
+                    }
+
+                    if ui.button("Load").clicked() {
+                        car.instructions[selected_index] =
+                            CarInstructions::Load(edit_instruction.resource);
                         currently_selected.locked = false;
                         edit_instruction.confirm_selection();
                     }
