@@ -5,7 +5,7 @@ use bevy::{
 };
 use bevy_egui::EguiContext;
 
-use super::assets::{SelectedTool, Tool};
+use crate::game::assets::{SelectedTool, Tool};
 
 // A simple camera system for moving and zooming the camera.
 #[allow(clippy::too_many_arguments)]
@@ -13,6 +13,7 @@ pub fn movement(
     time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,
     mouse_input: Res<Input<MouseButton>>,
+    windows: Res<Windows>,
     mut ev_scroll: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: Query<&mut Transform, With<Camera>>,
@@ -30,7 +31,6 @@ pub fn movement(
     let mut transform = query.single_mut().unwrap();
 
     let mut direction = Vec3::ZERO;
-    let scale = transform.scale.x;
 
     let mut delta_since = Vec2::ZERO;
     for MouseMotion { delta } in mouse_motion_events.iter() {
@@ -61,29 +61,41 @@ pub fn movement(
         direction -= Vec3::new(0.0, 1.0, 0.0);
     }
 
-    if keyboard_input.pressed(KeyCode::Z) {
-        let scale = scale + 0.05;
-        transform.scale = Vec3::splat(scale);
-    }
-
-    if keyboard_input.pressed(KeyCode::X) {
-        let scale = scale - 0.05;
-        transform.scale = Vec3::splat(scale);
-    }
-
     let mut scroll = 0.0;
     for ev in ev_scroll.iter() {
         scroll += ev.y;
     }
-    let scale = scale + scroll * time.delta_seconds() * 0.4;
-    transform.scale = Vec3::splat(scale);
 
-    if transform.scale.x > 1.5 {
-        transform.scale = Vec3::splat(1.5)
+    let mut scale = transform.scale.x + scroll * time.delta_seconds() * 0.4;
+
+    let win = windows.get_primary().expect("no primary window");
+
+    if scale > 1.5 {
+        scale = 1.5;
     }
 
-    if transform.scale.x < 0.1 {
-        transform.scale = Vec3::splat(0.1)
+    if scale < 0.1 {
+        scale = 0.1;
+    }
+
+    if scroll != 0.0 {
+        if let Some(cursor) = win.cursor_position() {
+            let mut cursor = cursor;
+            cursor.x += win.width() / 2.0;
+            cursor.y += win.height() / 2.0;
+            let mouse_in_world = Vec2::new(
+                ((cursor.x - win.width()) * transform.scale.x) + transform.translation.x,
+                ((cursor.y - win.height()) * transform.scale.x) + transform.translation.y,
+            );
+
+            let new_x = mouse_in_world.x - ((cursor.x - win.width()) * scale);
+            let new_y = mouse_in_world.y - ((cursor.y - win.height()) * scale);
+
+            transform.translation.x = new_x;
+            transform.translation.y = new_y;
+
+            transform.scale = Vec3::splat(scale);
+        }
     }
 
     transform.translation += time.delta_seconds() * direction * 500.;
