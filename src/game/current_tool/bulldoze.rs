@@ -4,7 +4,8 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     assets::{ClickedTile, SelectedTool, Street, Tool},
     car::Car,
-    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
+    constants::MapTile,
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
 };
 
 use super::update_neighbor_streets;
@@ -16,6 +17,7 @@ pub fn bulldoze(
     clicked_tile: Res<ClickedTile>,
     street_query: Query<&Street>,
     car_query: Query<(Entity, &Car)>,
+    mut tile_query: Query<&mut Tile>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -39,6 +41,15 @@ pub fn bulldoze(
                 map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
 
                 update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
+
+                let entity = map_query
+                    .get_tile_entity(pos, MAP_ID, GROUND_LAYER_ID)
+                    .unwrap();
+
+                let mut tile = tile_query.get_mut(entity).unwrap();
+                tile.texture_index = MapTile::Ground as u16;
+
+                map_query.notify_chunk_for_tile(pos, MAP_ID, GROUND_LAYER_ID);
             }
         }
     }

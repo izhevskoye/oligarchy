@@ -6,7 +6,7 @@ use super::constants::{
 };
 
 pub const MAP_ID: u16 = 0;
-pub const LAYER_ID: u16 = 0;
+pub const GROUND_LAYER_ID: u16 = 0;
 pub const BUILDING_LAYER_ID: u16 = 1;
 pub const VEHICLE_LAYER_ID: u16 = 2;
 
@@ -38,9 +38,13 @@ pub fn setup_map(
     let map_entity = commands.spawn().id();
     let mut map = Map::new(MAP_ID, map_entity);
 
-    let (mut layer_builder, layer_entity) =
-        LayerBuilder::<TileBundle>::new(&mut commands, map_settings.clone(), MAP_ID, LAYER_ID);
-    map.add_layer(&mut commands, LAYER_ID, layer_entity);
+    let (mut layer_builder, layer_entity) = LayerBuilder::<TileBundle>::new(
+        &mut commands,
+        map_settings.clone(),
+        MAP_ID,
+        GROUND_LAYER_ID,
+    );
+    map.add_layer(&mut commands, GROUND_LAYER_ID, layer_entity);
 
     layer_builder.fill(
         UVec2::new(0, 0),

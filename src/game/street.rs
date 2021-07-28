@@ -62,15 +62,23 @@ impl From<NeighborStructure> for u16 {
             return MapTile::StreetEastWest as u16;
         }
 
-        if ns.north || ns.south {
-            return MapTile::StreetNorthSouth as u16;
+        if ns.north {
+            return MapTile::StreetNorthEnd as u16;
         }
 
-        if ns.west || ns.east {
-            return MapTile::StreetEastWest as u16;
+        if ns.south {
+            return MapTile::StreetSouthEnd as u16;
         }
 
-        MapTile::StreetNorthEastSouthWest as u16
+        if ns.west {
+            return MapTile::StreetWestEnd as u16;
+        }
+
+        if ns.east {
+            return MapTile::StreetEastEnd as u16;
+        }
+
+        MapTile::StreetNone as u16
     }
 }
 
