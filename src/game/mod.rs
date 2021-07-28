@@ -75,6 +75,7 @@ impl Game {
                     .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::export_station_update.system())
+                    .with_system(asset_tiles::ground_update.system())
                     .with_system(street::update_streets.system())
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::update_car.system()),
