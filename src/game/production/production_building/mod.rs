@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use bevy::prelude::*;
 
 use crate::game::{
