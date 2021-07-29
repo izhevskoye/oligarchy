@@ -1,5 +1,5 @@
 use super::*;
-use crate::game::assets::{Product, Resource, Storage};
+use crate::game::assets::{Product, Storage};
 use bevy::prelude::*;
 
 #[test]
@@ -11,11 +11,14 @@ fn produces_resource() {
     let mut stage = SystemStage::parallel();
     stage.add_system(production_building.system());
 
+    let coke = "coke".to_owned();
+    let coal = "coal".to_owned();
+
     // Setup test entities
     let coke_storage_id = world
         .spawn()
         .insert(Storage {
-            resource: Resource::Coke,
+            resource: coke.clone(),
             amount: 0,
             capacity: 10,
         })
@@ -25,7 +28,7 @@ fn produces_resource() {
     let coal_storage_id = world
         .spawn()
         .insert(Storage {
-            resource: Resource::Coal,
+            resource: coal.clone(),
             amount: 10,
             capacity: 10,
         })
@@ -35,8 +38,8 @@ fn produces_resource() {
         .spawn()
         .insert(ProductionBuilding {
             products: vec![Product {
-                resource: Resource::Coke,
-                requisites: vec![Resource::Coal],
+                resource: coke.clone(),
+                requisites: vec![coal.clone()],
             }],
         })
         .insert(StorageConsolidator {

@@ -21,7 +21,7 @@ pub fn storage_placement(
         return;
     }
 
-    if let Tool::Storage(resource) = selected_tool.tool {
+    if let Tool::Storage(resource) = &selected_tool.tool {
         if !clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
                 let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
@@ -29,7 +29,7 @@ pub fn storage_placement(
                 commands
                     .entity(entity)
                     .insert(Storage {
-                        resource,
+                        resource: resource.clone(),
                         amount: 0,
                         capacity: 20,
                     })

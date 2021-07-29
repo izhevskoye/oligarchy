@@ -1,0 +1,7 @@
+"oxygen_converter":
+  name: Oxygen Converter
+  tile: 8
+  products:
+    - resource: steel
+      requisites:
+        - iron

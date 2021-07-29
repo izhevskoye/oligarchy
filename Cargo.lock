@@ -2732,6 +2732,7 @@ dependencies = [
  "bevy_ecs_tilemap",
  "bevy_egui",
  "env_logger 0.9.0",
+ "glob",
  "hierarchical_pathfinding",
  "log",
  "num-derive",

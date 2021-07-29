@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        ClickedTile, Editable, ExportStation, Occupied, RequiresUpdate, Resource, SelectedTool,
+        ClickedTile, Editable, ExportStation, Occupied, RequiresUpdate, SelectedTool,
         StorageConsolidator, Tool,
     },
     setup::BUILDING_LAYER_ID,
@@ -27,16 +27,7 @@ pub fn export_station_placement(
 
             commands
                 .entity(entity)
-                .insert(ExportStation {
-                    goods: vec![
-                        Resource::Steel,
-                        Resource::Coal,
-                        Resource::Coke,
-                        Resource::Limestone,
-                        Resource::Iron,
-                        Resource::IronOre,
-                    ],
-                })
+                .insert(ExportStation { goods: vec![] })
                 .insert(StorageConsolidator::default())
                 .insert(RequiresUpdate { position: pos })
                 .insert(Editable)

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Resource, Storage},
+    assets::Storage,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -11,7 +11,7 @@ use super::{Car, CarInstructions, Destination, Waypoints};
 fn load(
     car_entity: Entity,
     car: &mut Mut<Car>,
-    resource: Resource,
+    resource: &str,
     storage_query: &mut Query<&mut Storage>,
     map_query: &MapQuery,
     wait_for_load: bool,
@@ -69,7 +69,7 @@ fn load(
 fn unload(
     car_entity: Entity,
     car: &mut Mut<Car>,
-    resource: Resource,
+    resource: &str,
     storage_query: &mut Query<&mut Storage>,
     map_query: &MapQuery,
     wait_for_unload: bool,
@@ -140,7 +140,7 @@ pub fn car_instruction(
             car.current_instruction = 0;
         }
 
-        match car.instructions[car.current_instruction] {
+        match car.instructions[car.current_instruction].clone() {
             CarInstructions::Nop => {}
             CarInstructions::GoTo(destination) => {
                 let car_pos = car.position / 2;
@@ -156,7 +156,7 @@ pub fn car_instruction(
                 load(
                     car_entity,
                     &mut car,
-                    resource,
+                    &resource,
                     &mut storage_query,
                     &map_query,
                     false,
@@ -166,7 +166,7 @@ pub fn car_instruction(
                 load(
                     car_entity,
                     &mut car,
-                    resource,
+                    &resource,
                     &mut storage_query,
                     &map_query,
                     true,
@@ -176,7 +176,7 @@ pub fn car_instruction(
                 unload(
                     car_entity,
                     &mut car,
-                    resource,
+                    &resource,
                     &mut storage_query,
                     &map_query,
                     false,
@@ -186,7 +186,7 @@ pub fn car_instruction(
                 unload(
                     car_entity,
                     &mut car,
-                    resource,
+                    &resource,
                     &mut storage_query,
                     &map_query,
                     true,

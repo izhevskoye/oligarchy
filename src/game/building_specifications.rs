@@ -1,3 +1,4 @@
+use glob::glob;
 use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
 use crate::game::assets::BuildingSpecification;
@@ -32,6 +33,8 @@ pub fn load_file(buildings: &mut BuildingSpecifications, file_name: &str) {
 
 pub fn load_specifications() -> BuildingSpecifications {
     let mut buildings = HashMap::new();
-    load_file(&mut buildings, "assets/buildings/quarry.yml");
+    for file in glob("assets/buildings/**/*.yml").expect("Failed to read files") {
+        load_file(&mut buildings, &format!("{}", file.unwrap().display()));
+    }
     buildings
 }

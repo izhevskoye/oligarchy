@@ -2,13 +2,14 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Building, ExportStation, RequiresUpdate, Resource, Storage},
+    assets::{Building, ExportStation, RequiresUpdate, Storage},
     building_specifications::BuildingSpecifications,
     constants::MapTile,
 };
 
 use super::{
     assets::Occupied,
+    resource_specifications::ResourceSpecifications,
     setup::{GROUND_LAYER_ID, MAP_ID},
 };
 
@@ -24,17 +25,16 @@ pub fn building_update(
     }
 }
 
-pub fn storage_update(mut query: Query<(&mut Tile, &Storage), With<RequiresUpdate>>) {
+pub fn storage_update(
+    mut query: Query<(&mut Tile, &Storage), With<RequiresUpdate>>,
+    resources: Res<ResourceSpecifications>,
+) {
     for (mut tile, storage) in query.iter_mut() {
-        tile.texture_index = match storage.resource {
-            Resource::Coal => MapTile::StorageCoal,
-            Resource::Coke => MapTile::StorageCoke,
-            Resource::Limestone => MapTile::StorageLimestone,
-            Resource::IronOre => MapTile::StorageIronOre,
-            Resource::Iron => MapTile::StorageIron,
-            Resource::Steel => MapTile::StorageSteel,
-            // _ => MapTile::Storage,
-        } as u16;
+        let resource = resources
+            .get(&storage.resource)
+            .unwrap_or_else(|| panic!("Expected {} resource to exist", storage.resource));
+
+        tile.texture_index = resource.storage_tile.unwrap_or(MapTile::Storage as u16);
         tile.visible = true;
     }
 }

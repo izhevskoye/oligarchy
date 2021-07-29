@@ -1,0 +1,7 @@
+"coke_furnace":
+  name: Coke Furnace
+  tile: 9
+  products:
+    - resource: coke
+      requisites:
+        - coal
