@@ -130,6 +130,7 @@ fn load_state(
                             commands
                                 .entity(entity)
                                 .insert(c)
+                                .insert(Editable)
                                 .insert(StorageConsolidator::default());
                         }
                     }
