@@ -11,8 +11,8 @@ fn produces_resource() {
     let mut stage = SystemStage::parallel();
     stage.add_system(production_building.system());
 
-    let coke = "coke".to_owned();
-    let coal = "coal".to_owned();
+    let coke = "coke";
+    let coal = "coal";
 
     // Setup test entities
     let coke_storage_id = world
