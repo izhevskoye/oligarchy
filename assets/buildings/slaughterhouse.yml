@@ -1,0 +1,11 @@
+"slaughterhouse":
+  name: Slaughterhouse
+  tile: 41
+  products:
+    - resource: pork
+      requisites:
+        - hogs
+
+    - resource: poultry
+      requisites:
+        - chicken

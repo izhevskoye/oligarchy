@@ -1,0 +1,8 @@
+"poultry_farm":
+  name: Poultry Farm
+  tile: 40
+  products:
+    - resource: eggs
+      # requisites:
+      # - sunflower.seeds
+    - resource: chicken

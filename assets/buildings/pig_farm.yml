@@ -1,0 +1,7 @@
+"pig_farm":
+  name: Pig Farm
+  tile: 24
+  products:
+    - resource: hogs
+      # requisites:
+      # - sunflower.seeds
