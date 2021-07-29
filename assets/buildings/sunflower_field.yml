@@ -1,0 +1,5 @@
+"sunflower_field":
+  name: Sunflower Field
+  tile: 22
+  products:
+    - resource: sunflower.seeds

@@ -1,0 +1,7 @@
+"vegetable_oil_processor":
+  name: Vegetable Oil Processor
+  tile: 23
+  products:
+    - resource: sunflower.oil
+      requisites:
+        - sunflower.seeds
