@@ -1,14 +1,19 @@
 "eggs":
   name: Eggs
+  storage_tile: 36
 
 "chicken":
   name: Chicken
+  storage_tile: 38
 
 "pork":
   name: Pork
+  storage_tile: 34
 
 "poultry":
   name: Poultry
+  storage_tile: 35
 
 "hogs":
   name: Hogs
+  storage_tile: 37
