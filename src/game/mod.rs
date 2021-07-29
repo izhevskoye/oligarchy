@@ -8,6 +8,7 @@ mod current_selection;
 mod current_tool;
 mod production;
 mod remove_update;
+mod resource_specifications;
 mod setup;
 mod state_manager;
 mod storage;
@@ -45,6 +46,7 @@ impl Game {
             .init_resource::<SelectedTool>()
             .init_resource::<ClickedTile>()
             .insert_resource(building_specifications::load_specifications())
+            .insert_resource(resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())

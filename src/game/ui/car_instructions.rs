@@ -2,26 +2,17 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{ClickedTile, Resource},
+    assets::ClickedTile,
     car::{Car, CarInstructions},
     current_selection::CurrentlySelected,
+    resource_specifications::ResourceSpecifications,
 };
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Default)]
 pub struct EditInstruction {
     pub index: Option<usize>,
-    pub resource: Resource,
+    pub resource: Option<String>,
     pub select_mode: bool,
-}
-
-impl Default for EditInstruction {
-    fn default() -> Self {
-        Self {
-            index: None,
-            resource: Resource::Coal,
-            select_mode: false,
-        }
-    }
 }
 
 impl EditInstruction {
@@ -37,6 +28,7 @@ pub fn program_ui(
     mut currently_selected: ResMut<CurrentlySelected>,
     mut edit_instruction: Local<EditInstruction>,
     clicked_tile: Res<ClickedTile>,
+    resources: Res<ResourceSpecifications>,
 ) {
     let mut open = false;
 
@@ -71,31 +63,39 @@ pub fn program_ui(
                     }
 
                     if ui.button("Unload").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::Unload(edit_instruction.resource);
-                        currently_selected.locked = false;
-                        edit_instruction.confirm_selection();
+                        if let Some(resource) = &edit_instruction.resource {
+                            car.instructions[selected_index] =
+                                CarInstructions::Unload(resource.clone());
+                            currently_selected.locked = false;
+                            edit_instruction.confirm_selection();
+                        }
                     }
 
                     if ui.button("Wait For Unload").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::WaitForUnload(edit_instruction.resource);
-                        currently_selected.locked = false;
-                        edit_instruction.confirm_selection();
+                        if let Some(resource) = &edit_instruction.resource {
+                            car.instructions[selected_index] =
+                                CarInstructions::WaitForUnload(resource.clone());
+                            currently_selected.locked = false;
+                            edit_instruction.confirm_selection();
+                        }
                     }
 
                     if ui.button("Load").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::Load(edit_instruction.resource);
-                        currently_selected.locked = false;
-                        edit_instruction.confirm_selection();
+                        if let Some(resource) = &edit_instruction.resource {
+                            car.instructions[selected_index] =
+                                CarInstructions::Load(resource.clone());
+                            currently_selected.locked = false;
+                            edit_instruction.confirm_selection();
+                        }
                     }
 
                     if ui.button("Wait for Load").clicked() {
-                        car.instructions[selected_index] =
-                            CarInstructions::WaitForLoad(edit_instruction.resource);
-                        currently_selected.locked = false;
-                        edit_instruction.confirm_selection();
+                        if let Some(resource) = &edit_instruction.resource {
+                            car.instructions[selected_index] =
+                                CarInstructions::WaitForLoad(resource.clone());
+                            currently_selected.locked = false;
+                            edit_instruction.confirm_selection();
+                        }
                     }
 
                     if ui.button("Go to").clicked() {
@@ -103,20 +103,13 @@ pub fn program_ui(
                         currently_selected.locked = true;
                     }
 
-                    ui.radio_value(&mut edit_instruction.resource, Resource::Coal, "Coal");
-                    ui.radio_value(&mut edit_instruction.resource, Resource::Coke, "Coke");
-                    ui.radio_value(
-                        &mut edit_instruction.resource,
-                        Resource::Limestone,
-                        "Limestone",
-                    );
-                    ui.radio_value(
-                        &mut edit_instruction.resource,
-                        Resource::IronOre,
-                        "Iron Ore",
-                    );
-                    ui.radio_value(&mut edit_instruction.resource, Resource::Iron, "Iron");
-                    ui.radio_value(&mut edit_instruction.resource, Resource::Steel, "Steel");
+                    for (id, resource) in resources.iter() {
+                        ui.radio_value(
+                            &mut edit_instruction.resource,
+                            Some(id.to_owned()),
+                            resource.name.clone(),
+                        );
+                    }
 
                     if ui.button("Abort").clicked() {
                         edit_instruction.confirm_selection();

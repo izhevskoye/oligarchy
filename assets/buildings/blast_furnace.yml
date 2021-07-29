@@ -1,0 +1,9 @@
+"blast_furnace":
+  name: Blast Furnace
+  tile: 4
+  products:
+    - resource: iron
+      requisites:
+        - coke
+        - limestone
+        - iron_ore

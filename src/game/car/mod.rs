@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 use super::{
-    assets::{Direction, InfoUI, RequiresUpdate, Resource},
+    assets::{Direction, InfoUI, RequiresUpdate},
     constants::VehicleTile,
     setup::{MAP_ID, VEHICLE_LAYER_ID},
 };
@@ -53,10 +53,10 @@ impl Waypoints {
 pub enum CarInstructions {
     Nop,
     GoTo(UVec2),
-    WaitForLoad(Resource),
-    WaitForUnload(Resource),
-    Load(Resource),
-    Unload(Resource),
+    WaitForLoad(String),
+    WaitForUnload(String),
+    Load(String),
+    Unload(String),
 }
 
 impl fmt::Display for CarInstructions {

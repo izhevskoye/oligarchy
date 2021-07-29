@@ -5,14 +5,16 @@ use bevy_egui::{
 };
 
 use crate::game::{
-    assets::{Resource, SelectedTool, Tool},
+    assets::{SelectedTool, Tool},
     building_specifications::BuildingSpecifications,
+    resource_specifications::ResourceSpecifications,
 };
 
 pub fn construction_ui(
     egui_context: ResMut<EguiContext>,
     mut selected_tool: ResMut<SelectedTool>,
     buildings: Res<BuildingSpecifications>,
+    resources: Res<ResourceSpecifications>,
 ) {
     egui::Window::new("Construction")
         .anchor(Align2::RIGHT_TOP, [-10.0, 10.0])
@@ -38,57 +40,33 @@ pub fn construction_ui(
             ui.heading("Cars");
 
             egui::Grid::new("cars").show(ui, |ui| {
-                if ui.small_button("Steel Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::Steel);
+                for (index, (id, resource)) in resources.iter().enumerate() {
+                    if ui
+                        .small_button(format!("{} Truck", resource.name))
+                        .clicked()
+                    {
+                        selected_tool.tool = Tool::Car(id.clone());
+                    }
+                    if (index + 1) % 2 == 0 {
+                        ui.end_row();
+                    }
                 }
-                if ui.small_button("Iron Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::Iron);
-                }
-                ui.end_row();
-
-                if ui.small_button("Iron Ore Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::IronOre);
-                }
-                if ui.small_button("Coal Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::Coal);
-                }
-                ui.end_row();
-
-                if ui.small_button("Coke Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::Coke);
-                }
-                if ui.small_button("Limestone Truck").clicked() {
-                    selected_tool.tool = Tool::Car(Resource::Limestone);
-                }
-                ui.end_row();
             });
 
             ui.heading("Storage");
 
             egui::Grid::new("storage").show(ui, |ui| {
-                if ui.small_button("Coal Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::Coal);
+                for (index, (id, resource)) in resources.iter().enumerate() {
+                    if ui
+                        .small_button(format!("{} Storage", resource.name))
+                        .clicked()
+                    {
+                        selected_tool.tool = Tool::Storage(id.clone());
+                    }
+                    if (index + 1) % 2 == 0 {
+                        ui.end_row();
+                    }
                 }
-                if ui.small_button("Coke Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::Coke);
-                }
-                ui.end_row();
-
-                if ui.small_button("Limestone Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::Limestone);
-                }
-                if ui.small_button("Iron Ore Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::IronOre);
-                }
-                ui.end_row();
-
-                if ui.small_button("Iron Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::Iron);
-                }
-                if ui.small_button("Steel Storage").clicked() {
-                    selected_tool.tool = Tool::Storage(Resource::Steel);
-                }
-                ui.end_row();
             });
 
             ui.heading("Buildings");

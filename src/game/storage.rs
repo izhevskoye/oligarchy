@@ -3,14 +3,14 @@ use bevy_ecs_tilemap::prelude::*;
 use rand::{prelude::SliceRandom, thread_rng};
 
 use super::{
-    assets::{RequiresUpdate, Resource, Storage, StorageConsolidator},
+    assets::{RequiresUpdate, Storage, StorageConsolidator},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 pub fn distribute_to_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
-    resource: Resource,
+    resource: &str,
 ) {
     let mut entities = consolidator.connected_storage.clone();
     let mut random = thread_rng();
@@ -31,7 +31,7 @@ pub fn distribute_to_storage(
 pub fn has_in_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
-    resource: Resource,
+    resource: &str,
 ) -> bool {
     for storage in consolidator.connected_storage.iter() {
         let storage = storage_query.get_mut(*storage).unwrap();
@@ -47,7 +47,7 @@ pub fn has_in_storage(
 pub fn has_space_in_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
-    resource: Resource,
+    resource: &str,
 ) -> bool {
     for storage in consolidator.connected_storage.iter() {
         let storage = storage_query.get_mut(*storage).unwrap();
@@ -63,7 +63,7 @@ pub fn has_space_in_storage(
 pub fn fetch_from_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
-    resource: Resource,
+    resource: &str,
 ) -> bool {
     let mut entities = consolidator.connected_storage.clone();
     let mut random = thread_rng();

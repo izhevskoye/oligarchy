@@ -17,16 +17,16 @@ pub fn production_building(
             let has_requisites = product
                 .requisites
                 .iter()
-                .all(|resource| has_in_storage(&consolidator, &mut storage_query, *resource));
+                .all(|resource| has_in_storage(&consolidator, &mut storage_query, &resource));
 
             if has_requisites
-                && has_space_in_storage(&consolidator, &mut storage_query, product.resource)
+                && has_space_in_storage(&consolidator, &mut storage_query, &product.resource)
             {
                 for resource in &product.requisites {
-                    fetch_from_storage(consolidator, &mut storage_query, *resource);
+                    fetch_from_storage(consolidator, &mut storage_query, &resource);
                 }
 
-                distribute_to_storage(&consolidator, &mut storage_query, product.resource);
+                distribute_to_storage(&consolidator, &mut storage_query, &product.resource);
             }
         }
     }

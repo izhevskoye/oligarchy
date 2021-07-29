@@ -20,7 +20,7 @@ pub fn car_placement(
         return;
     }
 
-    if let Tool::Car(resource) = selected_tool.tool {
+    if let Tool::Car(resource) = &selected_tool.tool {
         if !clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {
                 // make sure tile is set
@@ -40,7 +40,7 @@ pub fn car_placement(
                         current_instruction: 0,
                     })
                     .insert(Storage {
-                        resource,
+                        resource: resource.clone(),
                         amount: 0,
                         capacity: 4,
                     })

@@ -3,22 +3,19 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
-pub enum Resource {
-    Coal,
-    Coke,
-    Limestone,
-    IronOre,
-    Iron,
-    Steel,
-}
-
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {
     pub name: String,
     pub tile: u16,
     pub products: Vec<Product>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResourceSpecification {
+    pub name: String,
+    pub storage_tile: Option<u16>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -30,11 +27,11 @@ pub struct Building {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Product {
-    pub resource: Resource,
+    pub resource: String,
     // TODO:
     // pub rate: i64,
     #[serde(default)]
-    pub requisites: Vec<Resource>,
+    pub requisites: Vec<String>,
 }
 
 // TODO: implicit through spec instead?
@@ -47,7 +44,7 @@ pub struct ProductionBuilding {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Storage {
-    pub resource: Resource,
+    pub resource: String,
     pub amount: i64,
     pub capacity: i64,
 }
@@ -64,7 +61,7 @@ pub struct RequiresUpdate {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ExportStation {
-    pub goods: Vec<Resource>,
+    pub goods: Vec<String>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -85,9 +82,9 @@ pub enum Tool {
     None,
     Bulldoze,
     Street,
-    Storage(Resource),
+    Storage(String),
     ExportStation,
-    Car(Resource),
+    Car(String),
     Building(String),
 }
 
