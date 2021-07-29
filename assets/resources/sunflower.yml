@@ -1,5 +1,7 @@
 "sunflower.seeds":
   name: Sunflower Seeds
+  storage_tile: 39
 
 "sunflower.oil":
   name: Sunflower Oil
+  storage_tile: 33

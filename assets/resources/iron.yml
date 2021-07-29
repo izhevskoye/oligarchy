@@ -1,17 +1,23 @@
 "iron":
   name: Iron
+  storage_tile: 18
 
 "iron_ore":
   name: Iron Ore
+  storage_tile: 21
 
 "limestone":
   name: Limestone
+  storage_tile: 20
 
 "steel":
   name: Steel
+  storage_tile: 19
 
 "coal":
   name: Coal
+  storage_tile: 16
 
 "coke":
   name: Coke
+  storage_tile: 17
