@@ -18,7 +18,7 @@ fn produces_resource() {
     let coke_storage_id = world
         .spawn()
         .insert(Storage {
-            resource: coke.clone(),
+            resource: coke.to_owned(),
             amount: 0,
             capacity: 10,
         })
@@ -28,7 +28,7 @@ fn produces_resource() {
     let coal_storage_id = world
         .spawn()
         .insert(Storage {
-            resource: coal.clone(),
+            resource: coal.to_owned(),
             amount: 10,
             capacity: 10,
         })
@@ -38,8 +38,8 @@ fn produces_resource() {
         .spawn()
         .insert(ProductionBuilding {
             products: vec![Product {
-                resource: coke.clone(),
-                requisites: vec![coal.clone()],
+                resource: coke.to_owned(),
+                requisites: vec![coal.to_owned()],
             }],
         })
         .insert(StorageConsolidator {
