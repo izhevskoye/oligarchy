@@ -153,11 +153,11 @@ impl InfoUI for Storage {
 impl InfoUI for ExportStation {
     fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.horizontal(|ui| {
-            ui.label(format!("Export Station for:"));
+            ui.label("Export Station for:");
             for resource in self.goods.iter() {
                 let resource = resources.get(resource).unwrap();
 
-                ui.label(format!("{}", resource.name));
+                ui.label(&resource.name);
             }
         });
     }
