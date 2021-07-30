@@ -12,12 +12,20 @@ pub struct BuildingSpecification {
     pub group: String,
 }
 
+#[derive(Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct CarTileDefinition {
+    pub horizontal: u16,
+    pub vertical: u16,
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResourceSpecification {
     pub name: String,
     pub storage_tile: Option<u16>,
     pub group: String,
+    pub car_tile: Option<CarTileDefinition>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

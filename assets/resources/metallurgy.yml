@@ -2,28 +2,46 @@
   name: Iron
   storage_tile: 18
   group: Metallurgy
+  car_tile:
+    horizontal: 115
+    vertical: 116
 
 "iron_ore":
   name: Iron Ore
   storage_tile: 21
   group: Metallurgy
+  car_tile:
+    horizontal: 83
+    vertical: 117
 
 "limestone":
   name: Limestone
   storage_tile: 20
   group: Metallurgy
+  car_tile:
+    horizontal: 83
+    vertical: 117
 
 "steel":
   name: Steel
   storage_tile: 19
   group: Metallurgy
+  car_tile:
+    horizontal: 115
+    vertical: 116
 
 "coal":
   name: Coal
   storage_tile: 16
   group: Metallurgy
+  car_tile:
+    horizontal: 83
+    vertical: 117
 
 "coke":
   name: Coke
   storage_tile: 17
   group: Metallurgy
+  car_tile:
+    horizontal: 83
+    vertical: 117

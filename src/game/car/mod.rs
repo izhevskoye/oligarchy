@@ -9,13 +9,16 @@ use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-use super::{
+use crate::game::{
     assets::{Direction, InfoUI, RequiresUpdate},
     constants::VehicleTile,
+    resource_specifications::ResourceSpecifications,
     setup::{MAP_ID, VEHICLE_LAYER_ID},
 };
 
 pub use calculate_destination::calculate_destination;
+
+use super::assets::{CarTileDefinition, Storage};
 
 pub struct Destination {
     pub destination: UVec2,
@@ -104,18 +107,29 @@ pub fn instruction_system() -> SystemSet {
 
 pub fn update_car(
     mut commands: Commands,
-    car_query: Query<(Entity, &Car), With<RequiresUpdate>>,
+    car_query: Query<(Entity, &Car, &Storage), With<RequiresUpdate>>,
     mut map_query: MapQuery,
+    resources: Res<ResourceSpecifications>,
 ) {
-    for (entity, car) in car_query.iter() {
+    for (entity, car, storage) in car_query.iter() {
         commands.entity(entity).remove::<RequiresUpdate>();
+
+        let resource = resources.get(&storage.resource).unwrap();
+        let car_tiles = if let Some(tile_spec) = &resource.car_tile {
+            tile_spec.clone()
+        } else {
+            CarTileDefinition {
+                vertical: VehicleTile::BlueVertical as u16,
+                horizontal: VehicleTile::BlueHorizontal as u16,
+            }
+        };
 
         let tile = Tile {
             texture_index: if car.direction == Direction::North || car.direction == Direction::South
             {
-                VehicleTile::BlueVertical
+                car_tiles.vertical
             } else {
-                VehicleTile::BlueHorizontal
+                car_tiles.horizontal
             } as u16,
             flip_y: car.direction == Direction::South,
             flip_x: car.direction == Direction::East,
