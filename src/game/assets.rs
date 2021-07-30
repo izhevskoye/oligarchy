@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
+use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {
@@ -126,36 +128,51 @@ pub struct Name(String);
 pub struct Editable;
 
 pub trait InfoUI {
-    fn ui(&self, _ui: &mut Ui) {}
+    fn ui(&self, _ui: &mut Ui, _resources: &ResourceSpecifications) {}
 }
 
 impl InfoUI for Name {
-    fn ui(&self, ui: &mut Ui) {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
         ui.heading(&self.0);
     }
 }
 
 impl InfoUI for Storage {
-    fn ui(&self, ui: &mut Ui) {
+    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.horizontal(|ui| {
+            let resource = resources.get(&self.resource).unwrap();
+
             ui.label(format!(
-                "{:?} {} / {}",
-                self.resource, self.amount, self.capacity
+                "{} {} / {}",
+                resource.name, self.amount, self.capacity
             ));
         });
     }
 }
 
 impl InfoUI for ExportStation {
-    fn ui(&self, ui: &mut Ui) {
+    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.horizontal(|ui| {
-            ui.label(format!("Export Station for {:?}", self.goods));
+            ui.label("Export Station for:");
+            for resource in self.goods.iter() {
+                let resource = resources.get(resource).unwrap();
+
+                ui.label(&resource.name);
+            }
         });
     }
 }
 
 impl InfoUI for BuildingSpecification {
-    fn ui(&self, ui: &mut Ui) {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
         ui.heading(&self.name);
+    }
+}
+
+impl InfoUI for Car {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            ui.label("Car");
+        });
     }
 }

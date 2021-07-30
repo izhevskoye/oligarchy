@@ -6,6 +6,7 @@ use crate::game::{
     building_specifications::BuildingSpecifications,
     car::Car,
     current_selection::CurrentlySelected,
+    resource_specifications::ResourceSpecifications,
 };
 
 fn query_resolve<'a, T>(items: &mut Vec<&'a dyn InfoUI>, item: Result<&'a T, QueryEntityError>)
@@ -30,6 +31,7 @@ pub fn info_ui(
         Query<&ExportStation>,
     ),
     mut currently_selected: ResMut<CurrentlySelected>,
+    resources: Res<ResourceSpecifications>,
 ) {
     if let Some(entity) = currently_selected.entity {
         let mut items: Vec<&dyn InfoUI> = vec![];
@@ -52,7 +54,7 @@ pub fn info_ui(
                     ui.heading("Info");
 
                     for item in items {
-                        item.ui(ui);
+                        item.ui(ui, &resources);
                     }
 
                     if queries.1.get(entity).is_ok() {

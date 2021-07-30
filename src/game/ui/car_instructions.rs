@@ -54,7 +54,7 @@ pub fn program_ui(
                 }
 
                 egui::Window::new("Instruction").show(egui_context.ctx(), |ui| {
-                    ui.heading(format!("Current: {}", instruction));
+                    ui.heading(format!("Current: {}", instruction.format(&resources)));
 
                     if ui.button("Idle").clicked() {
                         car.instructions[selected_index] = CarInstructions::Nop;
@@ -123,7 +123,7 @@ pub fn program_ui(
 
                 for (index, instruction) in instructions.iter().enumerate() {
                     ui.horizontal(|ui| {
-                        ui.label(format!("{}", instruction));
+                        ui.label(instruction.format(&resources));
                         if ui.button("Edit").clicked() {
                             edit_instruction.index = Some(index);
                         }
