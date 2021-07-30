@@ -62,7 +62,5 @@ pub fn ground_update(
         tile.texture_index = MapTile::GroundFactory as u16;
 
         map_query.notify_chunk_for_tile(update.position, MAP_ID, GROUND_LAYER_ID);
-
-        log::info!("ground updated!!!");
     }
 }
