@@ -6,3 +6,4 @@
       # requisites:
       # - sunflower.seeds
     - resource: chicken
+  group: Agriculture

@@ -3,15 +3,18 @@
   tile: 5
   products:
     - resource: coal
+  group: Metallurgy
 
 "quarry.iron_ore":
   name: Iron Ore Quarry
   tile: 6
   products:
     - resource: iron_ore
+  group: Metallurgy
 
 "quarry.limestone":
   name: Limestone Quarry
   tile: 7
   products:
     - resource: limestone
+  group: Metallurgy

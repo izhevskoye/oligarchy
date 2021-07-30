@@ -5,3 +5,4 @@
     - resource: hogs
       # requisites:
       # - sunflower.seeds
+  group: Agriculture
