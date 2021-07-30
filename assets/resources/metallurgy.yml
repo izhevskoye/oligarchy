@@ -1,23 +1,29 @@
 "iron":
   name: Iron
   storage_tile: 18
+  group: Metallurgy
 
 "iron_ore":
   name: Iron Ore
   storage_tile: 21
+  group: Metallurgy
 
 "limestone":
   name: Limestone
   storage_tile: 20
+  group: Metallurgy
 
 "steel":
   name: Steel
   storage_tile: 19
+  group: Metallurgy
 
 "coal":
   name: Coal
   storage_tile: 16
+  group: Metallurgy
 
 "coke":
   name: Coke
   storage_tile: 17
+  group: Metallurgy

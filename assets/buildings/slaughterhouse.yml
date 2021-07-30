@@ -9,3 +9,4 @@
     - resource: poultry
       requisites:
         - chicken
+  group: Agriculture

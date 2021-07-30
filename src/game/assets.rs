@@ -9,6 +9,7 @@ pub struct BuildingSpecification {
     pub name: String,
     pub tile: u16,
     pub products: Vec<Product>,
+    pub group: String,
 }
 
 #[derive(Deserialize)]
@@ -16,6 +17,7 @@ pub struct BuildingSpecification {
 pub struct ResourceSpecification {
     pub name: String,
     pub storage_tile: Option<u16>,
+    pub group: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

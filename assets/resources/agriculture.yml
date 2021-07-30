@@ -1,19 +1,34 @@
 "eggs":
   name: Eggs
   storage_tile: 36
+  group: Agriculture
 
 "chicken":
   name: Chicken
   storage_tile: 38
+  group: Agriculture
 
 "pork":
   name: Pork
   storage_tile: 34
+  group: Agriculture
 
 "poultry":
   name: Poultry
   storage_tile: 35
+  group: Agriculture
 
 "hogs":
   name: Hogs
   storage_tile: 37
+  group: Agriculture
+
+"sunflower.seeds":
+  name: Sunflower Seeds
+  storage_tile: 39
+  group: Agriculture
+
+"sunflower.oil":
+  name: Sunflower Oil
+  storage_tile: 33
+  group: Agriculture

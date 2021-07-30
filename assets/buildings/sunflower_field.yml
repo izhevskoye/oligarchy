@@ -3,3 +3,4 @@
   tile: 22
   products:
     - resource: sunflower.seeds
+  group: Agriculture

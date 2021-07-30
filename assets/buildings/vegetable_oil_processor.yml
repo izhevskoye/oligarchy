@@ -5,3 +5,4 @@
     - resource: sunflower.oil
       requisites:
         - sunflower.seeds
+  group: Agriculture
