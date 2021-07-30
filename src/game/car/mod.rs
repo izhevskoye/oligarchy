@@ -4,13 +4,11 @@ mod instructions;
 
 use bevy::{core::FixedTimestep, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
-use bevy_egui::egui::Ui;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
-use std::fmt;
 
 use crate::game::{
-    assets::{Direction, InfoUI, RequiresUpdate},
+    assets::{Direction, RequiresUpdate},
     constants::VehicleTile,
     resource_specifications::ResourceSpecifications,
     setup::{MAP_ID, VEHICLE_LAYER_ID},
@@ -62,15 +60,23 @@ pub enum CarInstructions {
     Unload(String),
 }
 
-impl fmt::Display for CarInstructions {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl CarInstructions {
+    pub fn format(&self, resources: &ResourceSpecifications) -> String {
         match self {
-            CarInstructions::Nop => write!(f, "Idle"),
-            CarInstructions::GoTo(position) => write!(f, "Drive to {}", position),
-            CarInstructions::WaitForLoad(resource) => write!(f, "Wait to load {:?}", resource),
-            CarInstructions::WaitForUnload(resource) => write!(f, "Wait to unload {:?}", resource),
-            CarInstructions::Load(resource) => write!(f, "Load {:?}", resource),
-            CarInstructions::Unload(resource) => write!(f, "Unload {:?}", resource),
+            CarInstructions::Nop => "Idle".to_string(),
+            CarInstructions::GoTo(position) => format!("Drive to {}", position),
+            CarInstructions::WaitForLoad(resource) => {
+                format!("Wait to load {:?}", resources.get(resource).unwrap().name)
+            }
+            CarInstructions::WaitForUnload(resource) => {
+                format!("Wait to unload {:?}", resources.get(resource).unwrap().name)
+            }
+            CarInstructions::Load(resource) => {
+                format!("Load {:?}", resources.get(resource).unwrap().name)
+            }
+            CarInstructions::Unload(resource) => {
+                format!("Unload {:?}", resources.get(resource).unwrap().name)
+            }
         }
     }
 }
@@ -81,14 +87,6 @@ pub struct Car {
     pub direction: Direction,
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
-}
-
-impl InfoUI for Car {
-    fn ui(&self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            ui.label("Car");
-        });
-    }
 }
 
 pub fn drive_system() -> SystemSet {
