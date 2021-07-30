@@ -8,7 +8,7 @@ use crate::game::{
     building_specifications::BuildingSpecifications,
     car::Car,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
-    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{BuildingEntity, GameEntityType, GameState},
 };
 
@@ -47,7 +47,6 @@ fn reset_state(
     car_query: &Query<(Entity, &Car)>,
 ) {
     map_query.despawn_layer_tiles(commands, MAP_ID, BUILDING_LAYER_ID);
-    map_query.despawn_layer_tiles(commands, MAP_ID, VEHICLE_LAYER_ID);
 
     for (entity, _car) in car_query.iter() {
         commands.entity(entity).despawn_recursive();
@@ -60,14 +59,6 @@ fn reset_state(
                 MAP_ID,
                 BUILDING_LAYER_ID,
             );
-
-            for i in 1..2 {
-                map_query.notify_chunk_for_tile(
-                    UVec2::new(x * CHUNK_SIZE * i, y * CHUNK_SIZE * i),
-                    MAP_ID,
-                    VEHICLE_LAYER_ID,
-                );
-            }
         }
     }
 }

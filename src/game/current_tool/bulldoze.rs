@@ -5,7 +5,7 @@ use crate::game::{
     assets::{ClickedTile, SelectedTool, Street, Tool},
     car::Car,
     constants::MapTile,
-    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
 use super::update_neighbor_streets;
@@ -26,9 +26,6 @@ pub fn bulldoze(
     if Tool::Bulldoze == selected_tool.tool {
         if clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {
-                let _ = map_query.despawn_tile(&mut commands, pos, MAP_ID, VEHICLE_LAYER_ID);
-                map_query.notify_chunk_for_tile(pos, MAP_ID, VEHICLE_LAYER_ID);
-
                 for (entity, car) in car_query.iter() {
                     if car.position == pos {
                         commands.entity(entity).despawn_recursive();

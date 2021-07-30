@@ -8,7 +8,6 @@ use super::constants::{
 pub const MAP_ID: u16 = 0;
 pub const GROUND_LAYER_ID: u16 = 0;
 pub const BUILDING_LAYER_ID: u16 = 1;
-pub const VEHICLE_LAYER_ID: u16 = 2;
 
 pub fn setup_map(
     mut commands: Commands,
@@ -63,22 +62,6 @@ pub fn setup_map(
     let (layer_builder, layer_entity) =
         LayerBuilder::<TileBundle>::new(&mut commands, map_settings, MAP_ID, BUILDING_LAYER_ID);
     map.add_layer(&mut commands, BUILDING_LAYER_ID, layer_entity);
-
-    map_query.build_layer(&mut commands, layer_builder, material_handle.clone());
-
-    // vehicles
-
-    let mut map_settings = LayerSettings::new(
-        UVec2::new(MAP_WIDTH * 2, MAP_HEIGHT * 2),
-        UVec2::new(CHUNK_SIZE, CHUNK_SIZE),
-        Vec2::new(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
-        Vec2::new(TILE_SIZE * TILE_MAP_WIDTH, TILE_SIZE * TILE_MAP_HEIGHT),
-    );
-    map_settings.mesh_type = TilemapMeshType::Square;
-
-    let (layer_builder, layer_entity) =
-        LayerBuilder::<TileBundle>::new(&mut commands, map_settings, MAP_ID, VEHICLE_LAYER_ID);
-    map.add_layer(&mut commands, VEHICLE_LAYER_ID, layer_entity);
 
     map_query.build_layer(&mut commands, layer_builder, material_handle);
 

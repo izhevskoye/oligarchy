@@ -3,7 +3,6 @@ mod drive_to_destination;
 mod instructions;
 
 use bevy::{core::FixedTimestep, prelude::*};
-use bevy_ecs_tilemap::prelude::*;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
@@ -11,12 +10,14 @@ use crate::game::{
     assets::{Direction, RequiresUpdate},
     constants::VehicleTile,
     resource_specifications::ResourceSpecifications,
-    setup::{MAP_ID, VEHICLE_LAYER_ID},
 };
 
 pub use calculate_destination::calculate_destination;
 
-use super::assets::{CarTileDefinition, Storage};
+use super::{
+    assets::{CarTileDefinition, Storage},
+    constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
+};
 
 pub struct Destination {
     pub destination: UVec2,
@@ -103,38 +104,84 @@ pub fn instruction_system() -> SystemSet {
         .with_system(instructions::car_instruction.system())
 }
 
+fn update_car_sprite(
+    sprite: &mut TextureAtlasSprite,
+    transform: &mut Transform,
+    car: &Car,
+    storage: &Storage,
+    resources: &Res<ResourceSpecifications>,
+) {
+    let resource = resources.get(&storage.resource).unwrap();
+    let car_tiles = if let Some(tile_spec) = &resource.car_tile {
+        tile_spec.clone()
+    } else {
+        CarTileDefinition {
+            vertical: VehicleTile::BlueVertical as u16,
+            horizontal: VehicleTile::BlueHorizontal as u16,
+        }
+    };
+
+    let tile_size = TILE_SIZE / 2.0;
+    let position = Vec2::new(car.position.x as f32 + 0.5, car.position.y as f32 + 0.5);
+    let translation = (position * tile_size).extend(1.0);
+    transform.translation = translation;
+
+    sprite.index = if car.direction == Direction::North || car.direction == Direction::South {
+        car_tiles.vertical
+    } else {
+        car_tiles.horizontal
+    } as u32;
+    sprite.flip_x = car.direction == Direction::East;
+    sprite.flip_y = car.direction == Direction::South;
+}
+
+pub fn spawn_car(
+    mut commands: Commands,
+    mut car_query: Query<(Entity, &Car, &Storage), Without<TextureAtlasSprite>>,
+    resources: Res<ResourceSpecifications>,
+    assets: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    for (entity, car, storage) in car_query.iter_mut() {
+        let texture_handle = assets.load("oligarchy_tiles.png");
+        let texture_atlas = TextureAtlas::from_grid(
+            texture_handle,
+            Vec2::splat(TILE_SIZE / 2.0),
+            TILE_MAP_WIDTH as usize * 2,
+            TILE_MAP_HEIGHT as usize * 2,
+        );
+        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+
+        let mut sprite = TextureAtlasSprite::new(0);
+        let mut transform = Transform::default();
+        update_car_sprite(&mut sprite, &mut transform, car, storage, &resources);
+
+        commands.entity(entity).insert_bundle(SpriteSheetBundle {
+            texture_atlas: texture_atlas_handle,
+            transform,
+            sprite,
+            ..Default::default()
+        });
+    }
+}
+
 pub fn update_car(
     mut commands: Commands,
-    car_query: Query<(Entity, &Car, &Storage), With<RequiresUpdate>>,
-    mut map_query: MapQuery,
+    mut car_query: Query<
+        (
+            Entity,
+            &Car,
+            &Storage,
+            &mut Transform,
+            &mut TextureAtlasSprite,
+        ),
+        With<RequiresUpdate>,
+    >,
     resources: Res<ResourceSpecifications>,
 ) {
-    for (entity, car, storage) in car_query.iter() {
+    for (entity, car, storage, mut transform, mut sprite) in car_query.iter_mut() {
         commands.entity(entity).remove::<RequiresUpdate>();
 
-        let resource = resources.get(&storage.resource).unwrap();
-        let car_tiles = if let Some(tile_spec) = &resource.car_tile {
-            tile_spec.clone()
-        } else {
-            CarTileDefinition {
-                vertical: VehicleTile::BlueVertical as u16,
-                horizontal: VehicleTile::BlueHorizontal as u16,
-            }
-        };
-
-        let tile = Tile {
-            texture_index: if car.direction == Direction::North || car.direction == Direction::South
-            {
-                car_tiles.vertical
-            } else {
-                car_tiles.horizontal
-            } as u16,
-            flip_y: car.direction == Direction::South,
-            flip_x: car.direction == Direction::East,
-            ..Default::default()
-        };
-
-        let _ = map_query.set_tile(&mut commands, car.position, tile, MAP_ID, VEHICLE_LAYER_ID);
-        map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
+        update_car_sprite(&mut sprite, &mut transform, car, storage, &resources);
     }
 }

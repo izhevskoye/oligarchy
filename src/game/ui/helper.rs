@@ -4,8 +4,9 @@ use bevy_egui::EguiContext;
 
 use crate::game::{
     assets::{ClickedTile, Occupied},
+    car::Car,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
-    setup::{BUILDING_LAYER_ID, MAP_ID, VEHICLE_LAYER_ID},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 fn eval_pos(x: f32, y: f32, modifier: i32) -> Option<UVec2> {
@@ -30,6 +31,7 @@ pub fn mouse_pos_to_tile(
     mouse_input: Res<Input<MouseButton>>,
     mut clicked_tile: ResMut<ClickedTile>,
     queries: (Query<&Transform, With<Camera>>, Query<&Occupied>),
+    car_query: Query<&Car>,
     map_query: MapQuery,
 ) {
     let (transform, occupied_query) = queries;
@@ -68,9 +70,7 @@ pub fn mouse_pos_to_tile(
         }
 
         if let Some(vehicle_pos) = clicked_tile.vehicle_pos {
-            clicked_tile.occupied_vehicle = map_query
-                .get_tile_entity(vehicle_pos, MAP_ID, VEHICLE_LAYER_ID)
-                .is_ok();
+            clicked_tile.occupied_vehicle = car_query.iter().any(|car| car.position == vehicle_pos);
         }
     }
 }

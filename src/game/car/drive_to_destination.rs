@@ -1,21 +1,30 @@
+use std::collections::HashSet;
+
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use rand::{thread_rng, Rng};
 
 use crate::game::{
     assets::{Direction, RequiresUpdate},
-    setup::{MAP_ID, VEHICLE_LAYER_ID},
+    car::{Car, Waypoints},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
-
-use super::{Car, Waypoints};
 
 pub fn drive_to_destination(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &mut Car, &mut Waypoints)>,
-    tile_query: Query<&Tile>,
-    mut map_query: MapQuery,
+    mut car_query: Query<(Entity, &mut Car)>,
+    mut waypoint_query: Query<&mut Waypoints>,
+    map_query: MapQuery,
 ) {
-    for (car_entity, mut car, mut waypoint) in car_query.iter_mut() {
+    let mut car_positions: HashSet<UVec2> =
+        car_query.iter_mut().map(|(_, car)| car.position).collect();
+
+    for (car_entity, mut car) in car_query.iter_mut() {
+        let mut waypoint = match waypoint_query.get_mut(car_entity) {
+            Ok(waypoint) => waypoint,
+            Err(_) => continue,
+        };
+
         let direction = waypoint.waypoints[0];
         let c_pos = car.position / 2;
 
@@ -60,13 +69,7 @@ pub fn drive_to_destination(
             }
         }
 
-        let can_drive_to_new_pos = if let Ok(entity) =
-            map_query.get_tile_entity(new_car_position, MAP_ID, VEHICLE_LAYER_ID)
-        {
-            tile_query.get(entity).is_err()
-        } else {
-            true
-        };
+        let can_drive_to_new_pos = !car_positions.contains(&new_car_position);
 
         if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
@@ -76,10 +79,8 @@ pub fn drive_to_destination(
         }
 
         if can_drive_to_new_pos {
-            if let Ok(entity) = map_query.get_tile_entity(car.position, MAP_ID, VEHICLE_LAYER_ID) {
-                map_query.notify_chunk_for_tile(car.position, MAP_ID, VEHICLE_LAYER_ID);
-                commands.entity(entity).despawn_recursive();
-            }
+            car_positions.remove(&car.position);
+            car_positions.insert(new_car_position);
 
             car.position = new_car_position;
             if direction != Direction::None {
@@ -94,8 +95,8 @@ pub fn drive_to_destination(
         if waypoint.considered_deadlocked() {
             log::error!("Car considered deadlocked. Moving away.");
 
-            let (_entity, layer) = map_query.get_layer(MAP_ID, VEHICLE_LAYER_ID).unwrap();
-            let size = layer.get_layer_size_in_tiles().as_i32();
+            let (_entity, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
+            let size = layer.get_layer_size_in_tiles().as_i32() * 2;
 
             // move into opposite
             let c_pos = c_pos.as_i32();
