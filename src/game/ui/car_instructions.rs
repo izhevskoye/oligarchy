@@ -119,8 +119,17 @@ pub fn program_ui(
             }
 
             egui::Window::new("Instructions").show(egui_context.ctx(), |ui| {
-                let instructions = car.instructions.clone();
+                ui.horizontal(|ui| {
+                    if car.active {
+                        if ui.button("Deactivate").clicked() {
+                            car.active = false;
+                        }
+                    } else if ui.button("Activate").clicked() {
+                        car.active = true;
+                    }
+                });
 
+                let instructions = car.instructions.clone();
                 for (index, instruction) in instructions.iter().enumerate() {
                     ui.horizontal(|ui| {
                         ui.label(instruction.format(&resources));

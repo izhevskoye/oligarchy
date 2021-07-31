@@ -133,9 +133,10 @@ pub fn car_instruction(
     map_query: MapQuery,
 ) {
     for (car_entity, mut car) in car_query.iter_mut() {
-        if car.instructions.is_empty() {
-            return;
+        if car.instructions.is_empty() || !car.active {
+            continue;
         }
+
         if car.current_instruction >= car.instructions.len() {
             car.current_instruction = 0;
         }

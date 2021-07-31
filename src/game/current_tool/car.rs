@@ -24,6 +24,7 @@ pub fn car_placement(
                         direction: Direction::North,
                         instructions: vec![CarInstructions::Nop],
                         current_instruction: 0,
+                        active: false,
                     })
                     .insert(Storage {
                         resource: resource.clone(),

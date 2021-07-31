@@ -83,6 +83,7 @@ pub struct Car {
     pub direction: Direction,
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
+    pub active: bool,
 }
 
 pub fn drive_system() -> SystemSet {
