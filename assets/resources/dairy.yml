@@ -1,0 +1,47 @@
+"milk":
+  name: Milk
+  storage_tile: 49
+  group: Dairy
+  car_tile:
+    horizontal: 114
+    vertical: 84
+
+"cows":
+  name: Cows
+  storage_tile: 51
+  group: Meat
+  car_tile:
+    horizontal: 114
+    vertical: 84
+
+"beef":
+  name: Beef
+  storage_tile: 50
+  group: Meat
+  car_tile:
+    horizontal: 114
+    vertical: 84
+
+"cheese":
+  name: Cheese
+  storage_tile: 53
+  group: Dairy
+  car_tile:
+    horizontal: 114
+    vertical: 84
+
+"sour_cream":
+  name: Sour Cream
+  storage_tile: 54
+  group: Dairy
+  car_tile:
+    horizontal: 114
+    vertical: 84
+
+"butter":
+  name: Butter
+  storage_tile: 55
+  group: Dairy
+  car_tile:
+    horizontal: 114
+    vertical: 84

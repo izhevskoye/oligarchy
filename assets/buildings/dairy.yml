@@ -1,0 +1,22 @@
+"dairy":
+  name: Dairy
+  tile: 52
+  products:
+    - resource: butter
+      rate: 0.5
+      requisites:
+        - resource: milk
+          rate: 2.0
+
+    - resource: sour_cream
+      rate: 0.5
+      requisites:
+        - resource: milk
+          rate: 1.5
+
+    - resource: cheese
+      rate: 0.5
+      requisites:
+        - resource: milk
+          rate: 2.0
+  group: Dairy

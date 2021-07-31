@@ -12,5 +12,11 @@
       rate: 1
       requisites:
         - resource: chicken
-          rate: 2
-  group: Agriculture
+          rate: 1.5
+
+    - resource: beef
+      rate: 1
+      requisites:
+        - resource: cows
+          rate: 2.5
+  group: Meat

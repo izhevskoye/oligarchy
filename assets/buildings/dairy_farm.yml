@@ -1,0 +1,10 @@
+"dairy_farm":
+  name: Dairy Farm
+  tile: 48
+  products:
+    - resource: milk
+      rate: 1.0
+      byproducts:
+        - resource: cows
+          rate: 0.05
+  group: Dairy

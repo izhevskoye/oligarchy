@@ -47,6 +47,22 @@ pub fn production_building(
                 &product.resource,
                 product.rate,
             );
+
+            for byproduct in &product.byproducts {
+                if has_space_in_storage(
+                    consolidator,
+                    &mut storage_query,
+                    &byproduct.resource,
+                    byproduct.rate,
+                ) {
+                    distribute_to_storage(
+                        consolidator,
+                        &mut storage_query,
+                        &byproduct.resource,
+                        byproduct.rate,
+                    );
+                }
+            }
         }
     }
 }

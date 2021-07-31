@@ -36,9 +36,9 @@ pub struct Building {
     pub id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct ProductRequisite {
+pub struct ProductDependency {
     pub resource: String,
     pub rate: f64,
 }
@@ -49,7 +49,9 @@ pub struct Product {
     pub resource: String,
     pub rate: f64,
     #[serde(default)]
-    pub requisites: Vec<ProductRequisite>,
+    pub requisites: Vec<ProductDependency>,
+    #[serde(default)]
+    pub byproducts: Vec<ProductDependency>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
