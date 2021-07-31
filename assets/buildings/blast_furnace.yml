@@ -3,8 +3,12 @@
   tile: 4
   products:
     - resource: iron
+      rate: 0.5
       requisites:
-        - coke
-        - limestone
-        - iron_ore
+        - resource: coke
+          rate: 0.25
+        - resource: limestone
+          rate: 0.1
+        - resource: iron_ore
+          rate: 0.75
   group: Metallurgy

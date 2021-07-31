@@ -14,19 +14,38 @@ pub fn production_building(
 ) {
     for (building, consolidator) in building_query.iter() {
         for product in &building.products {
-            let has_requisites = product
-                .requisites
-                .iter()
-                .all(|resource| has_in_storage(&consolidator, &mut storage_query, &resource));
+            let has_requisites = product.requisites.iter().all(|requisite| {
+                has_in_storage(
+                    &consolidator,
+                    &mut storage_query,
+                    &requisite.resource,
+                    requisite.rate,
+                )
+            });
 
             if has_requisites
-                && has_space_in_storage(&consolidator, &mut storage_query, &product.resource)
+                && has_space_in_storage(
+                    &consolidator,
+                    &mut storage_query,
+                    &product.resource,
+                    product.rate,
+                )
             {
-                for resource in &product.requisites {
-                    fetch_from_storage(consolidator, &mut storage_query, &resource);
+                for requisite in &product.requisites {
+                    fetch_from_storage(
+                        consolidator,
+                        &mut storage_query,
+                        &requisite.resource,
+                        requisite.rate,
+                    );
                 }
 
-                distribute_to_storage(&consolidator, &mut storage_query, &product.resource);
+                distribute_to_storage(
+                    &consolidator,
+                    &mut storage_query,
+                    &product.resource,
+                    product.rate,
+                );
             }
         }
     }

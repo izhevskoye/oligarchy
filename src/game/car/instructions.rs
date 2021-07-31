@@ -37,8 +37,8 @@ fn load(
                 map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
             {
                 if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                    if resource == map_storage.resource && map_storage.amount > 0 {
-                        map_storage.amount -= 1;
+                    if resource == map_storage.resource && map_storage.amount >= 1.0 {
+                        map_storage.amount -= 1.0;
                         result = Some(true)
                     } else {
                         result = Some(false)
@@ -59,7 +59,7 @@ fn load(
             // save unwrap here because we checked above and has_item is false if
             // it does not exist
             let mut storage = storage_query.get_mut(car_entity).unwrap();
-            storage.amount += 1;
+            storage.amount += 1.0;
         } else if !wait_for_load {
             car.current_instruction += 1;
         }
@@ -76,7 +76,7 @@ fn unload(
 ) {
     let empty = {
         match storage_query.get_mut(car_entity) {
-            Ok(storage) => storage.amount == 0,
+            Ok(storage) => storage.amount == 0.0,
             _ => {
                 log::warn!("Car has no storage but should wait for unloading");
                 car.current_instruction += 1;
@@ -95,9 +95,10 @@ fn unload(
                 map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
             {
                 if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                    if resource == map_storage.resource && map_storage.amount < map_storage.capacity
+                    if resource == map_storage.resource
+                        && map_storage.amount <= map_storage.capacity - 1.0
                     {
-                        map_storage.amount += 1;
+                        map_storage.amount += 1.0;
                         result = Some(true)
                     } else {
                         result = Some(false)
@@ -118,7 +119,7 @@ fn unload(
             // save unwrap here because we checked above and transfer_item is false if
             // it does not exist
             let mut storage = storage_query.get_mut(car_entity).unwrap();
-            storage.amount -= 1;
+            storage.amount -= 1.0;
         } else if !wait_for_unload {
             car.current_instruction += 1;
         }

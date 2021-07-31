@@ -38,15 +38,20 @@ pub struct Building {
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct Product {
+pub struct ProductRequisite {
     pub resource: String,
-    // TODO:
-    // pub rate: i64,
-    #[serde(default)]
-    pub requisites: Vec<String>,
+    pub rate: f64,
 }
 
-// TODO: implicit through spec instead?
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Product {
+    pub resource: String,
+    pub rate: f64,
+    #[serde(default)]
+    pub requisites: Vec<ProductRequisite>,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ProductionBuilding {
@@ -57,8 +62,8 @@ pub struct ProductionBuilding {
 #[serde(deny_unknown_fields)]
 pub struct Storage {
     pub resource: String,
-    pub amount: i64,
-    pub capacity: i64,
+    pub amount: f64,
+    pub capacity: f64,
 }
 
 #[derive(Default)]
@@ -145,7 +150,7 @@ impl InfoUI for Storage {
             let resource = resources.get(&self.resource).unwrap();
 
             ui.label(format!(
-                "{} {} / {}",
+                "{} {:.2} / {:.2}",
                 resource.name, self.amount, self.capacity
             ));
         });

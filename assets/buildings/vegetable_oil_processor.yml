@@ -3,6 +3,8 @@
   tile: 23
   products:
     - resource: sunflower.oil
+      rate: 0.2
       requisites:
-        - sunflower.seeds
+        - resource: sunflower.seeds
+          rate: 0.5
   group: Agriculture
