@@ -118,7 +118,12 @@ fn load_state(
                                     .insert(StorageConsolidator::default())
                                     .insert(ProductionBuilding {
                                         products: building.products.clone(),
+                                        active_product: 0,
                                     });
+
+                                if building.products.len() > 1 {
+                                    commands.entity(entity).insert(Editable);
+                                }
                             }
                         }
                         BuildingEntity::Street(c) => {

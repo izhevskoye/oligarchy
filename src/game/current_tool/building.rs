@@ -3,8 +3,8 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        Building, ClickedTile, Occupied, ProductionBuilding, RequiresUpdate, SelectedTool,
-        StorageConsolidator, Tool,
+        Building, ClickedTile, Editable, Occupied, ProductionBuilding, RequiresUpdate,
+        SelectedTool, StorageConsolidator, Tool,
     },
     building_specifications::BuildingSpecifications,
     setup::BUILDING_LAYER_ID,
@@ -42,7 +42,12 @@ pub fn building_placement(
                         .insert(StorageConsolidator::default())
                         .insert(ProductionBuilding {
                             products: building.products.clone(),
+                            active_product: 0,
                         });
+
+                    if building.products.len() > 1 {
+                        commands.entity(entity).insert(Editable);
+                    }
                 }
             }
         }
