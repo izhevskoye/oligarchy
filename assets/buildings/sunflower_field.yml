@@ -3,4 +3,5 @@
   tile: 22
   products:
     - resource: sunflower.seeds
+      rate: 0.05
   group: Agriculture

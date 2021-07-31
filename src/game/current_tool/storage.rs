@@ -30,8 +30,8 @@ pub fn storage_placement(
                     .entity(entity)
                     .insert(Storage {
                         resource: resource.clone(),
-                        amount: 0,
-                        capacity: 20,
+                        amount: 0.0,
+                        capacity: 20.0,
                     })
                     .insert(RequiresUpdate { position: pos })
                     .insert(Occupied);

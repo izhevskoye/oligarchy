@@ -28,8 +28,8 @@ pub fn car_placement(
                     })
                     .insert(Storage {
                         resource: resource.clone(),
-                        amount: 0,
-                        capacity: 4,
+                        amount: 0.0,
+                        capacity: 4.0,
                     })
                     .insert(Editable);
 

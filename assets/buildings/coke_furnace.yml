@@ -3,6 +3,8 @@
   tile: 9
   products:
     - resource: coke
+      rate: 1
       requisites:
-        - coal
+        - resource: coal
+          rate: 1.5
   group: Metallurgy

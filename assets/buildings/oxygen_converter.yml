@@ -3,6 +3,8 @@
   tile: 8
   products:
     - resource: steel
+      rate: 1
       requisites:
-        - iron
+        - resource: iron
+          rate: 1.1
   group: Metallurgy

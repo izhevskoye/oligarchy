@@ -1,36 +1,32 @@
 use super::*;
-use crate::game::assets::{Product, Storage};
+use crate::game::assets::{Product, ProductRequisite, Storage};
 use bevy::prelude::*;
 
 #[test]
 fn produces_resource() {
-    // Setup world
     let mut world = World::default();
 
-    // Setup stage with our two systems
     let mut stage = SystemStage::parallel();
     stage.add_system(production_building.system());
 
     let coke = "coke";
     let coal = "coal";
 
-    // Setup test entities
     let coke_storage_id = world
         .spawn()
         .insert(Storage {
             resource: coke.to_owned(),
-            amount: 0,
-            capacity: 10,
+            amount: 0.0,
+            capacity: 10.0,
         })
         .id();
 
-    // Setup test entities
     let coal_storage_id = world
         .spawn()
         .insert(Storage {
             resource: coal.to_owned(),
-            amount: 10,
-            capacity: 10,
+            amount: 10.0,
+            capacity: 10.0,
         })
         .id();
 
@@ -39,7 +35,11 @@ fn produces_resource() {
         .insert(ProductionBuilding {
             products: vec![Product {
                 resource: coke.to_owned(),
-                requisites: vec![coal.to_owned()],
+                rate: 1.0,
+                requisites: vec![ProductRequisite {
+                    resource: coal.to_owned(),
+                    rate: 2.0,
+                }],
             }],
         })
         .insert(StorageConsolidator {
@@ -49,25 +49,25 @@ fn produces_resource() {
 
     stage.run(&mut world);
 
-    assert_eq!(world.get::<Storage>(coke_storage_id).unwrap().amount, 1);
-    assert_eq!(world.get::<Storage>(coal_storage_id).unwrap().amount, 9);
+    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
+    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
 
     // if already full
-    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 10;
+    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 10.0;
 
     stage.run(&mut world);
 
     // no overflow
-    assert_eq!(world.get::<Storage>(coke_storage_id).unwrap().amount, 10);
-    assert_eq!(world.get::<Storage>(coal_storage_id).unwrap().amount, 9);
+    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 10.0).abs() < f64::EPSILON);
+    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
 
     // no requisites left
-    world.get_mut::<Storage>(coal_storage_id).unwrap().amount = 0;
-    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 0;
+    world.get_mut::<Storage>(coal_storage_id).unwrap().amount = 0.0;
+    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 0.0;
 
     stage.run(&mut world);
 
     // no production
-    assert_eq!(world.get::<Storage>(coke_storage_id).unwrap().amount, 0);
-    assert_eq!(world.get::<Storage>(coal_storage_id).unwrap().amount, 0);
+    assert!(world.get::<Storage>(coke_storage_id).unwrap().amount < f64::EPSILON);
+    assert!(world.get::<Storage>(coal_storage_id).unwrap().amount < f64::EPSILON);
 }

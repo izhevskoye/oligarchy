@@ -3,10 +3,14 @@
   tile: 41
   products:
     - resource: pork
+      rate: 1
       requisites:
-        - hogs
+        - resource: hogs
+          rate: 2
 
     - resource: poultry
+      rate: 1
       requisites:
-        - chicken
+        - resource: chicken
+          rate: 2
   group: Agriculture

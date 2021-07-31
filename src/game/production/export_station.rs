@@ -11,7 +11,7 @@ pub fn export_station(
 ) {
     for (export, consolidator) in export_station.iter() {
         for resource in &export.goods {
-            if fetch_from_storage(&consolidator, &mut storage_query, &resource) {
+            if fetch_from_storage(&consolidator, &mut storage_query, &resource, 1.0) {
                 log::info!("Exporting {:?}", resource);
             }
         }

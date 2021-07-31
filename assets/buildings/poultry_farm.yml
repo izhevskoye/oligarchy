@@ -3,7 +3,9 @@
   tile: 40
   products:
     - resource: eggs
+      rate: 0.2
       # requisites:
       # - sunflower.seeds
     - resource: chicken
+      rate: 0.6
   group: Agriculture
