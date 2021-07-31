@@ -162,5 +162,5 @@ fn produces_byproducts() {
 
     assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 2.0).abs() < f64::EPSILON);
     assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 6.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(slug_storage_id).unwrap().amount - 1.0) < f64::EPSILON);
+    assert!((world.get::<Storage>(slug_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
 }
