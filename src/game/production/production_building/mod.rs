@@ -13,40 +13,40 @@ pub fn production_building(
     mut storage_query: Query<&mut Storage>,
 ) {
     for (building, consolidator) in building_query.iter() {
-        for product in &building.products {
-            let has_requisites = product.requisites.iter().all(|requisite| {
-                has_in_storage(
-                    &consolidator,
+        let product = &building.products[building.active_product];
+
+        let has_requisites = product.requisites.iter().all(|requisite| {
+            has_in_storage(
+                &consolidator,
+                &mut storage_query,
+                &requisite.resource,
+                requisite.rate,
+            )
+        });
+
+        if has_requisites
+            && has_space_in_storage(
+                &consolidator,
+                &mut storage_query,
+                &product.resource,
+                product.rate,
+            )
+        {
+            for requisite in &product.requisites {
+                fetch_from_storage(
+                    consolidator,
                     &mut storage_query,
                     &requisite.resource,
                     requisite.rate,
-                )
-            });
-
-            if has_requisites
-                && has_space_in_storage(
-                    &consolidator,
-                    &mut storage_query,
-                    &product.resource,
-                    product.rate,
-                )
-            {
-                for requisite in &product.requisites {
-                    fetch_from_storage(
-                        consolidator,
-                        &mut storage_query,
-                        &requisite.resource,
-                        requisite.rate,
-                    );
-                }
-
-                distribute_to_storage(
-                    &consolidator,
-                    &mut storage_query,
-                    &product.resource,
-                    product.rate,
                 );
             }
+
+            distribute_to_storage(
+                &consolidator,
+                &mut storage_query,
+                &product.resource,
+                product.rate,
+            );
         }
     }
 }

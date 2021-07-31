@@ -56,6 +56,7 @@ pub struct Product {
 #[serde(deny_unknown_fields)]
 pub struct ProductionBuilding {
     pub products: Vec<Product>,
+    pub active_product: usize,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

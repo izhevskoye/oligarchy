@@ -33,14 +33,25 @@ fn produces_resource() {
     world
         .spawn()
         .insert(ProductionBuilding {
-            products: vec![Product {
-                resource: coke.to_owned(),
-                rate: 1.0,
-                requisites: vec![ProductRequisite {
-                    resource: coal.to_owned(),
-                    rate: 2.0,
-                }],
-            }],
+            products: vec![
+                Product {
+                    resource: coke.to_owned(),
+                    rate: 1.0,
+                    requisites: vec![ProductRequisite {
+                        resource: coal.to_owned(),
+                        rate: 2.0,
+                    }],
+                },
+                Product {
+                    resource: coke.to_owned(),
+                    rate: 1.0,
+                    requisites: vec![ProductRequisite {
+                        resource: coal.to_owned(),
+                        rate: 2.0,
+                    }],
+                },
+            ],
+            active_product: 0,
         })
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id],
