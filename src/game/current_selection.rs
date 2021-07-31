@@ -12,6 +12,7 @@ pub struct CurrentlySelected {
     pub entity: Option<Entity>,
     pub locked: bool,
     pub editing: bool,
+    pub renaming: bool,
 }
 
 pub fn current_selection(

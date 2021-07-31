@@ -123,7 +123,9 @@ pub struct Occupied;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Name(String);
+pub struct Name {
+    pub name: String,
+}
 
 pub struct Editable;
 
@@ -133,7 +135,7 @@ pub trait InfoUI {
 
 impl InfoUI for Name {
     fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
-        ui.heading(&self.0);
+        ui.heading(&self.name);
     }
 }
 
