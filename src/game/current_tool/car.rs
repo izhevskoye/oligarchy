@@ -7,7 +7,7 @@ use crate::game::{
 
 pub fn car_placement(
     mut commands: Commands,
-    selected_tool: Res<SelectedTool>,
+    mut selected_tool: ResMut<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
 ) {
     if clicked_tile.dragging {
@@ -32,6 +32,8 @@ pub fn car_placement(
                         capacity: 4,
                     })
                     .insert(Editable);
+
+                selected_tool.tool = Tool::None;
             }
         }
     }

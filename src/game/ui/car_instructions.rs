@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::ClickedTile,
+    assets::{ClickedTile, Storage},
     car::{Car, CarInstructions},
     current_selection::CurrentlySelected,
     resource_specifications::ResourceSpecifications,
@@ -10,6 +10,7 @@ use crate::game::{
 
 #[derive(Clone, Default)]
 pub struct EditInstruction {
+    pub entity: Option<Entity>,
     pub index: Option<usize>,
     pub resource: Option<String>,
     pub select_mode: bool,
@@ -24,7 +25,7 @@ impl EditInstruction {
 
 pub fn program_ui(
     egui_context: ResMut<EguiContext>,
-    mut car_query: Query<&mut Car>,
+    mut car_query: Query<(&mut Car, &Storage)>,
     mut currently_selected: ResMut<CurrentlySelected>,
     mut edit_instruction: Local<EditInstruction>,
     clicked_tile: Res<ClickedTile>,
@@ -41,16 +42,23 @@ pub fn program_ui(
     }
 
     if let Some(entity) = currently_selected.entity {
-        if let Ok(mut car) = car_query.get_mut(entity) {
+        if let Ok((mut car, storage)) = car_query.get_mut(entity) {
             open = true;
+
+            if Some(entity) != edit_instruction.entity {
+                edit_instruction.entity = Some(entity);
+                edit_instruction.resource = Some(storage.resource.clone());
+            };
 
             if let Some(selected_index) = edit_instruction.index {
                 let instruction = &car.instructions[selected_index].clone();
 
                 if let Some(pos) = clicked_tile.pos {
-                    car.instructions[selected_index] = CarInstructions::GoTo(pos);
-                    currently_selected.locked = false;
-                    edit_instruction.confirm_selection();
+                    if edit_instruction.select_mode {
+                        car.instructions[selected_index] = CarInstructions::GoTo(pos);
+                        currently_selected.locked = false;
+                        edit_instruction.confirm_selection();
+                    }
                 }
 
                 egui::Window::new("Instruction").show(egui_context.ctx(), |ui| {
@@ -103,13 +111,18 @@ pub fn program_ui(
                         currently_selected.locked = true;
                     }
 
-                    for (id, resource) in resources.iter() {
-                        ui.radio_value(
-                            &mut edit_instruction.resource,
-                            Some(id.to_owned()),
-                            resource.name.clone(),
-                        );
-                    }
+                    egui::CollapsingHeader::new("Load / Unload Resource Configuration").show(
+                        ui,
+                        |ui| {
+                            for (id, resource) in resources.iter() {
+                                ui.radio_value(
+                                    &mut edit_instruction.resource,
+                                    Some(id.to_owned()),
+                                    resource.name.clone(),
+                                );
+                            }
+                        },
+                    );
 
                     if ui.button("Abort").clicked() {
                         edit_instruction.confirm_selection();
