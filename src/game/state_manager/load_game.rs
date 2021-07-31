@@ -70,32 +70,42 @@ fn load_state(
     buildings: &Res<BuildingSpecifications>,
 ) {
     for game_entity in state.entities {
-        let tile = Tile {
-            visible: false,
-            ..Default::default()
-        };
-
         match game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {
-                commands
+                let entity = commands
                     .spawn()
                     .insert(RequiresUpdate {
                         position: game_entity.pos,
                     })
                     .insert(vehicle.car)
                     .insert(vehicle.storage)
-                    .insert(Editable);
+                    .insert(Editable)
+                    .id();
+
+                if let Some(name) = game_entity.name {
+                    commands.entity(entity).insert(name);
+                }
             }
             GameEntityType::Building(building) => {
+                let tile = Tile {
+                    visible: false,
+                    ..Default::default()
+                };
+
                 if let Ok(entity) =
                     map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID)
                 {
-                    commands
+                    let entity = commands
                         .entity(entity)
                         .insert(RequiresUpdate {
                             position: game_entity.pos,
                         })
-                        .insert(Occupied);
+                        .insert(Occupied)
+                        .id();
+
+                    if let Some(name) = game_entity.name {
+                        commands.entity(entity).insert(name);
+                    }
 
                     match building {
                         BuildingEntity::Building(c) => {

@@ -1,8 +1,9 @@
 mod car_instructions;
 mod construction;
 mod export_station;
-mod helper;
 mod info;
+mod mouse_pos_to_tile;
+mod name;
 
 use bevy::prelude::*;
 
@@ -23,5 +24,10 @@ pub fn ui_system() -> SystemSet {
         .with_system(export_station::edit_ui.system().after(Label::InfoUI))
         .with_system(car_instructions::program_ui.system().after(Label::InfoUI))
         .with_system(construction::construction_ui.system().before(Label::UIEnd))
-        .with_system(helper::mouse_pos_to_tile.system().label(Label::UIEnd))
+        .with_system(name::name_ui.system().before(Label::UIEnd))
+        .with_system(
+            mouse_pos_to_tile::mouse_pos_to_tile
+                .system()
+                .label(Label::UIEnd),
+        )
 }

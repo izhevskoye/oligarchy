@@ -20,7 +20,7 @@ pub fn movement(
     egui_context: ResMut<EguiContext>,
     selected_tool: Res<SelectedTool>,
 ) {
-    if egui_context.ctx().wants_pointer_input() {
+    if egui_context.ctx().wants_pointer_input() || egui_context.ctx().wants_keyboard_input() {
         return;
     }
 

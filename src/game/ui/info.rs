@@ -67,6 +67,18 @@ pub fn info_ui(
                             currently_selected.editing = !currently_selected.editing;
                         }
                     }
+
+                    let label = if currently_selected.renaming {
+                        "close rename"
+                    } else if queries.2.get(entity).is_err() {
+                        "give name"
+                    } else {
+                        "rename"
+                    };
+                    if ui.button(label).clicked() {
+                        currently_selected.renaming = !currently_selected.renaming;
+                        currently_selected.locked = !currently_selected.locked;
+                    }
                 });
         }
     }
