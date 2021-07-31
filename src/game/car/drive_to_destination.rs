@@ -20,6 +20,10 @@ pub fn drive_to_destination(
         car_query.iter_mut().map(|(_, car)| car.position).collect();
 
     for (car_entity, mut car) in car_query.iter_mut() {
+        if !car.active {
+            continue;
+        }
+
         let mut waypoint = match waypoint_query.get_mut(car_entity) {
             Ok(waypoint) => waypoint,
             Err(_) => continue,
