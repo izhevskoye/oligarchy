@@ -7,4 +7,8 @@
       byproducts:
         - resource: cows
           rate: 0.05
+      enhancers:
+        - resource: animal_feed
+          rate: 1.25
+          modifier: 2.0
   group: Dairy

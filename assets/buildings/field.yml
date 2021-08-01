@@ -1,0 +1,10 @@
+"field":
+  name: Field
+  tile: 59
+  products:
+    - resource: corn
+      rate: 0.75
+
+    - resource: wheat
+      rate: 0.75
+  group: Agriculture
