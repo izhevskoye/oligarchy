@@ -1,8 +1,8 @@
-mod calculate_destination;
-mod drive_to_destination;
-mod instructions;
+pub mod calculate_destination;
+pub mod drive_to_destination;
+pub mod instructions;
 
-use bevy::{core::FixedTimestep, prelude::*};
+use bevy::prelude::*;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
@@ -84,20 +84,6 @@ pub struct Car {
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
     pub active: bool,
-}
-
-pub fn drive_system() -> SystemSet {
-    // TODO: refactor time
-    SystemSet::new()
-        .with_run_criteria(FixedTimestep::step(0.2))
-        .with_system(drive_to_destination::drive_to_destination.system())
-}
-
-pub fn instruction_system() -> SystemSet {
-    // TODO: refactor time
-    SystemSet::new()
-        .with_run_criteria(FixedTimestep::step(1.0))
-        .with_system(instructions::car_instruction.system())
 }
 
 fn update_car_sprite(

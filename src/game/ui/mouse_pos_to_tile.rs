@@ -3,21 +3,21 @@ use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiContext;
 
 use crate::game::{
-    assets::{ClickedTile, Occupied},
+    assets::{ClickedTile, MapSettings, Occupied},
     car::Car,
-    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH, TILE_SIZE},
+    constants::{CHUNK_SIZE, TILE_SIZE},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-fn eval_pos(x: f32, y: f32, modifier: i32) -> Option<UVec2> {
+fn eval_pos(map_settings: &Res<MapSettings>, x: f32, y: f32, modifier: i32) -> Option<UVec2> {
     let tile_size = TILE_SIZE / modifier as f32;
     let x = (x / tile_size).floor() as i32;
     let y = (y / tile_size).floor() as i32;
 
     if x < 0
-        || x >= (MAP_WIDTH * CHUNK_SIZE - 1) as i32 * modifier
+        || x >= (map_settings.width * CHUNK_SIZE - 1) as i32 * modifier
         || y < 0
-        || y >= (MAP_HEIGHT * CHUNK_SIZE - 1) as i32 * modifier
+        || y >= (map_settings.height * CHUNK_SIZE - 1) as i32 * modifier
     {
         return None;
     }
@@ -30,11 +30,15 @@ pub fn mouse_pos_to_tile(
     windows: Res<Windows>,
     mouse_input: Res<Input<MouseButton>>,
     mut clicked_tile: ResMut<ClickedTile>,
-    queries: (Query<&Transform, With<Camera>>, Query<&Occupied>),
-    car_query: Query<&Car>,
+    queries: (
+        Query<&Transform, With<Camera>>,
+        Query<&Occupied>,
+        Query<&Car>,
+    ),
     map_query: MapQuery,
+    map_settings: Res<MapSettings>,
 ) {
-    let (transform, occupied_query) = queries;
+    let (transform, occupied_query, car_query) = queries;
 
     clicked_tile.pos = None;
     clicked_tile.occupied_building = false;
@@ -56,8 +60,8 @@ pub fn mouse_pos_to_tile(
         let x = (pos.x - (win.width() / 2.0)) * transform.scale.x + transform.translation.x;
         let y = (pos.y - (win.height() / 2.0)) * transform.scale.y + transform.translation.y;
 
-        clicked_tile.pos = eval_pos(x, y, 1);
-        clicked_tile.vehicle_pos = eval_pos(x, y, 2);
+        clicked_tile.pos = eval_pos(&map_settings, x, y, 1);
+        clicked_tile.vehicle_pos = eval_pos(&map_settings, x, y, 2);
         clicked_tile.dragging = !mouse_input.just_pressed(MouseButton::Left);
 
         if let Some(pos) = clicked_tile.pos {

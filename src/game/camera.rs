@@ -7,6 +7,9 @@ use bevy_egui::EguiContext;
 
 use crate::game::assets::{SelectedTool, Tool};
 
+const MAX_ZOOM_OUT: f32 = 0.1;
+const MAX_ZOOM_IN: f32 = 1.5;
+
 // A simple camera system for moving and zooming the camera.
 #[allow(clippy::too_many_arguments)]
 pub fn movement(
@@ -70,12 +73,12 @@ pub fn movement(
 
     let win = windows.get_primary().expect("no primary window");
 
-    if scale > 1.5 {
-        scale = 1.5;
+    if scale > MAX_ZOOM_IN {
+        scale = MAX_ZOOM_IN;
     }
 
-    if scale < 0.1 {
-        scale = 0.1;
+    if scale < MAX_ZOOM_OUT {
+        scale = MAX_ZOOM_OUT;
     }
 
     if scroll != 0.0 {

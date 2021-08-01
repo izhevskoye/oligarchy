@@ -5,6 +5,22 @@ use bevy_egui::egui::Ui;
 
 use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
 
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct MapSettings {
+    pub width: u32,
+    pub height: u32,
+}
+
+impl Default for MapSettings {
+    fn default() -> Self {
+        Self {
+            width: 3,
+            height: 3,
+        }
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {

@@ -1,35 +1,7 @@
-mod car_instructions;
-mod construction;
-mod export_station;
-mod info;
-mod mouse_pos_to_tile;
-mod name;
-mod production_building;
-
-use bevy::prelude::*;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
-pub enum Label {
-    InfoUI,
-    UIEnd,
-}
-
-pub fn ui_system() -> SystemSet {
-    SystemSet::new()
-        .with_system(
-            info::info_ui
-                .system()
-                .before(Label::UIEnd)
-                .label(Label::InfoUI),
-        )
-        .with_system(export_station::edit_ui.system().after(Label::InfoUI))
-        .with_system(production_building::edit_ui.system().after(Label::InfoUI))
-        .with_system(car_instructions::program_ui.system().after(Label::InfoUI))
-        .with_system(construction::construction_ui.system().before(Label::UIEnd))
-        .with_system(name::name_ui.system().before(Label::UIEnd))
-        .with_system(
-            mouse_pos_to_tile::mouse_pos_to_tile
-                .system()
-                .label(Label::UIEnd),
-        )
-}
+pub mod car_instructions;
+pub mod construction;
+pub mod export_station;
+pub mod info;
+pub mod mouse_pos_to_tile;
+pub mod name;
+pub mod production_building;
