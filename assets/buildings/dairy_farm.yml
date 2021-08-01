@@ -10,5 +10,5 @@
       enhancers:
         - resource: animal_feed
           rate: 0.1
-          multiplier: 2.0
+          modifier: 2.0
   group: Dairy
