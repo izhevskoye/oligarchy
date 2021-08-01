@@ -4,6 +4,8 @@
   products:
     - resource: hogs
       rate: 0.5
-      # requisites:
-      # - sunflower.seeds
+      enhancers:
+        - resource: animal_feed
+          rate: 0.1
+          multiplier: 2.0
   group: Meat

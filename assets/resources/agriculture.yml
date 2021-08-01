@@ -53,3 +53,27 @@
   car_tile:
     horizontal: 82
     vertical: 85
+
+"animal_feed":
+  name: Animal Feed
+  storage_tile: 58
+  group: Agriculture
+  car_tile:
+    horizontal: 82
+    vertical: 85
+
+"corn":
+  name: Corn
+  storage_tile: 56
+  group: Agriculture
+  car_tile:
+    horizontal: 82
+    vertical: 85
+
+"wheat":
+  name: Wheat
+  storage_tile: 57
+  group: Agriculture
+  car_tile:
+    horizontal: 82
+    vertical: 85

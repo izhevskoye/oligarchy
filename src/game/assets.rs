@@ -59,7 +59,15 @@ pub struct ProductDependency {
     pub rate: f64,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ProductEnhancer {
+    pub resource: String,
+    pub rate: f64,
+    pub modifier: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Product {
     pub resource: String,
@@ -68,6 +76,8 @@ pub struct Product {
     pub requisites: Vec<ProductDependency>,
     #[serde(default)]
     pub byproducts: Vec<ProductDependency>,
+    #[serde(default)]
+    pub enhancers: Vec<ProductEnhancer>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

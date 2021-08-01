@@ -1,0 +1,22 @@
+"feed_processing_plant":
+  name: Feed Processing Plant
+  tile: 60
+  products:
+    - resource: animal_feed
+      rate: 1.0
+      requisites:
+        - resource: corn
+          rate: 1.1
+
+    - resource: animal_feed
+      rate: 1.0
+      requisites:
+        - resource: wheat
+          rate: 1.1
+
+    - resource: animal_feed
+      rate: 1.0
+      requisites:
+        - resource: sunflower.seeds
+          rate: 2.0
+  group: Agriculture
