@@ -42,6 +42,31 @@ pub fn program_ui(
     }
 
     if let Some(entity) = currently_selected.entity {
+        if edit_instruction.index.is_none() {
+            if let Some(pos) = clicked_tile.vehicle_pos {
+                if edit_instruction.select_mode && clicked_tile.occupied_vehicle {
+                    // clone instructions
+                    let instructions = car_query.iter_mut().find_map(|(other_car, _storage)| {
+                        if other_car.position == pos {
+                            Some(other_car.instructions.clone())
+                        } else {
+                            None
+                        }
+                    });
+
+                    if let Some(instructions) = instructions {
+                        if let Ok((mut car, _storage)) = car_query.get_mut(entity) {
+                            car.current_instruction = 0;
+                            car.instructions = instructions;
+                        }
+                    }
+
+                    edit_instruction.select_mode = false;
+                    currently_selected.locked = false;
+                }
+            }
+        }
+
         if let Ok((mut car, storage)) = car_query.get_mut(entity) {
             open = true;
 
@@ -142,12 +167,22 @@ pub fn program_ui(
                     }
                 });
 
+                ui.horizontal(|ui| {
+                    if ui.button("Clone instructions").clicked() {
+                        edit_instruction.select_mode = !edit_instruction.select_mode;
+                        edit_instruction.index = None;
+                        currently_selected.locked = true;
+                    }
+                });
+
                 let instructions = car.instructions.clone();
                 for (index, instruction) in instructions.iter().enumerate() {
                     ui.horizontal(|ui| {
                         ui.label(instruction.format(&resources));
                         if ui.button("Edit").clicked() {
+                            edit_instruction.select_mode = false;
                             edit_instruction.index = Some(index);
+                            currently_selected.locked = false;
                         }
 
                         if ui.button("Delete").clicked() {
