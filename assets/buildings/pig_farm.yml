@@ -6,6 +6,6 @@
       rate: 0.5
       enhancers:
         - resource: animal_feed
-          rate: 0.1
+          rate: 1.0
           modifier: 2.0
   group: Meat

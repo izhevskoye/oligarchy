@@ -6,13 +6,13 @@
       rate: 0.2
       enhancers:
         - resource: animal_feed
-          rate: 0.1
+          rate: 0.4
           modifier: 2.0
 
     - resource: chicken
-      rate: 0.6
+      rate: 0.3
       enhancers:
         - resource: animal_feed
-          rate: 0.1
+          rate: 1.2
           modifier: 2.0
   group: Meat
