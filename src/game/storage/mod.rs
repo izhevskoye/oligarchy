@@ -24,18 +24,18 @@ pub fn distribute_to_storage(
     entities.shuffle(&mut random);
 
     for storage in entities.iter() {
-        let mut storage = storage_query.get_mut(*storage).unwrap();
+        if let Ok(mut storage) = storage_query.get_mut(*storage) {
+            if storage.resource == resource && storage.amount < storage.capacity {
+                let space_left = storage.capacity - storage.amount;
+                let amount_added = if space_left < amount_left {
+                    space_left
+                } else {
+                    amount_left
+                };
 
-        if storage.resource == resource && storage.amount < storage.capacity {
-            let space_left = storage.capacity - storage.amount;
-            let amount_added = if space_left < amount_left {
-                space_left
-            } else {
-                amount_left
-            };
-
-            storage.amount += amount_added;
-            amount_left -= amount_added;
+                storage.amount += amount_added;
+                amount_left -= amount_added;
+            }
         }
 
         if amount_left <= 0.0 {
@@ -43,7 +43,7 @@ pub fn distribute_to_storage(
         }
     }
 
-    panic!("Expected some storage to accept resource");
+    log::error!("Expected some storage to accept resource");
 }
 
 pub fn has_in_storage(
@@ -52,13 +52,14 @@ pub fn has_in_storage(
     resource: &str,
     amount: f64,
 ) -> bool {
+    assert!(amount > 0.0);
     let mut amount_needed = amount;
 
     for storage in consolidator.connected_storage.iter() {
-        let storage = storage_query.get_mut(*storage).unwrap();
-
-        if storage.resource == resource && storage.amount > 0.0 {
-            amount_needed -= storage.amount
+        if let Ok(storage) = storage_query.get_mut(*storage) {
+            if storage.resource == resource && storage.amount > 0.0 {
+                amount_needed -= storage.amount
+            }
         }
 
         if amount_needed <= 0.0 {
@@ -75,13 +76,14 @@ pub fn has_space_in_storage(
     resource: &str,
     amount: f64,
 ) -> bool {
+    assert!(amount > 0.0);
     let mut amount_found = 0.0;
     for storage in consolidator.connected_storage.iter() {
-        let storage = storage_query.get_mut(*storage).unwrap();
-
-        if storage.resource == resource && storage.amount < storage.capacity {
-            let space_left = storage.capacity - storage.amount;
-            amount_found += space_left;
+        if let Ok(storage) = storage_query.get_mut(*storage) {
+            if storage.resource == resource && storage.amount < storage.capacity {
+                let space_left = storage.capacity - storage.amount;
+                amount_found += space_left;
+            }
         }
 
         if amount_found >= amount {
@@ -108,16 +110,16 @@ pub fn fetch_from_storage(
     entities.shuffle(&mut random);
 
     for storage in entities.iter() {
-        let mut storage = storage_query.get_mut(*storage).unwrap();
-
-        if storage.resource == resource && storage.amount > 0.0 {
-            let amount_taken = if storage.amount < amount_left {
-                storage.amount
-            } else {
-                amount_left
-            };
-            storage.amount -= amount_taken;
-            amount_left -= amount_taken;
+        if let Ok(mut storage) = storage_query.get_mut(*storage) {
+            if storage.resource == resource && storage.amount > 0.0 {
+                let amount_taken = if storage.amount < amount_left {
+                    storage.amount
+                } else {
+                    amount_left
+                };
+                storage.amount -= amount_taken;
+                amount_left -= amount_taken;
+            }
         }
 
         if amount_left <= 0.0 {
