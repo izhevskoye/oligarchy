@@ -5,6 +5,7 @@ use crate::game::{
     assets::{
         ClickedTile, Occupied, RequiresUpdate, SelectedTool, Storage, StorageConsolidator, Tool,
     },
+    constants::STORAGE_SIZE,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -31,7 +32,7 @@ pub fn storage_placement(
                     .insert(Storage {
                         resource: resource.clone(),
                         amount: 0.0,
-                        capacity: 20.0,
+                        capacity: STORAGE_SIZE,
                     })
                     .insert(RequiresUpdate { position: pos })
                     .insert(Occupied);
