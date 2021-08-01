@@ -4,7 +4,9 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Editable, Occupied, ProductionBuilding, RequiresUpdate, StorageConsolidator},
+    assets::{
+        Building, Editable, Occupied, ProductionBuilding, RequiresUpdate, StorageConsolidator,
+    },
     building_specifications::BuildingSpecifications,
     car::Car,
     constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
@@ -110,7 +112,9 @@ fn load_state(
                     match building {
                         BuildingEntity::Building(c) => {
                             let building = buildings.get(&c.id).unwrap();
-                            commands.entity(entity).insert(c);
+                            commands
+                                .entity(entity)
+                                .insert(Building { id: c.id.clone() });
 
                             if !building.products.is_empty() {
                                 commands
@@ -118,7 +122,7 @@ fn load_state(
                                     .insert(StorageConsolidator::default())
                                     .insert(ProductionBuilding {
                                         products: building.products.clone(),
-                                        active_product: 0,
+                                        active_product: c.active_product,
                                     });
 
                                 if building.products.len() > 1 {
