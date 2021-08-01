@@ -49,7 +49,12 @@ pub fn construction_ui(
             group_names.sort_by_key(|a| a.to_lowercase());
 
             for group in group_names.iter() {
-                let resources = groups.remove_all(group).unwrap();
+                let resources = groups.get_all_mut(group).unwrap();
+                resources.sort_by_key(|(_id, r)| r.name.to_lowercase());
+            }
+
+            for group in group_names.iter() {
+                let resources = groups.get_all(group).unwrap().clone();
 
                 egui::CollapsingHeader::new(format!("Transport: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
@@ -71,16 +76,8 @@ pub fn construction_ui(
 
             ui.heading("Storage");
 
-            let mut groups = CollectingHashMap::new();
-            for (id, resource) in resources.iter() {
-                groups.insert(resource.group.clone(), (id, resource));
-            }
-
-            let mut group_names: Vec<String> = groups.keys().cloned().collect();
-            group_names.sort_by_key(|a| a.to_lowercase());
-
             for group in group_names.iter() {
-                let resources = groups.remove_all(group).unwrap();
+                let resources = groups.get_all(group).unwrap().clone();
 
                 egui::CollapsingHeader::new(format!("Storage: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
@@ -111,7 +108,12 @@ pub fn construction_ui(
             group_names.sort_by_key(|a| a.to_lowercase());
 
             for group in group_names.iter() {
-                let buildings = groups.remove_all(group).unwrap();
+                let buildings = groups.get_all_mut(group).unwrap();
+                buildings.sort_by_key(|(_id, r)| r.name.to_lowercase());
+            }
+
+            for group in group_names.iter() {
+                let buildings = groups.get_all(group).unwrap();
 
                 egui::CollapsingHeader::new(format!("Building: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
