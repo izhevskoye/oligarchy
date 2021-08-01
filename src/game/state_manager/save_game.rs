@@ -4,10 +4,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Building, ExportStation, Name, Storage, Street},
+    assets::{Building, ExportStation, Name, ProductionBuilding, Storage, Street},
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
-    state_manager::{BuildingEntity, GameEntity, GameEntityType, GameState, Vehicle},
+    state_manager::{
+        BuildingEntity, GameEntity, GameEntityType, GameState, SerializedBuilding, Vehicle,
+    },
 };
 
 #[allow(clippy::type_complexity)]
@@ -18,7 +20,7 @@ pub fn save_game(
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Street>,
-        Query<&Building>,
+        Query<(&Building, Option<&ProductionBuilding>)>,
     ),
     map_query: &mut MapQuery,
 ) {
@@ -61,12 +63,21 @@ pub fn save_game(
                     None
                 };
 
-                if let Ok(building) = building_query.get(entity) {
+                if let Ok((building, production_building)) = building_query.get(entity) {
+                    let active_product = if let Some(pb) = production_building {
+                        pb.active_product
+                    } else {
+                        0
+                    };
+
                     state.entities.push(GameEntity {
                         pos,
                         name: name.clone(),
                         entity: GameEntityType::Building(BuildingEntity::Building(
-                            building.clone(),
+                            SerializedBuilding {
+                                id: building.id.clone(),
+                                active_product,
+                            },
                         )),
                     });
                 }

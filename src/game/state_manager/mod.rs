@@ -15,12 +15,21 @@ use crate::game::{
     car::Car,
 };
 
+use super::assets::ProductionBuilding;
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct SerializedBuilding {
+    pub id: String,
+    pub active_product: usize,
+}
+
 #[derive(Serialize, Deserialize)]
 pub enum BuildingEntity {
     Storage(Storage),
     ExportStation(ExportStation),
     Street(Street),
-    Building(Building),
+    Building(SerializedBuilding),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -56,7 +65,7 @@ pub fn save_ui(
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Street>,
-        Query<&Building>,
+        Query<(&Building, Option<&ProductionBuilding>)>,
     ),
     egui_context: ResMut<EguiContext>,
     mut map_query: MapQuery,
