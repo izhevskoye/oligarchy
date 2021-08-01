@@ -1,5 +1,3 @@
-use std::{fs::File, io::prelude::*, path::Path};
-
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
@@ -8,142 +6,117 @@ use crate::game::{
         Building, Editable, Occupied, ProductionBuilding, RequiresUpdate, StorageConsolidator,
     },
     building_specifications::BuildingSpecifications,
-    car::Car,
-    constants::{CHUNK_SIZE, MAP_HEIGHT, MAP_WIDTH},
     setup::{BUILDING_LAYER_ID, MAP_ID},
-    state_manager::{BuildingEntity, GameEntityType, GameState},
+    state_manager::{
+        BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
+    },
 };
 
 pub fn load_game(
-    commands: &mut Commands,
-    map_query: &mut MapQuery,
-    car_query: &Query<(Entity, &Car)>,
-    buildings: &Res<BuildingSpecifications>,
+    mut commands: Commands,
+    mut map_query: MapQuery,
+    buildings: Res<BuildingSpecifications>,
+    mut load_game: EventReader<LoadGameEvent>,
 ) {
-    let path = Path::new("world.yaml");
-    let mut file = match File::open(&path) {
-        Ok(file) => file,
-        Err(why) => {
-            log::error!("Could not read file: {}", why);
-            return;
-        }
-    };
-
-    let mut content = String::new();
-    let _ = file.read_to_string(&mut content);
-
-    let state: Result<GameState, serde_yaml::Error> = serde_yaml::from_str(&content);
-
-    match state {
-        Ok(state) => {
-            reset_state(commands, map_query, car_query);
-            load_state(commands, map_query, state, buildings);
-        }
-        Err(why) => log::error!("Could not load state: {}", why),
-    }
-}
-
-fn reset_state(
-    commands: &mut Commands,
-    map_query: &mut MapQuery,
-    car_query: &Query<(Entity, &Car)>,
-) {
-    map_query.despawn_layer_tiles(commands, MAP_ID, BUILDING_LAYER_ID);
-
-    for (entity, _car) in car_query.iter() {
-        commands.entity(entity).despawn_recursive();
-    }
-
-    for x in 0..MAP_WIDTH {
-        for y in 0..MAP_HEIGHT {
-            map_query.notify_chunk_for_tile(
-                UVec2::new(x * CHUNK_SIZE, y * CHUNK_SIZE),
-                MAP_ID,
-                BUILDING_LAYER_ID,
-            );
-        }
+    for event in load_game.iter() {
+        load_state(&mut commands, &mut map_query, &event.state, &buildings);
     }
 }
 
 fn load_state(
     commands: &mut Commands,
     map_query: &mut MapQuery,
-    state: GameState,
+    state: &GameState,
     buildings: &Res<BuildingSpecifications>,
 ) {
-    for game_entity in state.entities {
-        match game_entity.entity {
+    for game_entity in &state.entities {
+        match &game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {
-                let entity = commands
-                    .spawn()
-                    .insert(RequiresUpdate {
-                        position: game_entity.pos,
-                    })
-                    .insert(vehicle.car)
-                    .insert(vehicle.storage)
-                    .insert(Editable)
-                    .id();
-
-                if let Some(name) = game_entity.name {
-                    commands.entity(entity).insert(name);
-                }
+                insert_car(commands, vehicle, game_entity);
             }
             GameEntityType::Building(building) => {
-                let tile = Tile {
-                    visible: false,
-                    ..Default::default()
-                };
+                insert_building(commands, building, game_entity, map_query, buildings);
+            }
+        }
+    }
+}
 
-                if let Ok(entity) =
-                    map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID)
-                {
-                    let entity = commands
+fn insert_car(commands: &mut Commands, vehicle: &Vehicle, game_entity: &GameEntity) {
+    let entity = commands
+        .spawn()
+        .insert(RequiresUpdate {
+            position: game_entity.pos,
+        })
+        .insert(vehicle.car.clone())
+        .insert(vehicle.storage.clone())
+        .insert(Editable)
+        .id();
+
+    if let Some(name) = &game_entity.name {
+        commands.entity(entity).insert(name.clone());
+    }
+}
+
+fn insert_building(
+    commands: &mut Commands,
+    building: &BuildingEntity,
+    game_entity: &GameEntity,
+    map_query: &mut MapQuery,
+    buildings: &Res<BuildingSpecifications>,
+) {
+    let tile = Tile {
+        visible: false,
+        ..Default::default()
+    };
+
+    match map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID) {
+        Err(why) => log::error!("Failed to set tile: {:?}", why),
+        Ok(entity) => {
+            let entity = commands
+                .entity(entity)
+                .insert(RequiresUpdate {
+                    position: game_entity.pos,
+                })
+                .insert(Occupied)
+                .id();
+
+            if let Some(name) = &game_entity.name {
+                commands.entity(entity).insert(name.clone());
+            }
+
+            match building {
+                BuildingEntity::Building(c) => {
+                    let building = buildings.get(&c.id).unwrap();
+                    commands
                         .entity(entity)
-                        .insert(RequiresUpdate {
-                            position: game_entity.pos,
-                        })
-                        .insert(Occupied)
-                        .id();
+                        .insert(Building { id: c.id.clone() });
 
-                    if let Some(name) = game_entity.name {
-                        commands.entity(entity).insert(name);
-                    }
+                    if !building.products.is_empty() {
+                        commands
+                            .entity(entity)
+                            .insert(StorageConsolidator::default())
+                            .insert(ProductionBuilding {
+                                products: building.products.clone(),
+                                active_product: c.active_product,
+                            });
 
-                    match building {
-                        BuildingEntity::Building(c) => {
-                            let building = buildings.get(&c.id).unwrap();
-                            commands
-                                .entity(entity)
-                                .insert(Building { id: c.id.clone() });
-
-                            if !building.products.is_empty() {
-                                commands
-                                    .entity(entity)
-                                    .insert(StorageConsolidator::default())
-                                    .insert(ProductionBuilding {
-                                        products: building.products.clone(),
-                                        active_product: c.active_product,
-                                    });
-
-                                if building.products.len() > 1 {
-                                    commands.entity(entity).insert(Editable);
-                                }
-                            }
-                        }
-                        BuildingEntity::Street(c) => {
-                            commands.entity(entity).insert(c);
-                        }
-                        BuildingEntity::Storage(c) => {
-                            commands.entity(entity).insert(c);
-                        }
-                        BuildingEntity::ExportStation(c) => {
-                            commands
-                                .entity(entity)
-                                .insert(c)
-                                .insert(Editable)
-                                .insert(StorageConsolidator::default());
+                        if building.products.len() > 1 {
+                            commands.entity(entity).insert(Editable);
                         }
                     }
+                }
+                BuildingEntity::Street(c) => {
+                    commands.entity(entity).insert(c.clone());
+                }
+                BuildingEntity::Storage(c) => {
+                    commands.entity(entity).insert(c.clone());
+                }
+                BuildingEntity::ExportStation(c) => {
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(Editable)
+                        .insert(StorageConsolidator::default());
                 }
             }
         }

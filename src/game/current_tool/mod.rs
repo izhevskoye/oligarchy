@@ -1,9 +1,9 @@
-mod building;
-mod bulldoze;
-mod car;
-mod export_station;
-mod storage;
-mod street;
+pub mod building;
+pub mod bulldoze;
+pub mod car;
+pub mod export_station;
+pub mod storage;
+pub mod street;
 
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
@@ -54,14 +54,4 @@ fn update_neighbor_streets(
             }
         }
     }
-}
-
-pub fn current_tool_system() -> SystemSet {
-    SystemSet::new()
-        .with_system(street::street_placement.system())
-        .with_system(storage::storage_placement.system())
-        .with_system(export_station::export_station_placement.system())
-        .with_system(car::car_placement.system())
-        .with_system(building::building_placement.system())
-        .with_system(bulldoze::bulldoze.system())
 }
