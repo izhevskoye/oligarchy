@@ -31,7 +31,8 @@ pub fn edit_ui(
                 group_names.sort_by_key(|a| a.to_lowercase());
 
                 for group in group_names.iter() {
-                    let resources = groups.remove_all(group).unwrap();
+                    let mut resources = groups.remove_all(group).unwrap();
+                    resources.sort_by_key(|(_id, r)| r.name.to_lowercase());
 
                     let count = resources
                         .iter()
