@@ -28,6 +28,7 @@ pub fn bulldoze(
             if let Some(pos) = clicked_tile.vehicle_pos {
                 for (entity, position) in car_query.iter() {
                     if position.position == pos {
+                        // TODO: breaks pathfinding due to not receiving update!
                         commands.entity(entity).despawn_recursive();
                     }
                 }
