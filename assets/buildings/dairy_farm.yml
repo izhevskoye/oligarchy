@@ -3,7 +3,7 @@
   tile: 48
   products:
     - resource: milk
-      rate: 1.0
+      rate: 0.5
       byproducts:
         - resource: cows
           rate: 0.05

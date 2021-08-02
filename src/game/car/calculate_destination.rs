@@ -17,7 +17,7 @@ fn cost_fn<'a, 'b: 'a>(
     map_query: &'b MapQuery,
     street_query: &'a Query<(), With<Street>>,
     occupied_query: &'a Query<(), With<Occupied>>,
-) -> impl 'a + FnMut((usize, usize)) -> isize {
+) -> impl 'a + Fn((usize, usize)) -> isize {
     move |(x, y)| match map_query.get_tile_entity(
         UVec2::new(x as u32, y as u32),
         MAP_ID,
