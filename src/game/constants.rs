@@ -6,6 +6,10 @@ pub const CHUNK_SIZE: u32 = 16;
 pub const STORAGE_SIZE: f64 = 250.0;
 pub const CAR_STORAGE_SIZE: f64 = 20.0;
 
+pub const PRODUCTION_TICK_SPEED: f64 = 2.5;
+pub const CAR_DRIVE_TICK_SPEED: f64 = 0.2;
+pub const CAR_INSTRUCTION_TICK_SPEED: f64 = 0.25;
+
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
     WaterDeep,
