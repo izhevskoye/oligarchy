@@ -65,16 +65,15 @@ pub fn calculate_destination(
 
         updated = true;
     } else {
-        // safe unwrap due because it is always created above
-        let pathfinding = pathfinding.as_mut().unwrap();
-
         let changes: Vec<(usize, usize)> = update_query
             .iter()
             .map(|update| (update.position.x as usize, update.position.y as usize))
             .collect();
 
         if !changes.is_empty() {
+            // safe unwrap due because it is always created above
             log::info!("Updating pathfinding cache: {:?}", changes);
+            let pathfinding = pathfinding.as_mut().unwrap();
             pathfinding.tiles_changed(
                 &changes,
                 cost_fn(&map_query, &street_query, &occupied_query),
