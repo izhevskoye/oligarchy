@@ -164,7 +164,8 @@ impl Game {
                     .before(Label::Update)
                     .with_run_criteria(FixedTimestep::step(PRODUCTION_TICK_SPEED))
                     .with_system(production::export_station::export_station.system())
-                    .with_system(production::production_building::production_building.system()),
+                    .with_system(production::production_building::production_building.system())
+                    .with_system(production::spawn_idle.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)

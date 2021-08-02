@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{ClickedTile, Storage},
+    assets::{ClickedTile, Position, Storage},
     car::{Car, CarInstructions},
     current_selection::CurrentlySelected,
     resource_specifications::ResourceSpecifications,
@@ -25,7 +25,7 @@ impl EditInstruction {
 
 pub fn program_ui(
     egui_context: ResMut<EguiContext>,
-    mut car_query: Query<(&mut Car, &Storage)>,
+    mut car_query: Query<(&mut Car, &Storage, &Position)>,
     mut currently_selected: ResMut<CurrentlySelected>,
     mut edit_instruction: Local<EditInstruction>,
     clicked_tile: Res<ClickedTile>,
@@ -46,16 +46,19 @@ pub fn program_ui(
             if let Some(pos) = clicked_tile.vehicle_pos {
                 if edit_instruction.select_mode && clicked_tile.occupied_vehicle {
                     // clone instructions
-                    let instructions = car_query.iter_mut().find_map(|(other_car, _storage)| {
-                        if other_car.position == pos {
-                            Some(other_car.instructions.clone())
-                        } else {
-                            None
-                        }
-                    });
+                    let instructions =
+                        car_query
+                            .iter_mut()
+                            .find_map(|(other_car, _storage, position)| {
+                                if position.position == pos {
+                                    Some(other_car.instructions.clone())
+                                } else {
+                                    None
+                                }
+                            });
 
                     if let Some(instructions) = instructions {
-                        if let Ok((mut car, _storage)) = car_query.get_mut(entity) {
+                        if let Ok((mut car, _storage, _position)) = car_query.get_mut(entity) {
                             car.current_instruction = 0;
                             car.instructions = instructions;
                         }
@@ -67,7 +70,7 @@ pub fn program_ui(
             }
         }
 
-        if let Ok((mut car, storage)) = car_query.get_mut(entity) {
+        if let Ok((mut car, storage, _position)) = car_query.get_mut(entity) {
             open = true;
 
             if Some(entity) != edit_instruction.entity {

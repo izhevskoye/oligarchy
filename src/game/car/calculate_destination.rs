@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{Occupied, RequiresUpdate, Street},
+    assets::{Occupied, Position, RequiresUpdate, Street},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -38,10 +38,10 @@ fn cost_fn<'a, 'b: 'a>(
 
 pub fn calculate_destination(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &Car, &Destination)>,
+    mut car_query: Query<(Entity, &Destination, &Position), With<Car>>,
     street_query: Query<(), With<Street>>,
     occupied_query: Query<(), With<Occupied>>,
-    update_query: Query<&RequiresUpdate, With<Tile>>,
+    update_query: Query<&Position, (With<Tile>, With<RequiresUpdate>)>,
     map_query: MapQuery,
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,
 ) {
@@ -67,7 +67,7 @@ pub fn calculate_destination(
 
         let changes: Vec<(usize, usize)> = update_query
             .iter()
-            .map(|update| (update.position.x as usize, update.position.y as usize))
+            .map(|position| (position.position.x as usize, position.position.y as usize))
             .collect();
 
         if !changes.is_empty() {
@@ -86,10 +86,13 @@ pub fn calculate_destination(
     // safe unwrap due because it is always created above
     let pathfinding = pathfinding.as_ref().unwrap();
 
-    for (car_entity, car, destination) in car_query.iter_mut() {
+    for (car_entity, destination, position) in car_query.iter_mut() {
         log::info!("Calculating pathfinding");
         let path = pathfinding.find_path(
-            (car.position.x as usize / 2, car.position.y as usize / 2),
+            (
+                position.position.x as usize / 2,
+                position.position.y as usize / 2,
+            ),
             (
                 destination.destination.x as usize,
                 destination.destination.y as usize,

@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiContext;
 
 use crate::game::{
-    assets::{ClickedTile, MapSettings, Occupied},
+    assets::{ClickedTile, MapSettings, Occupied, Position},
     car::Car,
     constants::{CHUNK_SIZE, TILE_SIZE},
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -33,7 +33,7 @@ pub fn mouse_pos_to_tile(
     queries: (
         Query<&Transform, With<Camera>>,
         Query<&Occupied>,
-        Query<&Car>,
+        Query<&Position, With<Car>>,
     ),
     map_query: MapQuery,
     map_settings: Res<MapSettings>,
@@ -74,7 +74,9 @@ pub fn mouse_pos_to_tile(
         }
 
         if let Some(vehicle_pos) = clicked_tile.vehicle_pos {
-            clicked_tile.occupied_vehicle = car_query.iter().any(|car| car.position == vehicle_pos);
+            clicked_tile.occupied_vehicle = car_query
+                .iter()
+                .any(|position| position.position == vehicle_pos);
         }
     }
 }

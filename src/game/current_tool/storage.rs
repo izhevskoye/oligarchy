@@ -3,7 +3,8 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        ClickedTile, Occupied, RequiresUpdate, SelectedTool, Storage, StorageConsolidator, Tool,
+        ClickedTile, Occupied, Position, RequiresUpdate, SelectedTool, Storage,
+        StorageConsolidator, Tool,
     },
     constants::STORAGE_SIZE,
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -34,16 +35,15 @@ pub fn storage_placement(
                         amount: 0.0,
                         capacity: STORAGE_SIZE,
                     })
-                    .insert(RequiresUpdate { position: pos })
+                    .insert(RequiresUpdate)
+                    .insert(Position { position: pos })
                     .insert(Occupied);
 
                 let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
-                for (pos, neighbor) in neighbors.iter() {
+                for (_pos, neighbor) in neighbors.iter() {
                     if let Some(neighbor) = neighbor {
                         if let Ok(entity) = consolidator_query.get(*neighbor) {
-                            commands.entity(entity).insert(RequiresUpdate {
-                                position: pos.as_u32(),
-                            });
+                            commands.entity(entity).insert(RequiresUpdate);
                         }
                     }
                 }

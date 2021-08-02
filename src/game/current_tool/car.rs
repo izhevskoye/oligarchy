@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Direction, Editable, SelectedTool, Storage, Tool},
+    assets::{ClickedTile, Direction, Editable, Position, SelectedTool, Storage, Tool},
     car::{Car, CarInstructions},
     constants::CAR_STORAGE_SIZE,
 };
@@ -20,8 +20,8 @@ pub fn car_placement(
             if let Some(pos) = clicked_tile.vehicle_pos {
                 commands
                     .spawn()
+                    .insert(Position { position: pos })
                     .insert(Car {
-                        position: pos,
                         direction: Direction::North,
                         instructions: vec![CarInstructions::Nop],
                         current_instruction: 0,

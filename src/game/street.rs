@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::{RequiresUpdate, Street},
+    assets::{Position, RequiresUpdate, Street},
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -93,13 +93,13 @@ fn eval_neighbor(entity: Option<Entity>, street_query: &Query<&Street>) -> bool 
 }
 
 pub fn update_streets(
-    mut tile_query: Query<(&mut Tile, &RequiresUpdate), With<Street>>,
+    mut tile_query: Query<(&mut Tile, &Position), (With<Street>, With<RequiresUpdate>)>,
     street_query: Query<&Street>,
     map_query: MapQuery,
 ) {
-    for (mut tile, update) in tile_query.iter_mut() {
+    for (mut tile, position) in tile_query.iter_mut() {
         let mut ns = NeighborStructure::default();
-        let pos = UVec2::new(update.position.x, update.position.y);
+        let pos = UVec2::new(position.position.x, position.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
         // N, S, W, E, NW, NE, SW, SE.
         ns.north = eval_neighbor(neighbors[0].1, &street_query);

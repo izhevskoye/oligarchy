@@ -5,8 +5,6 @@ use bevy_egui::egui::Ui;
 
 use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
 
-pub struct Idle;
-
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct MapSettings {
@@ -21,6 +19,10 @@ impl Default for MapSettings {
             height: 3,
         }
     }
+}
+
+pub struct Position {
+    pub position: UVec2,
 }
 
 #[derive(Deserialize)]
@@ -102,9 +104,7 @@ pub struct StorageConsolidator {
     pub connected_storage: Vec<Entity>,
 }
 
-pub struct RequiresUpdate {
-    pub position: UVec2,
-}
+pub struct RequiresUpdate;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
