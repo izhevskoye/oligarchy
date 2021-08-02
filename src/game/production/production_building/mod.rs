@@ -4,15 +4,16 @@ mod tests;
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{ProductionBuilding, Storage, StorageConsolidator},
+    assets::{Idle, ProductionBuilding, Storage, StorageConsolidator},
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
 };
 
 pub fn production_building(
-    building_query: Query<(&ProductionBuilding, &StorageConsolidator)>,
+    mut commands: Commands,
+    building_query: Query<(Entity, &ProductionBuilding, &StorageConsolidator)>,
     mut storage_query: Query<&mut Storage>,
 ) {
-    for (building, consolidator) in building_query.iter() {
+    for (entity, building, consolidator) in building_query.iter() {
         let product = &building.products[building.active_product];
 
         let has_requisites = product.requisites.iter().all(|requisite| {
@@ -70,6 +71,8 @@ pub fn production_building(
                 product.rate * modifier,
             );
 
+            commands.entity(entity).remove::<Idle>();
+
             for byproduct in &product.byproducts {
                 if has_space_in_storage(
                     consolidator,
@@ -85,6 +88,9 @@ pub fn production_building(
                     );
                 }
             }
+        } else {
+            // not produced
+            commands.entity(entity).insert(Idle);
         }
     }
 }

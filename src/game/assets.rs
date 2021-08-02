@@ -5,6 +5,8 @@ use bevy_egui::egui::Ui;
 
 use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
 
+pub struct Idle;
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct MapSettings {
