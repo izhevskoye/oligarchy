@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::game::{
     assets::{ClickedTile, Direction, Editable, SelectedTool, Storage, Tool},
     car::{Car, CarInstructions},
+    constants::CAR_STORAGE_SIZE,
 };
 
 pub fn car_placement(
@@ -29,7 +30,7 @@ pub fn car_placement(
                     .insert(Storage {
                         resource: resource.clone(),
                         amount: 0.0,
-                        capacity: 4.0,
+                        capacity: CAR_STORAGE_SIZE,
                     })
                     .insert(Editable);
 

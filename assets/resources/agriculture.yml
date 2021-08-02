@@ -3,48 +3,16 @@
   storage_tile: 36
   group: Agriculture
   car_tile:
-    horizontal: 114
-    vertical: 84
-
-"chicken":
-  name: Chicken
-  storage_tile: 38
-  group: Meat
-  car_tile:
-    horizontal: 114
-    vertical: 84
-
-"pork":
-  name: Pork
-  storage_tile: 34
-  group: Meat
-  car_tile:
-    horizontal: 115
-    vertical: 116
-
-"poultry":
-  name: Poultry
-  storage_tile: 35
-  group: Meat
-  car_tile:
-    horizontal: 114
-    vertical: 84
-
-"hogs":
-  name: Hogs
-  storage_tile: 37
-  group: Meat
-  car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 251
+    vertical: 219
 
 "sunflower.seeds":
   name: Sunflower Seeds
   storage_tile: 39
   group: Agriculture
   car_tile:
-    horizontal: 82
-    vertical: 85
+    horizontal: 253
+    vertical: 221
 
 "sunflower.oil":
   name: Sunflower Oil
@@ -59,21 +27,21 @@
   storage_tile: 58
   group: Agriculture
   car_tile:
-    horizontal: 82
-    vertical: 85
+    horizontal: 251
+    vertical: 219
 
 "corn":
   name: Corn
   storage_tile: 56
   group: Agriculture
   car_tile:
-    horizontal: 82
-    vertical: 85
+    horizontal: 253
+    vertical: 221
 
 "wheat":
   name: Wheat
   storage_tile: 57
   group: Agriculture
   car_tile:
-    horizontal: 82
-    vertical: 85
+    horizontal: 253
+    vertical: 221

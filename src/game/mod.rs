@@ -172,7 +172,7 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(1.0))
+                    .with_run_criteria(FixedTimestep::step(0.25))
                     .with_system(car::instructions::car_instruction.system()),
             )
             .add_system_set(

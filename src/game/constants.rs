@@ -3,6 +3,9 @@ pub const TILE_MAP_WIDTH: f32 = 16.0;
 pub const TILE_MAP_HEIGHT: f32 = 16.0;
 pub const CHUNK_SIZE: u32 = 16;
 
+pub const STORAGE_SIZE: f64 = 250.0;
+pub const CAR_STORAGE_SIZE: f64 = 20.0;
+
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
     WaterDeep,
