@@ -10,8 +10,8 @@ use crate::game::{
 use super::{Car, Destination, Waypoints};
 
 const STREET_COST: isize = 1;
-const GRASS_COST: isize = 100;
-const BUILDING_COST: isize = 1000;
+const GRASS_COST: isize = 3;
+const BUILDING_COST: isize = 5;
 
 fn cost_fn<'a, 'b: 'a>(
     map_query: &'b MapQuery,
@@ -45,6 +45,7 @@ pub fn calculate_destination(
     map_query: MapQuery,
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,
 ) {
+    let mut updated = false;
     if pathfinding.is_none() {
         log::info!("Building pathfinding cache");
         let (_entity, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
@@ -55,12 +56,14 @@ pub fn calculate_destination(
             cost_fn(&map_query, &street_query, &occupied_query),
             ManhattanNeighborhood::new(size.x as usize, size.y as usize),
             PathCacheConfig {
-                chunk_size: 3,
+                chunk_size: 2,
                 ..Default::default()
             },
         );
 
         *pathfinding = Some(cache);
+
+        updated = true;
     } else {
         // safe unwrap due because it is always created above
         let pathfinding = pathfinding.as_mut().unwrap();
@@ -76,10 +79,11 @@ pub fn calculate_destination(
                 &changes,
                 cost_fn(&map_query, &street_query, &occupied_query),
             );
+            updated = true;
         }
     }
 
-    if !car_query.iter().any(|_| true) {
+    if updated || !car_query.iter().any(|_| true) {
         return;
     }
 
