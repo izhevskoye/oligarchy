@@ -26,7 +26,10 @@ use crate::game::{
     state_manager::{LoadGameEvent, SaveGameEvent},
 };
 
-use self::assets::MapSettings;
+use self::{
+    assets::MapSettings,
+    constants::{CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, PRODUCTION_TICK_SPEED},
+};
 
 #[derive(Default)]
 pub struct Game {}
@@ -159,20 +162,20 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(1.0))
+                    .with_run_criteria(FixedTimestep::step(PRODUCTION_TICK_SPEED))
                     .with_system(production::export_station::export_station.system())
                     .with_system(production::production_building::production_building.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(0.2))
+                    .with_run_criteria(FixedTimestep::step(CAR_DRIVE_TICK_SPEED))
                     .with_system(car::drive_to_destination::drive_to_destination.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(0.25))
+                    .with_run_criteria(FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED))
                     .with_system(car::instructions::car_instruction.system()),
             )
             .add_system_set(
