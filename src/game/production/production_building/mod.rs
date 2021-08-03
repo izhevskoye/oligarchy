@@ -78,7 +78,10 @@ pub fn production_building(
                 product.rate * modifier,
             );
 
-            if idle.is_some() {
+            if let Some(idle) = idle {
+                if let Some(entity) = idle.entity {
+                    commands.entity(entity).despawn_recursive();
+                }
                 commands.entity(entity).remove::<Idle>();
             }
 

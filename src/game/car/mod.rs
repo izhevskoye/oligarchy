@@ -14,7 +14,7 @@ use crate::game::{
 
 pub use calculate_destination::calculate_destination;
 
-use super::assets::Position;
+use super::{assets::Position, constants::Z_CAR};
 
 pub struct Destination {
     pub destination: UVec2,
@@ -110,7 +110,7 @@ fn update_car_sprite(
         position.position.x as f32 + 0.5,
         position.position.y as f32 + 0.5,
     );
-    let translation = (position * tile_size).extend(1.0);
+    let translation = (position * tile_size).extend(Z_CAR);
     transform.translation = translation;
 
     sprite.index = if car.direction == Direction::North || car.direction == Direction::South {

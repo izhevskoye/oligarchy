@@ -1,5 +1,5 @@
 use super::*;
-use crate::game::assets::{Idle, Product, ProductDependency, ProductEnhancer, Storage};
+use crate::game::assets::{Product, ProductDependency, ProductEnhancer, Storage};
 use bevy::prelude::*;
 
 #[test]

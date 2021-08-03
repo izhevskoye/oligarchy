@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 use super::{
     assets::Position,
-    constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
+    constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_IDLE_INDICATOR},
 };
 
 #[derive(Default)]
@@ -38,11 +38,8 @@ pub fn spawn_idle(
             position.position.x as f32 + 0.5,
             position.position.y as f32 + 0.5,
         );
-        // TODO: z-layer constants
-        let translation = (position * TILE_SIZE).extend(1.5);
+        let translation = (position * TILE_SIZE).extend(Z_IDLE_INDICATOR);
         transform.translation = translation;
-
-        log::info!("mark as idle! {}", transform.translation);
 
         let entity = commands
             .spawn()
