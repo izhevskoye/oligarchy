@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, SelectedTool, Street, Tool},
+    assets::{ClickedTile, RemovedBuildingEvent, SelectedTool, Street, Tool},
     car::Car,
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
@@ -18,6 +18,7 @@ pub fn bulldoze(
     street_query: Query<&Street>,
     car_query: Query<(Entity, &Car)>,
     mut tile_query: Query<&mut Tile>,
+    mut removed_events: EventWriter<RemovedBuildingEvent>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -36,6 +37,8 @@ pub fn bulldoze(
             if let Some(pos) = clicked_tile.pos {
                 let _ = map_query.despawn_tile(&mut commands, pos, MAP_ID, BUILDING_LAYER_ID);
                 map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
+
+                removed_events.send(RemovedBuildingEvent { position: pos });
 
                 update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
 

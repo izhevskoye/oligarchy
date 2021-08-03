@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{Occupied, RequiresUpdate, Street},
+    assets::{Occupied, RemovedBuildingEvent, RequiresUpdate, Street},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -44,6 +44,7 @@ pub fn calculate_destination(
     update_query: Query<&RequiresUpdate, With<Tile>>,
     map_query: MapQuery,
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,
+    mut removed_events: EventReader<RemovedBuildingEvent>,
 ) {
     let mut updated = false;
     if pathfinding.is_none() {
@@ -65,10 +66,14 @@ pub fn calculate_destination(
 
         updated = true;
     } else {
-        let changes: Vec<(usize, usize)> = update_query
+        let mut changes: Vec<(usize, usize)> = update_query
             .iter()
             .map(|update| (update.position.x as usize, update.position.y as usize))
             .collect();
+
+        for event in removed_events.iter() {
+            changes.push((event.position.x as usize, event.position.y as usize));
+        }
 
         if !changes.is_empty() {
             // safe unwrap due because it is always created above
