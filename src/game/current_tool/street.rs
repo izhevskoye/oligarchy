@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Occupied, RequiresUpdate, SelectedTool, Street, Tool},
+    assets::{ClickedTile, Occupied, Position, RequiresUpdate, SelectedTool, Street, Tool},
     setup::BUILDING_LAYER_ID,
 };
 
@@ -25,7 +25,8 @@ pub fn street_placement(
         commands
             .entity(entity)
             .insert(Street)
-            .insert(RequiresUpdate { position: pos })
+            .insert(RequiresUpdate)
+            .insert(Position { position: pos })
             .insert(Occupied);
 
         update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);

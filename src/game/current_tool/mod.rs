@@ -45,12 +45,10 @@ fn update_neighbor_streets(
     street_query: Query<&Street>,
 ) {
     let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
-    for (pos, neighbor) in neighbors[0..4].iter() {
+    for (_pos, neighbor) in neighbors[0..4].iter() {
         if let Some(neighbor) = neighbor {
             if street_query.get(*neighbor).is_ok() {
-                commands.entity(*neighbor).insert(RequiresUpdate {
-                    position: pos.as_u32(),
-                });
+                commands.entity(*neighbor).insert(RequiresUpdate);
             }
         }
     }

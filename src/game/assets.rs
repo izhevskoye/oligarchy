@@ -21,6 +21,10 @@ impl Default for MapSettings {
     }
 }
 
+pub struct Position {
+    pub position: UVec2,
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {
@@ -100,9 +104,7 @@ pub struct StorageConsolidator {
     pub connected_storage: Vec<Entity>,
 }
 
-pub struct RequiresUpdate {
-    pub position: UVec2,
-}
+pub struct RequiresUpdate;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
