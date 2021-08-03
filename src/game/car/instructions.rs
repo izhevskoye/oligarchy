@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::Storage,
+    assets::{Position, Storage},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -11,6 +11,7 @@ use super::{Car, CarInstructions, Destination, Waypoints};
 fn load(
     car_entity: Entity,
     car: &mut Mut<Car>,
+    position: &Position,
     resource: &str,
     storage_query: &mut Query<&mut Storage>,
     map_query: &MapQuery,
@@ -34,7 +35,7 @@ fn load(
             let mut result = None;
 
             if let Ok(entity) =
-                map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
+                map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
             {
                 if let Ok(mut map_storage) = storage_query.get_mut(entity) {
                     if resource == map_storage.resource && map_storage.amount >= 1.0 {
@@ -69,6 +70,7 @@ fn load(
 fn unload(
     car_entity: Entity,
     car: &mut Mut<Car>,
+    position: &Position,
     resource: &str,
     storage_query: &mut Query<&mut Storage>,
     map_query: &MapQuery,
@@ -92,7 +94,7 @@ fn unload(
             let mut result = None;
 
             if let Ok(entity) =
-                map_query.get_tile_entity(car.position / 2, MAP_ID, BUILDING_LAYER_ID)
+                map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
             {
                 if let Ok(mut map_storage) = storage_query.get_mut(entity) {
                     if resource == map_storage.resource
@@ -129,11 +131,11 @@ fn unload(
 #[allow(clippy::type_complexity)]
 pub fn car_instruction(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &mut Car), (Without<Destination>, Without<Waypoints>)>,
+    mut car_query: Query<(Entity, &mut Car, &Position), (Without<Destination>, Without<Waypoints>)>,
     mut storage_query: Query<&mut Storage>,
     map_query: MapQuery,
 ) {
-    for (car_entity, mut car) in car_query.iter_mut() {
+    for (car_entity, mut car, position) in car_query.iter_mut() {
         if car.instructions.is_empty() || !car.active {
             continue;
         }
@@ -145,7 +147,7 @@ pub fn car_instruction(
         match car.instructions[car.current_instruction].clone() {
             CarInstructions::Nop => {}
             CarInstructions::GoTo(destination) => {
-                let car_pos = car.position / 2;
+                let car_pos = position.position / 2;
                 if car_pos == destination {
                     car.current_instruction += 1;
                 } else {
@@ -158,6 +160,7 @@ pub fn car_instruction(
                 load(
                     car_entity,
                     &mut car,
+                    position,
                     &resource,
                     &mut storage_query,
                     &map_query,
@@ -168,6 +171,7 @@ pub fn car_instruction(
                 load(
                     car_entity,
                     &mut car,
+                    position,
                     &resource,
                     &mut storage_query,
                     &map_query,
@@ -178,6 +182,7 @@ pub fn car_instruction(
                 unload(
                     car_entity,
                     &mut car,
+                    position,
                     &resource,
                     &mut storage_query,
                     &map_query,
@@ -188,6 +193,7 @@ pub fn car_instruction(
                 unload(
                     car_entity,
                     &mut car,
+                    position,
                     &resource,
                     &mut storage_query,
                     &map_query,

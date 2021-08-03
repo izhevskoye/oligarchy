@@ -10,6 +10,9 @@ pub const PRODUCTION_TICK_SPEED: f64 = 2.5;
 pub const CAR_DRIVE_TICK_SPEED: f64 = 0.2;
 pub const CAR_INSTRUCTION_TICK_SPEED: f64 = 0.25;
 
+pub const Z_CAR: f32 = 1.0;
+pub const Z_IDLE_INDICATOR: f32 = 1.5;
+
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
     WaterDeep,

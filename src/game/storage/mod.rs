@@ -6,7 +6,7 @@ use bevy_ecs_tilemap::prelude::*;
 use rand::{prelude::SliceRandom, thread_rng};
 
 use super::{
-    assets::{RequiresUpdate, Storage, StorageConsolidator},
+    assets::{Position, RequiresUpdate, Storage, StorageConsolidator},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -133,10 +133,10 @@ pub fn fetch_from_storage(
 pub fn update_consolidators(
     map_query: MapQuery,
     storage_query: Query<(Entity, &Storage)>,
-    mut consolidator_query: Query<(&mut StorageConsolidator, &RequiresUpdate)>,
+    mut consolidator_query: Query<(&mut StorageConsolidator, &Position), With<RequiresUpdate>>,
 ) {
-    for (mut consolidator, update) in consolidator_query.iter_mut() {
-        let neighbors = map_query.get_tile_neighbors(update.position, MAP_ID, BUILDING_LAYER_ID);
+    for (mut consolidator, position) in consolidator_query.iter_mut() {
+        let neighbors = map_query.get_tile_neighbors(position.position, MAP_ID, BUILDING_LAYER_ID);
 
         let mut connected_storage = vec![];
         for (_, neighbor) in neighbors.iter() {

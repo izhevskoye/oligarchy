@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, RemovedBuildingEvent, SelectedTool, Street, Tool},
+    assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Street, Tool},
     car::Car,
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
@@ -17,7 +17,7 @@ pub fn bulldoze(
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
     street_query: Query<&Street>,
-    car_query: Query<(Entity, &Car)>,
+    car_query: Query<(Entity, &Position), With<Car>>,
     mut tile_query: Query<&mut Tile>,
     mut removed_events: EventWriter<RemovedBuildingEvent>,
 ) {
@@ -28,8 +28,8 @@ pub fn bulldoze(
     if Tool::Bulldoze == selected_tool.tool {
         if clicked_tile.occupied_vehicle {
             if let Some(pos) = clicked_tile.vehicle_pos {
-                for (entity, car) in car_query.iter() {
-                    if car.position == pos {
+                for (entity, position) in car_query.iter() {
+                    if position.position == pos {
                         commands.entity(entity).despawn_recursive();
                     }
                 }

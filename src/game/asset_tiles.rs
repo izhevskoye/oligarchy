@@ -8,7 +8,7 @@ use crate::game::{
 };
 
 use super::{
-    assets::Occupied,
+    assets::{Occupied, Position},
     resource_specifications::ResourceSpecifications,
     setup::{GROUND_LAYER_ID, MAP_ID},
 };
@@ -49,18 +49,18 @@ pub fn export_station_update(
 }
 
 pub fn ground_update(
-    query: Query<&RequiresUpdate, With<Occupied>>,
+    query: Query<&Position, (With<Occupied>, With<RequiresUpdate>)>,
     mut tile_query: Query<&mut Tile>,
     mut map_query: MapQuery,
 ) {
-    for update in query.iter() {
+    for position in query.iter() {
         let entity = map_query
-            .get_tile_entity(update.position, MAP_ID, GROUND_LAYER_ID)
+            .get_tile_entity(position.position, MAP_ID, GROUND_LAYER_ID)
             .unwrap();
 
         let mut tile = tile_query.get_mut(entity).unwrap();
         tile.texture_index = MapTile::GroundFactory as u16;
 
-        map_query.notify_chunk_for_tile(update.position, MAP_ID, GROUND_LAYER_ID);
+        map_query.notify_chunk_for_tile(position.position, MAP_ID, GROUND_LAYER_ID);
     }
 }

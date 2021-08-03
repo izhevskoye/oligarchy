@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::ClickedTile,
+    assets::{ClickedTile, Position},
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -18,7 +18,7 @@ pub struct CurrentlySelected {
 pub fn current_selection(
     clicked_tile: Res<ClickedTile>,
     map_query: MapQuery,
-    car_query: Query<(Entity, &Car)>,
+    car_query: Query<(Entity, &Position), With<Car>>,
     mut currently_selected: ResMut<CurrentlySelected>,
 ) {
     if currently_selected.locked || currently_selected.editing {
@@ -28,8 +28,8 @@ pub fn current_selection(
     if clicked_tile.occupied_vehicle {
         if let Some(pos) = clicked_tile.vehicle_pos {
             // TODO: improve
-            for (entity, car) in car_query.iter() {
-                if car.position == pos {
+            for (entity, position) in car_query.iter() {
+                if position.position == pos {
                     currently_selected.entity = Some(entity);
                     return;
                 }

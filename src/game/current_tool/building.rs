@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        Building, ClickedTile, Editable, Occupied, ProductionBuilding, RequiresUpdate,
+        Building, ClickedTile, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
         SelectedTool, StorageConsolidator, Tool,
     },
     building_specifications::BuildingSpecifications,
@@ -33,7 +33,8 @@ pub fn building_placement(
                 commands
                     .entity(entity)
                     .insert(Building { id: id.clone() })
-                    .insert(RequiresUpdate { position: pos })
+                    .insert(Position { position: pos })
+                    .insert(RequiresUpdate)
                     .insert(Occupied);
 
                 if !building.products.is_empty() {

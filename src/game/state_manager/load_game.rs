@@ -3,7 +3,8 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        Building, Editable, Occupied, ProductionBuilding, RequiresUpdate, StorageConsolidator,
+        Building, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
+        StorageConsolidator,
     },
     building_specifications::BuildingSpecifications,
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -44,7 +45,8 @@ fn load_state(
 fn insert_car(commands: &mut Commands, vehicle: &Vehicle, game_entity: &GameEntity) {
     let entity = commands
         .spawn()
-        .insert(RequiresUpdate {
+        .insert(RequiresUpdate)
+        .insert(Position {
             position: game_entity.pos,
         })
         .insert(vehicle.car.clone())
@@ -74,7 +76,8 @@ fn insert_building(
         Ok(entity) => {
             let entity = commands
                 .entity(entity)
-                .insert(RequiresUpdate {
+                .insert(RequiresUpdate)
+                .insert(Position {
                     position: game_entity.pos,
                 })
                 .insert(Occupied)

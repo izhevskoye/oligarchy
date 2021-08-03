@@ -4,7 +4,9 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Building, ExportStation, MapSettings, Name, ProductionBuilding, Storage, Street},
+    assets::{
+        Building, ExportStation, MapSettings, Name, Position, ProductionBuilding, Storage, Street,
+    },
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
@@ -17,7 +19,7 @@ use crate::game::{
 pub fn save_game(
     queries: (
         Query<&Name>,
-        Query<(Entity, &Car)>,
+        Query<(Entity, &Car, &Position)>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&Street>,
@@ -36,8 +38,8 @@ pub fn save_game(
             ..Default::default()
         };
 
-        for (entity, car) in car_query.iter() {
-            let pos = car.position;
+        for (entity, car, position) in car_query.iter() {
+            let pos = position.position;
 
             let name = if let Ok(name) = name_query.get(entity) {
                 Some(name.clone())

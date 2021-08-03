@@ -14,6 +14,8 @@ use crate::game::{
 
 pub use calculate_destination::calculate_destination;
 
+use super::{assets::Position, constants::Z_CAR};
+
 pub struct Destination {
     pub destination: UVec2,
 }
@@ -79,7 +81,6 @@ impl CarInstructions {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Car {
-    pub position: UVec2,
     pub direction: Direction,
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
@@ -90,6 +91,7 @@ fn update_car_sprite(
     sprite: &mut TextureAtlasSprite,
     transform: &mut Transform,
     car: &Car,
+    position: &Position,
     storage: &Storage,
     resources: &Res<ResourceSpecifications>,
 ) {
@@ -104,8 +106,11 @@ fn update_car_sprite(
     };
 
     let tile_size = TILE_SIZE / 2.0;
-    let position = Vec2::new(car.position.x as f32 + 0.5, car.position.y as f32 + 0.5);
-    let translation = (position * tile_size).extend(1.0);
+    let position = Vec2::new(
+        position.position.x as f32 + 0.5,
+        position.position.y as f32 + 0.5,
+    );
+    let translation = (position * tile_size).extend(Z_CAR);
     transform.translation = translation;
 
     sprite.index = if car.direction == Direction::North || car.direction == Direction::South {
@@ -119,12 +124,12 @@ fn update_car_sprite(
 
 pub fn spawn_car(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &Car, &Storage), Without<TextureAtlasSprite>>,
+    mut car_query: Query<(Entity, &Car, &Storage, &Position), Without<TextureAtlasSprite>>,
     resources: Res<ResourceSpecifications>,
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    for (entity, car, storage) in car_query.iter_mut() {
+    for (entity, car, storage, position) in car_query.iter_mut() {
         let texture_handle = assets.load("oligarchy_tiles.png");
         let texture_atlas = TextureAtlas::from_grid(
             texture_handle,
@@ -136,7 +141,14 @@ pub fn spawn_car(
 
         let mut sprite = TextureAtlasSprite::new(0);
         let mut transform = Transform::default();
-        update_car_sprite(&mut sprite, &mut transform, car, storage, &resources);
+        update_car_sprite(
+            &mut sprite,
+            &mut transform,
+            car,
+            position,
+            storage,
+            &resources,
+        );
 
         commands.entity(entity).insert_bundle(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -147,12 +159,14 @@ pub fn spawn_car(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn update_car(
     mut commands: Commands,
     mut car_query: Query<
         (
             Entity,
             &Car,
+            &Position,
             &Storage,
             &mut Transform,
             &mut TextureAtlasSprite,
@@ -161,9 +175,16 @@ pub fn update_car(
     >,
     resources: Res<ResourceSpecifications>,
 ) {
-    for (entity, car, storage, mut transform, mut sprite) in car_query.iter_mut() {
+    for (entity, car, position, storage, mut transform, mut sprite) in car_query.iter_mut() {
         commands.entity(entity).remove::<RequiresUpdate>();
 
-        update_car_sprite(&mut sprite, &mut transform, car, storage, &resources);
+        update_car_sprite(
+            &mut sprite,
+            &mut transform,
+            car,
+            position,
+            storage,
+            &resources,
+        );
     }
 }

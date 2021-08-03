@@ -5,21 +5,23 @@ use bevy_ecs_tilemap::prelude::*;
 use rand::{thread_rng, Rng};
 
 use crate::game::{
-    assets::{Direction, RequiresUpdate},
+    assets::{Direction, Position, RequiresUpdate},
     car::{Car, Waypoints},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 pub fn drive_to_destination(
     mut commands: Commands,
-    mut car_query: Query<(Entity, &mut Car)>,
+    mut car_query: Query<(Entity, &mut Car, &mut Position)>,
     mut waypoint_query: Query<&mut Waypoints>,
     map_query: MapQuery,
 ) {
-    let mut car_positions: HashSet<UVec2> =
-        car_query.iter_mut().map(|(_, car)| car.position).collect();
+    let mut car_positions: HashSet<UVec2> = car_query
+        .iter_mut()
+        .map(|(_, _, position)| position.position)
+        .collect();
 
-    for (car_entity, mut car) in car_query.iter_mut() {
+    for (car_entity, mut car, mut position) in car_query.iter_mut() {
         if !car.active {
             continue;
         }
@@ -30,7 +32,7 @@ pub fn drive_to_destination(
         };
 
         let direction = waypoint.waypoints[0];
-        let c_pos = car.position / 2;
+        let c_pos = position.position / 2;
 
         let mut direction = if direction.x < c_pos.x {
             Direction::West
@@ -44,17 +46,17 @@ pub fn drive_to_destination(
             Direction::None
         };
 
-        if direction == Direction::North && car.position.x % 2 == 0 {
+        if direction == Direction::North && position.position.x % 2 == 0 {
             direction = Direction::East;
-        } else if direction == Direction::South && car.position.x % 2 == 1 {
+        } else if direction == Direction::South && position.position.x % 2 == 1 {
             direction = Direction::West;
-        } else if direction == Direction::East && car.position.y % 2 == 1 {
+        } else if direction == Direction::East && position.position.y % 2 == 1 {
             direction = Direction::South;
-        } else if direction == Direction::West && car.position.y % 2 == 0 {
+        } else if direction == Direction::West && position.position.y % 2 == 0 {
             direction = Direction::North;
         }
 
-        let mut new_car_position = car.position;
+        let mut new_car_position = position.position;
 
         if direction == Direction::West {
             new_car_position.x -= 1;
@@ -83,17 +85,15 @@ pub fn drive_to_destination(
         }
 
         if can_drive_to_new_pos {
-            car_positions.remove(&car.position);
+            car_positions.remove(&position.position);
             car_positions.insert(new_car_position);
 
-            car.position = new_car_position;
+            position.position = new_car_position;
             if direction != Direction::None {
                 car.direction = direction;
             }
 
-            commands.entity(car_entity).insert(RequiresUpdate {
-                position: car.position,
-            });
+            commands.entity(car_entity).insert(RequiresUpdate);
         }
 
         if waypoint.considered_deadlocked() {
