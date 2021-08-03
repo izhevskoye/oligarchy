@@ -159,6 +159,7 @@ pub fn spawn_car(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn update_car(
     mut commands: Commands,
     mut car_query: Query<
