@@ -12,6 +12,7 @@ pub const CAR_INSTRUCTION_TICK_SPEED: f64 = 0.25;
 
 pub const Z_CAR: f32 = 1.0;
 pub const Z_IDLE_INDICATOR: f32 = 1.5;
+pub const Z_SELECTION_INDICATOR: f32 = 2.0;
 
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {

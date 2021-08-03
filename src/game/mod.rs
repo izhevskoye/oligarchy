@@ -102,6 +102,11 @@ impl Game {
                     .with_system(camera::movement.system())
                     .with_system(texture::set_texture_filters_to_nearest.system())
                     .with_system(
+                        current_selection::spawn_selected
+                            .system()
+                            .after(Label::CurrentSelection),
+                    )
+                    .with_system(
                         current_selection::current_selection
                             .system()
                             .label(Label::CurrentSelection),
@@ -177,7 +182,7 @@ impl Game {
                     .with_system(
                         production::production_building::production_building
                             .system()
-                            .before(IdleLabel::SpawnIdle),
+                            .after(IdleLabel::SpawnIdle),
                     )
                     .with_system(production::spawn_idle.system().label(IdleLabel::SpawnIdle)),
             )
