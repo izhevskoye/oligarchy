@@ -36,6 +36,7 @@ fn cost_fn<'a, 'b: 'a>(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn calculate_destination(
     mut commands: Commands,
     mut car_query: Query<(Entity, &Car, &Destination)>,
