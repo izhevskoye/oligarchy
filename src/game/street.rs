@@ -92,6 +92,7 @@ fn eval_neighbor(entity: Option<Entity>, street_query: &Query<&Street>) -> bool 
     false
 }
 
+#[allow(clippy::type_complexity)]
 pub fn update_streets(
     mut tile_query: Query<(&mut Tile, &Position), (With<Street>, With<RequiresUpdate>)>,
     street_query: Query<&Street>,
