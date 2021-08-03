@@ -10,7 +10,7 @@ use crate::game::{
 
 use super::update_neighbor_streets;
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn bulldoze(
     mut commands: Commands,
     mut map_query: MapQuery,
