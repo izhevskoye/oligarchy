@@ -27,7 +27,7 @@ use crate::game::{
 };
 
 use self::{
-    assets::MapSettings,
+    assets::{MapSettings, RemovedBuildingEvent},
     constants::{CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, PRODUCTION_TICK_SPEED},
 };
 
@@ -79,6 +79,7 @@ impl Game {
             .add_state(AppState::MainMenu)
             .add_event::<LoadGameEvent>()
             .add_event::<SaveGameEvent>()
+            .add_event::<RemovedBuildingEvent>()
             //
             // MENU
             //
@@ -161,8 +162,12 @@ impl Game {
                     .with_system(current_tool::bulldoze::bulldoze.system()),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame)
-                    .with_system(car::calculate_destination.system().before(Label::UpdateEnd)),
+                SystemSet::on_update(AppState::InGame).with_system(
+                    car::calculate_destination
+                        .system()
+                        .before(Label::UpdateEnd)
+                        .after(Label::CurrentSelection),
+                ),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)

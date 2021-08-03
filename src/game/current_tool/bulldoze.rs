@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Position, SelectedTool, Street, Tool},
+    assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Street, Tool},
     car::Car,
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
@@ -10,6 +10,7 @@ use crate::game::{
 
 use super::update_neighbor_streets;
 
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn bulldoze(
     mut commands: Commands,
     mut map_query: MapQuery,
@@ -18,6 +19,7 @@ pub fn bulldoze(
     street_query: Query<&Street>,
     car_query: Query<(Entity, &Position), With<Car>>,
     mut tile_query: Query<&mut Tile>,
+    mut removed_events: EventWriter<RemovedBuildingEvent>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -28,7 +30,6 @@ pub fn bulldoze(
             if let Some(pos) = clicked_tile.vehicle_pos {
                 for (entity, position) in car_query.iter() {
                     if position.position == pos {
-                        // TODO: breaks pathfinding due to not receiving update!
                         commands.entity(entity).despawn_recursive();
                     }
                 }
@@ -37,6 +38,8 @@ pub fn bulldoze(
             if let Some(pos) = clicked_tile.pos {
                 let _ = map_query.despawn_tile(&mut commands, pos, MAP_ID, BUILDING_LAYER_ID);
                 map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
+
+                removed_events.send(RemovedBuildingEvent { position: pos });
 
                 update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
 
