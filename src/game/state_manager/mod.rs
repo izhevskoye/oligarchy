@@ -15,7 +15,7 @@ use crate::game::{
     car::Car,
 };
 
-use super::AppState;
+use super::{assets::DeliveryStation, AppState};
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -28,6 +28,7 @@ pub struct SerializedBuilding {
 pub enum BuildingEntity {
     Storage(Storage),
     ExportStation(ExportStation),
+    DeliveryStation(DeliveryStation),
     Street(Street),
     Building(SerializedBuilding),
 }

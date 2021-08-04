@@ -2,11 +2,14 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Position, Storage},
+    assets::{DeliveryStation, Position, Storage, StorageConsolidator},
     setup::{BUILDING_LAYER_ID, MAP_ID},
+    storage::{distribute_to_storage, fetch_from_storage, has_space_in_storage},
 };
 
 use super::{Car, CarInstructions, Destination, Waypoints};
+
+const AMOUNT: f64 = 1.0;
 
 fn load(
     car_entity: Entity,
@@ -14,6 +17,7 @@ fn load(
     position: &Position,
     resource: &str,
     storage_query: &mut Query<&mut Storage>,
+    consolidator_query: &Query<&StorageConsolidator, With<DeliveryStation>>,
     map_query: &MapQuery,
     wait_for_load: bool,
 ) {
@@ -30,41 +34,26 @@ fn load(
 
     if full {
         car.current_instruction += 1;
+        return;
     } else {
-        let has_item = {
-            let mut result = None;
-
-            if let Ok(entity) =
-                map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
-            {
-                if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                    if resource == map_storage.resource && map_storage.amount >= 1.0 {
-                        map_storage.amount -= 1.0;
-                        result = Some(true)
-                    } else {
-                        result = Some(false)
-                    }
+        if let Ok(entity) =
+            map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
+        {
+            if let Ok(consolidator) = consolidator_query.get(entity) {
+                if fetch_from_storage(consolidator, storage_query, resource, AMOUNT) {
+                    let mut storage = storage_query.get_mut(car_entity).unwrap();
+                    storage.amount += AMOUNT;
+                    return;
+                } else if !wait_for_load {
+                    car.current_instruction += 1;
+                    return;
                 }
             }
-
-            if let Some(result) = result {
-                result
-            } else {
-                log::warn!("Car waiting at location that is not a storage");
-                car.current_instruction += 1;
-                return;
-            }
-        };
-
-        if has_item {
-            // save unwrap here because we checked above and has_item is false if
-            // it does not exist
-            let mut storage = storage_query.get_mut(car_entity).unwrap();
-            storage.amount += 1.0;
-        } else if !wait_for_load {
-            car.current_instruction += 1;
         }
     }
+
+    log::warn!("Car waiting at location that is not a delivery station");
+    car.current_instruction += 1;
 }
 
 fn unload(
@@ -73,6 +62,7 @@ fn unload(
     position: &Position,
     resource: &str,
     storage_query: &mut Query<&mut Storage>,
+    consolidator_query: &Query<&StorageConsolidator, With<DeliveryStation>>,
     map_query: &MapQuery,
     wait_for_unload: bool,
 ) {
@@ -89,43 +79,28 @@ fn unload(
 
     if empty {
         car.current_instruction += 1;
+        return;
     } else {
-        let transfer_item = {
-            let mut result = None;
+        if let Ok(entity) =
+            map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
+        {
+            if let Ok(consolidator) = consolidator_query.get(entity) {
+                if has_space_in_storage(consolidator, storage_query, resource, AMOUNT) {
+                    distribute_to_storage(consolidator, storage_query, resource, AMOUNT);
 
-            if let Ok(entity) =
-                map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
-            {
-                if let Ok(mut map_storage) = storage_query.get_mut(entity) {
-                    if resource == map_storage.resource
-                        && map_storage.amount <= map_storage.capacity - 1.0
-                    {
-                        map_storage.amount += 1.0;
-                        result = Some(true)
-                    } else {
-                        result = Some(false)
-                    }
+                    let mut storage = storage_query.get_mut(car_entity).unwrap();
+                    storage.amount -= AMOUNT;
+                    return;
+                } else if !wait_for_unload {
+                    car.current_instruction += 1;
+                    return;
                 }
             }
-
-            if let Some(result) = result {
-                result
-            } else {
-                log::warn!("Car wants to unload at a location that is not a storage");
-                car.current_instruction += 1;
-                return;
-            }
-        };
-
-        if transfer_item {
-            // save unwrap here because we checked above and transfer_item is false if
-            // it does not exist
-            let mut storage = storage_query.get_mut(car_entity).unwrap();
-            storage.amount -= 1.0;
-        } else if !wait_for_unload {
-            car.current_instruction += 1;
         }
     }
+
+    log::warn!("Car waiting at location that is not a delivery station");
+    car.current_instruction += 1;
 }
 
 #[allow(clippy::type_complexity)]
@@ -133,6 +108,7 @@ pub fn car_instruction(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car, &Position), (Without<Destination>, Without<Waypoints>)>,
     mut storage_query: Query<&mut Storage>,
+    consolidator_query: Query<&StorageConsolidator, With<DeliveryStation>>,
     map_query: MapQuery,
 ) {
     for (car_entity, mut car, position) in car_query.iter_mut() {
@@ -163,6 +139,7 @@ pub fn car_instruction(
                     position,
                     &resource,
                     &mut storage_query,
+                    &consolidator_query,
                     &map_query,
                     false,
                 );
@@ -174,6 +151,7 @@ pub fn car_instruction(
                     position,
                     &resource,
                     &mut storage_query,
+                    &consolidator_query,
                     &map_query,
                     true,
                 );
@@ -185,6 +163,7 @@ pub fn car_instruction(
                     position,
                     &resource,
                     &mut storage_query,
+                    &consolidator_query,
                     &map_query,
                     false,
                 );
@@ -196,6 +175,7 @@ pub fn car_instruction(
                     position,
                     &resource,
                     &mut storage_query,
+                    &consolidator_query,
                     &map_query,
                     true,
                 );
