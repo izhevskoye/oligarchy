@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        Building, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
+        Building, CanDriveOver, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
         StorageConsolidator,
     },
     building_specifications::BuildingSpecifications,
@@ -113,6 +113,13 @@ fn insert_building(
                 }
                 BuildingEntity::Storage(c) => {
                     commands.entity(entity).insert(c.clone());
+                }
+                BuildingEntity::DeliveryStation(c) => {
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(CanDriveOver)
+                        .insert(StorageConsolidator::default());
                 }
                 BuildingEntity::ExportStation(c) => {
                     commands

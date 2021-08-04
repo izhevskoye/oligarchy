@@ -5,7 +5,8 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::{
-        Building, ExportStation, MapSettings, Name, Position, ProductionBuilding, Storage, Street,
+        Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
+        Storage, Street,
     },
     car::Car,
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -22,6 +23,7 @@ pub fn save_game(
         Query<(Entity, &Car, &Position)>,
         Query<&Storage>,
         Query<&ExportStation>,
+        Query<&DeliveryStation>,
         Query<&Street>,
         Query<(&Building, Option<&ProductionBuilding>)>,
     ),
@@ -29,8 +31,15 @@ pub fn save_game(
     mut save_game: EventReader<SaveGameEvent>,
     map_settings: Res<MapSettings>,
 ) {
-    let (name_query, car_query, storage_query, export_station_query, street_query, building_query) =
-        queries;
+    let (
+        name_query,
+        car_query,
+        storage_query,
+        export_station_query,
+        delivery_station_query,
+        street_query,
+        building_query,
+    ) = queries;
 
     for _ in save_game.iter() {
         let mut state = GameState {
@@ -106,6 +115,16 @@ pub fn save_game(
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::ExportStation(
+                                building.clone(),
+                            )),
+                        });
+                    }
+
+                    if let Ok(building) = delivery_station_query.get(entity) {
+                        state.entities.push(GameEntity {
+                            pos,
+                            name: name.clone(),
+                            entity: GameEntityType::Building(BuildingEntity::DeliveryStation(
                                 building.clone(),
                             )),
                         });

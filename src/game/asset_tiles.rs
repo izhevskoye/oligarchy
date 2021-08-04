@@ -8,7 +8,7 @@ use crate::game::{
 };
 
 use super::{
-    assets::{Occupied, Position},
+    assets::{DeliveryStation, Occupied, Position},
     resource_specifications::ResourceSpecifications,
     setup::{GROUND_LAYER_ID, MAP_ID},
 };
@@ -44,6 +44,15 @@ pub fn export_station_update(
 ) {
     for mut tile in query.iter_mut() {
         tile.texture_index = MapTile::ExportStation as u16;
+        tile.visible = true;
+    }
+}
+
+pub fn delivery_station_update(
+    mut query: Query<&mut Tile, (With<DeliveryStation>, With<RequiresUpdate>)>,
+) {
+    for mut tile in query.iter_mut() {
+        tile.texture_index = MapTile::DeliveryStation as u16;
         tile.visible = true;
     }
 }

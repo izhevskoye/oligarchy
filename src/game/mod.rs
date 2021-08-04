@@ -162,6 +162,9 @@ impl Game {
                     .with_system(current_tool::street::street_placement.system())
                     .with_system(current_tool::storage::storage_placement.system())
                     .with_system(current_tool::export_station::export_station_placement.system())
+                    .with_system(
+                        current_tool::delivery_station::delivery_station_placement.system(),
+                    )
                     .with_system(current_tool::car::car_placement.system())
                     .with_system(current_tool::building::building_placement.system())
                     .with_system(current_tool::bulldoze::bulldoze.system()),
@@ -205,6 +208,7 @@ impl Game {
                     .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::export_station_update.system())
+                    .with_system(asset_tiles::delivery_station_update.system())
                     .with_system(asset_tiles::ground_update.system())
                     .with_system(street::update_streets.system())
                     .with_system(storage::update_consolidators.system())

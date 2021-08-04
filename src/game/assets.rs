@@ -116,6 +116,10 @@ pub struct ExportStation {
     pub goods: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct DeliveryStation;
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Street;
@@ -136,6 +140,7 @@ pub enum Tool {
     Street,
     Storage(String),
     ExportStation,
+    DeliveryStation,
     Car(String),
     Building(String),
 }
@@ -160,6 +165,7 @@ pub struct ClickedTile {
 }
 
 pub struct Occupied;
+pub struct CanDriveOver;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

@@ -3,20 +3,20 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{Occupied, Position, RemovedBuildingEvent, RequiresUpdate, Street},
+    assets::{CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate, Street},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 use super::{Car, Destination, Waypoints};
 
 const STREET_COST: isize = 1;
-const GRASS_COST: isize = 3;
-const BUILDING_COST: isize = 5;
+const GRASS_COST: isize = 10;
+const BUILDING_COST: isize = -1;
 
 fn cost_fn<'a, 'b: 'a>(
     map_query: &'b MapQuery,
     street_query: &'a Query<(), With<Street>>,
-    occupied_query: &'a Query<(), With<Occupied>>,
+    occupied_query: &'a Query<(), (With<Occupied>, Without<CanDriveOver>)>,
 ) -> impl 'a + Fn((usize, usize)) -> isize {
     move |(x, y)| match map_query.get_tile_entity(
         UVec2::new(x as u32, y as u32),
@@ -41,7 +41,7 @@ pub fn calculate_destination(
     mut commands: Commands,
     mut car_query: Query<(Entity, &Destination, &Position), With<Car>>,
     street_query: Query<(), With<Street>>,
-    occupied_query: Query<(), With<Occupied>>,
+    occupied_query: Query<(), (With<Occupied>, Without<CanDriveOver>)>,
     update_query: Query<&Position, (With<Tile>, With<RequiresUpdate>)>,
     map_query: MapQuery,
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,

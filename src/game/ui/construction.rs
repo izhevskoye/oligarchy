@@ -36,6 +36,10 @@ pub fn construction_ui(
                     selected_tool.tool = Tool::ExportStation;
                 }
                 ui.end_row();
+                if ui.small_button("Delivery Station").clicked() {
+                    selected_tool.tool = Tool::DeliveryStation;
+                }
+                ui.end_row();
             });
 
             ui.heading("Cars");
