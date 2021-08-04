@@ -35,19 +35,17 @@ fn load(
     if full {
         car.current_instruction += 1;
         return;
-    } else {
-        if let Ok(entity) =
-            map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
-        {
-            if let Ok(consolidator) = consolidator_query.get(entity) {
-                if fetch_from_storage(consolidator, storage_query, resource, AMOUNT) {
-                    let mut storage = storage_query.get_mut(car_entity).unwrap();
-                    storage.amount += AMOUNT;
-                    return;
-                } else if !wait_for_load {
-                    car.current_instruction += 1;
-                    return;
-                }
+    } else if let Ok(entity) =
+        map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
+    {
+        if let Ok(consolidator) = consolidator_query.get(entity) {
+            if fetch_from_storage(consolidator, storage_query, resource, AMOUNT) {
+                let mut storage = storage_query.get_mut(car_entity).unwrap();
+                storage.amount += AMOUNT;
+                return;
+            } else if !wait_for_load {
+                car.current_instruction += 1;
+                return;
             }
         }
     }
@@ -80,21 +78,19 @@ fn unload(
     if empty {
         car.current_instruction += 1;
         return;
-    } else {
-        if let Ok(entity) =
-            map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
-        {
-            if let Ok(consolidator) = consolidator_query.get(entity) {
-                if has_space_in_storage(consolidator, storage_query, resource, AMOUNT) {
-                    distribute_to_storage(consolidator, storage_query, resource, AMOUNT);
+    } else if let Ok(entity) =
+        map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
+    {
+        if let Ok(consolidator) = consolidator_query.get(entity) {
+            if has_space_in_storage(consolidator, storage_query, resource, AMOUNT) {
+                distribute_to_storage(consolidator, storage_query, resource, AMOUNT);
 
-                    let mut storage = storage_query.get_mut(car_entity).unwrap();
-                    storage.amount -= AMOUNT;
-                    return;
-                } else if !wait_for_unload {
-                    car.current_instruction += 1;
-                    return;
-                }
+                let mut storage = storage_query.get_mut(car_entity).unwrap();
+                storage.amount -= AMOUNT;
+                return;
+            } else if !wait_for_unload {
+                car.current_instruction += 1;
+                return;
             }
         }
     }
