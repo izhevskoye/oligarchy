@@ -11,6 +11,7 @@ use super::{Car, CarInstructions, Destination, Waypoints};
 
 const AMOUNT: f64 = 1.0;
 
+#[allow(clippy::too_many_arguments)]
 fn load(
     car_entity: Entity,
     car: &mut Mut<Car>,
@@ -54,6 +55,7 @@ fn load(
     car.current_instruction += 1;
 }
 
+#[allow(clippy::too_many_arguments)]
 fn unload(
     car_entity: Entity,
     car: &mut Mut<Car>,
