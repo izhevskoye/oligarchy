@@ -1,0 +1,23 @@
+"steel_rolling_plant":
+  name: Steel Rolling Plant
+  tile: 67
+  products:
+    - resource: steel.slabs
+      rate: 1.0
+      requisites:
+        - resource: steel
+          rate: 1.0
+
+    - resource: steel.blooms
+      rate: 1.0
+      requisites:
+        - resource: steel
+          rate: 1.0
+
+    - resource: steel.billets
+      rate: 1.0
+      requisites:
+        - resource: steel
+          rate: 1.0
+
+  group: Metallurgy

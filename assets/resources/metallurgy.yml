@@ -30,6 +30,30 @@
     horizontal: 115
     vertical: 116
 
+"steel.slabs":
+  name: Steel Slabs
+  storage_tile: 64
+  group: Metallurgy
+  car_tile:
+    horizontal: 115
+    vertical: 116
+
+"steel.blooms":
+  name: Steel Blooms
+  storage_tile: 66
+  group: Metallurgy
+  car_tile:
+    horizontal: 115
+    vertical: 116
+
+"steel.billets":
+  name: Steel Billets
+  storage_tile: 65
+  group: Metallurgy
+  car_tile:
+    horizontal: 115
+    vertical: 116
+
 "coal":
   name: Coal
   storage_tile: 16
