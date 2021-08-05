@@ -5,6 +5,7 @@ use crate::game::{
     assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Street, Tool},
     car::Car,
     constants::MapTile,
+    production::Idle,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
@@ -18,6 +19,7 @@ pub fn bulldoze(
     clicked_tile: Res<ClickedTile>,
     street_query: Query<&Street>,
     car_query: Query<(Entity, &Position), With<Car>>,
+    idle_query: Query<&Idle>,
     mut tile_query: Query<&mut Tile>,
     mut removed_events: EventWriter<RemovedBuildingEvent>,
 ) {
@@ -36,6 +38,14 @@ pub fn bulldoze(
             }
         } else if clicked_tile.occupied_building {
             if let Some(pos) = clicked_tile.pos {
+                if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+                    if let Ok(idle) = idle_query.get(entity) {
+                        if let Some(entity) = idle.entity {
+                            commands.entity(entity).despawn_recursive();
+                        }
+                    }
+                }
+
                 let _ = map_query.despawn_tile(&mut commands, pos, MAP_ID, BUILDING_LAYER_ID);
                 map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
 
