@@ -16,8 +16,13 @@ pub fn teardown(
     mut map_query: MapQuery,
     car_query: Query<Entity, With<Car>>,
     camera_query: Query<Entity, With<Camera>>,
+    sprite_query: Query<Entity, With<TextureAtlasSprite>>,
 ) {
     map_query.depsawn_map(&mut commands, MAP_ID);
+
+    for entity in sprite_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
 
     for entity in car_query.iter() {
         commands.entity(entity).despawn_recursive();
