@@ -15,6 +15,10 @@ impl StatisticTracker {
             self.data.get(resource).unwrap_or(&0.0) + amount,
         );
     }
+
+    pub fn get(&self, resource: &str) -> f64 {
+        *self.data.get(resource).unwrap_or(&0.0)
+    }
 }
 
 #[derive(Serialize, Deserialize, Default)]
