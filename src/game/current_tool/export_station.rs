@@ -7,6 +7,7 @@ use crate::game::{
         StorageConsolidator, Tool,
     },
     setup::BUILDING_LAYER_ID,
+    statistics::Statistics,
 };
 
 use super::get_entity;
@@ -29,6 +30,7 @@ pub fn export_station_placement(
                 .entity(entity)
                 .insert(ExportStation { goods: vec![] })
                 .insert(StorageConsolidator::default())
+                .insert(Statistics::default())
                 .insert(RequiresUpdate)
                 .insert(Position { position: pos })
                 .insert(Editable)

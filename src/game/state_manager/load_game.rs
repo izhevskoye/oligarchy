@@ -74,6 +74,7 @@ fn insert_building(
     match map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, BUILDING_LAYER_ID) {
         Err(why) => log::error!("Failed to set tile: {:?}", why),
         Ok(entity) => {
+            // TODO: stat tracker!
             let entity = commands
                 .entity(entity)
                 .insert(RequiresUpdate)

@@ -11,6 +11,7 @@ mod remove_update;
 mod resource_specifications;
 mod setup;
 mod state_manager;
+mod statistics;
 mod storage;
 mod street;
 mod texture;
