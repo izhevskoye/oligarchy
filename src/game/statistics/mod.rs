@@ -16,6 +16,7 @@ impl StatisticTracker {
         );
     }
 
+    #[cfg(test)]
     pub fn get(&self, resource: &str) -> f64 {
         *self.data.get(resource).unwrap_or(&0.0)
     }

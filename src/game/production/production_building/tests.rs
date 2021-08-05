@@ -1,37 +1,91 @@
 use super::*;
-use crate::game::assets::{Product, ProductDependency, ProductEnhancer, Storage};
+use crate::game::{
+    assets::{Product, ProductDependency, ProductEnhancer, Storage},
+    statistics::Statistics,
+};
 use bevy::prelude::*;
 
-#[test]
-fn produces_resource() {
-    let mut world = World::default();
+struct TestSetup {
+    world: World,
+    stage: SystemStage,
+}
+
+impl TestSetup {
+    fn add_storage(&mut self, resource: &str, amount: f64) -> Entity {
+        self.world
+            .spawn()
+            .insert(Storage {
+                resource: resource.to_owned(),
+                amount,
+                capacity: 10.0,
+            })
+            .id()
+    }
+
+    fn assert_storage_amount(&self, entity: Entity, amount: f64) {
+        assert!((self.world.get::<Storage>(entity).unwrap().amount - amount).abs() < f64::EPSILON);
+    }
+
+    fn set_storage_amount(&mut self, entity: Entity, amount: f64) {
+        self.world.get_mut::<Storage>(entity).unwrap().amount = amount;
+    }
+
+    fn assert_production_statistic(&self, resource: &str, building_id: Entity, amount: f64) {
+        let current_amount = self
+            .world
+            .get::<Statistics>(building_id)
+            .unwrap()
+            .production
+            .get(resource);
+
+        assert!(
+            (current_amount - amount).abs() < f64::EPSILON,
+            "current was {}, but expected {}",
+            current_amount,
+            amount
+        );
+    }
+
+    fn assert_consumption_statistic(&self, resource: &str, building_id: Entity, amount: f64) {
+        let current_amount = self
+            .world
+            .get::<Statistics>(building_id)
+            .unwrap()
+            .consumption
+            .get(resource);
+
+        assert!(
+            (current_amount - amount).abs() < f64::EPSILON,
+            "current was {}, but expected {}",
+            current_amount,
+            amount
+        );
+    }
+}
+
+fn setup_test() -> TestSetup {
+    let world = World::default();
 
     let mut stage = SystemStage::parallel();
     stage.add_system(production_building.system());
 
+    TestSetup { world, stage }
+}
+
+#[test]
+fn produces_resource() {
+    let mut setup = setup_test();
+
     let coke = "coke";
     let coal = "coal";
 
-    let coke_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coke.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
+    let coke_storage_id = setup.add_storage(coke, 0.0);
+    let coal_storage_id = setup.add_storage(coal, 10.0);
 
-    let coal_storage_id = world
+    let building_id = setup
+        .world
         .spawn()
-        .insert(Storage {
-            resource: coal.to_owned(),
-            amount: 10.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    world
-        .spawn()
+        .insert(Statistics::default())
         .insert(ProductionBuilding {
             products: vec![
                 Product {
@@ -57,73 +111,58 @@ fn produces_resource() {
         })
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id],
-        });
+        })
+        .id();
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 1.0);
+    setup.assert_storage_amount(coal_storage_id, 8.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 
     // if already full
-    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 10.0;
+    setup.set_storage_amount(coke_storage_id, 10.0);
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
     // no overflow
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 10.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 10.0);
+    setup.assert_storage_amount(coal_storage_id, 8.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 
     // no requisites left
-    world.get_mut::<Storage>(coal_storage_id).unwrap().amount = 0.0;
-    world.get_mut::<Storage>(coke_storage_id).unwrap().amount = 0.0;
+    setup.set_storage_amount(coal_storage_id, 0.0);
+    setup.set_storage_amount(coke_storage_id, 0.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
     // no production
-    assert!(world.get::<Storage>(coke_storage_id).unwrap().amount < f64::EPSILON);
-    assert!(world.get::<Storage>(coal_storage_id).unwrap().amount < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 0.0);
+    setup.assert_storage_amount(coal_storage_id, 0.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 }
 
 #[test]
 fn produces_byproducts() {
-    let mut world = World::default();
-
-    let mut stage = SystemStage::parallel();
-    stage.add_system(production_building.system());
+    let mut setup = setup_test();
 
     let coke = "coke";
     let slug = "slug";
     let coal = "coal";
 
-    let coke_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coke.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
+    let coke_storage_id = setup.add_storage(coke, 0.0);
+    let coal_storage_id = setup.add_storage(coal, 10.0);
+    let slug_storage_id = setup.add_storage(slug, 0.0);
 
-    let slug_storage_id = world
+    let building_id = setup
+        .world
         .spawn()
-        .insert(Storage {
-            resource: slug.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let coal_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coal.to_owned(),
-            amount: 10.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let building_id = world
-        .spawn()
+        .insert(Statistics::default())
         .insert(ProductionBuilding {
             products: vec![Product {
                 resource: coke.to_owned(),
@@ -145,77 +184,52 @@ fn produces_byproducts() {
         })
         .id();
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
-    assert!(world.get::<Storage>(slug_storage_id).unwrap().amount < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 1.0);
+    setup.assert_storage_amount(coal_storage_id, 8.0);
+    setup.assert_storage_amount(slug_storage_id, 0.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_production_statistic(slug, building_id, 0.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 
     // slug storage connected
-    world
+    setup
+        .world
         .get_entity_mut(building_id)
         .unwrap()
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id, slug_storage_id],
         });
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 2.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 6.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(slug_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 2.0);
+    setup.assert_storage_amount(coal_storage_id, 6.0);
+    setup.assert_storage_amount(slug_storage_id, 1.0);
+    setup.assert_production_statistic(coke, building_id, 2.0);
+    setup.assert_production_statistic(slug, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 4.0);
 }
 
 #[test]
 fn increases_production_with_enhancers() {
-    let mut world = World::default();
-
-    let mut stage = SystemStage::parallel();
-    stage.add_system(production_building.system());
+    let mut setup = setup_test();
 
     let coke = "coke";
     let slug = "slug";
     let enhancer = "enhancer";
     let coal = "coal";
 
-    let coke_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coke.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
+    let coke_storage_id = setup.add_storage(coke, 0.0);
+    let coal_storage_id = setup.add_storage(coal, 10.0);
+    let enhancer_storage_id = setup.add_storage(enhancer, 10.0);
+    let slug_storage_id = setup.add_storage(slug, 0.0);
 
-    let slug_storage_id = world
+    let building_id = setup
+        .world
         .spawn()
-        .insert(Storage {
-            resource: slug.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let enhancer_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: enhancer.to_owned(),
-            amount: 10.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let coal_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coal.to_owned(),
-            amount: 10.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let building_id = world
-        .spawn()
+        .insert(Statistics::default())
         .insert(ProductionBuilding {
             products: vec![Product {
                 resource: coke.to_owned(),
@@ -241,17 +255,20 @@ fn increases_production_with_enhancers() {
         })
         .id();
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 8.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(slug_storage_id).unwrap().amount - 1.0).abs() < f64::EPSILON);
-    assert!(
-        (world.get::<Storage>(enhancer_storage_id).unwrap().amount - 10.0).abs() < f64::EPSILON
-    );
+    setup.assert_storage_amount(coke_storage_id, 1.0);
+    setup.assert_storage_amount(coal_storage_id, 8.0);
+    setup.assert_storage_amount(slug_storage_id, 1.0);
+    setup.assert_storage_amount(enhancer_storage_id, 10.0);
+    setup.assert_production_statistic(coke, building_id, 1.0);
+    setup.assert_production_statistic(slug, building_id, 1.0);
+    setup.assert_consumption_statistic(enhancer, building_id, 0.0);
+    setup.assert_consumption_statistic(coal, building_id, 2.0);
 
     // enhancer storage connected
-    world
+    setup
+        .world
         .get_entity_mut(building_id)
         .unwrap()
         .insert(StorageConsolidator {
@@ -263,44 +280,32 @@ fn increases_production_with_enhancers() {
             ],
         });
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!((world.get::<Storage>(coke_storage_id).unwrap().amount - 3.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(coal_storage_id).unwrap().amount - 6.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(slug_storage_id).unwrap().amount - 3.0).abs() < f64::EPSILON);
-    assert!((world.get::<Storage>(enhancer_storage_id).unwrap().amount - 9.0).abs() < f64::EPSILON);
+    setup.assert_storage_amount(coke_storage_id, 3.0);
+    setup.assert_storage_amount(coal_storage_id, 6.0);
+    setup.assert_storage_amount(slug_storage_id, 3.0);
+    setup.assert_storage_amount(enhancer_storage_id, 9.0);
+    setup.assert_production_statistic(coke, building_id, 3.0);
+    setup.assert_production_statistic(slug, building_id, 3.0);
+    setup.assert_consumption_statistic(enhancer, building_id, 1.0);
+    setup.assert_consumption_statistic(coal, building_id, 4.0);
 }
 
 #[test]
 fn no_production_is_marked_idle() {
-    let mut world = World::default();
-
-    let mut stage = SystemStage::parallel();
-    stage.add_system(production_building.system());
+    let mut setup = setup_test();
 
     let coke = "coke";
     let coal = "coal";
 
-    let coke_storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: coke.to_owned(),
-            amount: 0.0,
-            capacity: 10.0,
-        })
-        .id();
+    let coke_storage_id = setup.add_storage(coke, 0.0);
+    let coal_storage_id = setup.add_storage(coal, 10.0);
 
-    let coal_storage_id = world
+    let building_id = setup
+        .world
         .spawn()
-        .insert(Storage {
-            resource: coal.to_owned(),
-            amount: 10.0,
-            capacity: 10.0,
-        })
-        .id();
-
-    let building_id = world
-        .spawn()
+        .insert(Statistics::default())
         .insert(ProductionBuilding {
             products: vec![Product {
                 resource: coke.to_owned(),
@@ -318,18 +323,19 @@ fn no_production_is_marked_idle() {
         })
         .id();
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!(world.get::<Idle>(building_id).is_some());
+    assert!(setup.world.get::<Idle>(building_id).is_some());
 
-    world
+    setup
+        .world
         .get_entity_mut(building_id)
         .unwrap()
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id],
         });
 
-    stage.run(&mut world);
+    setup.stage.run(&mut setup.world);
 
-    assert!(world.get::<Idle>(building_id).is_none());
+    assert!(setup.world.get::<Idle>(building_id).is_none());
 }

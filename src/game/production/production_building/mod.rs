@@ -5,6 +5,7 @@ use bevy::prelude::*;
 
 use crate::game::{
     assets::{ProductionBuilding, Storage, StorageConsolidator},
+    statistics::Statistics,
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
 };
 
@@ -12,15 +13,16 @@ use super::Idle;
 
 pub fn production_building(
     mut commands: Commands,
-    building_query: Query<(
+    mut building_query: Query<(
         Entity,
         &ProductionBuilding,
         &StorageConsolidator,
+        &mut Statistics,
         Option<&Idle>,
     )>,
     mut storage_query: Query<&mut Storage>,
 ) {
-    for (entity, building, consolidator, idle) in building_query.iter() {
+    for (entity, building, consolidator, mut statistics, idle) in building_query.iter_mut() {
         let product = &building.products[building.active_product];
 
         let has_requisites = product.requisites.iter().all(|requisite| {
@@ -60,15 +62,23 @@ pub fn production_building(
                     &requisite.resource,
                     requisite.rate,
                 );
+
+                statistics
+                    .consumption
+                    .track(&requisite.resource, requisite.rate);
             }
 
             for enhancer in &product.enhancers {
-                fetch_from_storage(
+                if fetch_from_storage(
                     consolidator,
                     &mut storage_query,
                     &enhancer.resource,
                     enhancer.rate,
-                );
+                ) {
+                    statistics
+                        .consumption
+                        .track(&enhancer.resource, enhancer.rate);
+                }
             }
 
             distribute_to_storage(
@@ -77,6 +87,10 @@ pub fn production_building(
                 &product.resource,
                 product.rate * modifier,
             );
+
+            statistics
+                .production
+                .track(&product.resource, product.rate * modifier);
 
             if let Some(idle) = idle {
                 if let Some(entity) = idle.entity {
@@ -98,6 +112,10 @@ pub fn production_building(
                         &byproduct.resource,
                         byproduct.rate * modifier,
                     );
+
+                    statistics
+                        .production
+                        .track(&byproduct.resource, byproduct.rate * modifier);
                 }
             }
         } else if idle.is_none() {
