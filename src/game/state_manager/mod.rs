@@ -15,7 +15,7 @@ use crate::game::{
     car::Car,
 };
 
-use super::{assets::DeliveryStation, AppState};
+use super::{assets::DeliveryStation, statistics::Statistics, AppState};
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -50,6 +50,7 @@ pub struct GameEntity {
     pub pos: UVec2,
     pub entity: GameEntityType,
     pub name: Option<Name>,
+    pub statistics: Option<Statistics>,
 }
 
 #[derive(Default, Serialize, Deserialize)]
