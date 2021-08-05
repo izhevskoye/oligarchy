@@ -6,6 +6,7 @@ mod car;
 mod constants;
 mod current_selection;
 mod current_tool;
+mod goals;
 mod production;
 mod remove_update;
 mod resource_specifications;
@@ -21,15 +22,12 @@ use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude:
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use crate::game::{
-    assets::{ClickedTile, SelectedTool},
-    current_selection::CurrentlySelected,
-    state_manager::{LoadGameEvent, SaveGameEvent},
-};
-
 use self::{
-    assets::{MapSettings, RemovedBuildingEvent},
+    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool},
     constants::{CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, PRODUCTION_TICK_SPEED},
+    current_selection::CurrentlySelected,
+    goals::GoalManager,
+    state_manager::{LoadGameEvent, SaveGameEvent},
 };
 
 #[derive(Default)]
@@ -71,6 +69,7 @@ impl Game {
             .init_resource::<SelectedTool>()
             .init_resource::<ClickedTile>()
             .init_resource::<MapSettings>()
+            .init_resource::<GoalManager>()
             .insert_resource(building_specifications::load_specifications())
             .insert_resource(resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
@@ -93,7 +92,9 @@ impl Game {
             // GAME
             //
             .add_system_set(
-                SystemSet::on_enter(AppState::InGame).with_system(setup::setup_map.system()),
+                SystemSet::on_enter(AppState::InGame)
+                    .with_system(setup::setup_map.system())
+                    .with_system(goals::generate_goals.system()),
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::InGame).with_system(setup::teardown.system()),
