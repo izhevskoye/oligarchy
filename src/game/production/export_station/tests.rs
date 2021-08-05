@@ -76,8 +76,8 @@ fn setup_test(setup: Setup) -> TestSetup {
 
     TestSetup {
         world,
-        storage_id,
         station_id,
+        storage_id,
     }
 }
 
