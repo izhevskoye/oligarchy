@@ -22,7 +22,7 @@ pub fn goals_ui(
                 for (resource, goal) in goals.goals.iter() {
                     let resource = resources.get(resource).unwrap();
                     let resource = &resource.name;
-                    ui.label(format!("{}", resource));
+                    ui.label(resource);
                     ui.label(format!(
                         "{} / {}",
                         (goal.current as i64).to_formatted_string(&Locale::en),
