@@ -2,12 +2,12 @@
   goals:
     - resource: pork
       amount:
-        small: 15000
-        medium: 35000
-        large: 200000
+        small: 3500
+        medium: 10000
+        large: 25000
 
     - resource: poultry
       amount:
-        small: 15000
-        medium: 35000
-        large: 200000
+        small: 3500
+        medium: 10000
+        large: 25000

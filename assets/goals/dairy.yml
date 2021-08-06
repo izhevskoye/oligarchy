@@ -2,18 +2,18 @@
   goals:
     - resource: cheese
       amount:
-        small: 10000
-        medium: 25000
-        large: 100000
+        small: 3500
+        medium: 10000
+        large: 25000
 
     - resource: sour_cream
       amount:
-        small: 10000
-        medium: 25000
-        large: 100000
+        small: 3500
+        medium: 10000
+        large: 25000
 
     - resource: butter
       amount:
-        small: 10000
-        medium: 25000
-        large: 100000
+        small: 3500
+        medium: 10000
+        large: 25000

@@ -82,15 +82,24 @@ pub fn generate_goals(mut manager: ResMut<GoalManager>, map_settings: Res<MapSet
 
 // TODO: TEST
 pub fn update_goals(query: Query<&Statistics>, mut manager: ResMut<GoalManager>) {
-    for (_, goal) in manager.goals.iter_mut() {
-        goal.current = 0.0;
+    if manager.goals.is_empty() {
+        return;
     }
 
-    for statistic in query.iter() {
-        for (resource, count) in statistic.export.data().iter() {
-            if let Some(goal) = manager.goals.get_mut(resource) {
-                goal.current += count;
-            }
+    let mut remove = vec![];
+    for (resource, goal) in manager.goals.iter_mut() {
+        goal.current = 0.0;
+
+        for statistic in query.iter() {
+            goal.current += statistic.export.get(resource);
         }
+
+        if goal.current > goal.amount {
+            remove.push(resource.to_owned());
+        }
+    }
+
+    for resource in remove {
+        manager.goals.remove(&resource);
     }
 }
