@@ -20,6 +20,10 @@ impl StatisticTracker {
     pub fn get(&self, resource: &str) -> f64 {
         *self.data.get(resource).unwrap_or(&0.0)
     }
+
+    pub fn data(&self) -> &HashMap<String, f64> {
+        &self.data
+    }
 }
 
 #[derive(Serialize, Deserialize, Default, Clone)]

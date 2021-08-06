@@ -24,7 +24,10 @@ use bevy_egui::EguiPlugin;
 
 use self::{
     assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool},
-    constants::{CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, PRODUCTION_TICK_SPEED},
+    constants::{
+        CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, GOAL_UPDATE_TICK_SPEED,
+        PRODUCTION_TICK_SPEED,
+    },
     current_selection::CurrentlySelected,
     goals::GoalManager,
     state_manager::{LoadGameEvent, SaveGameEvent},
@@ -95,6 +98,11 @@ impl Game {
                 SystemSet::on_enter(AppState::InGame)
                     .with_system(setup::setup_map.system())
                     .with_system(goals::generate_goals.system()),
+            )
+            .add_system_set(
+                SystemSet::on_enter(AppState::InGame)
+                    .with_run_criteria(FixedTimestep::step(GOAL_UPDATE_TICK_SPEED))
+                    .with_system(goals::update_goals.system()),
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::InGame).with_system(setup::teardown.system()),
