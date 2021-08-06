@@ -57,15 +57,3 @@ pub struct LoadGameEvent {
     pub state: GameState,
 }
 pub struct SaveGameEvent;
-
-#[derive(PartialEq, Eq)]
-pub enum MenuState {
-    None,
-    OpenMenu,
-}
-
-impl Default for MenuState {
-    fn default() -> Self {
-        Self::None
-    }
-}

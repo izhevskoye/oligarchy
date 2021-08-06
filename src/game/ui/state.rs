@@ -1,6 +1,6 @@
 use crate::game::{
     assets::MapSettings,
-    state_manager::{GameState, LoadGameEvent, MenuState, SaveGameEvent},
+    state_manager::{GameState, LoadGameEvent, SaveGameEvent},
     AppState,
 };
 use bevy::prelude::*;
@@ -10,6 +10,18 @@ use bevy_egui::{
 };
 
 use std::{fs::File, io::prelude::*, path::Path};
+
+#[derive(PartialEq, Eq)]
+pub enum MenuState {
+    None,
+    OpenMenu,
+}
+
+impl Default for MenuState {
+    fn default() -> Self {
+        Self::None
+    }
+}
 
 pub fn emit_load_game(commands: &mut Commands, load_game: &mut EventWriter<LoadGameEvent>) {
     let path = Path::new("world.yaml");

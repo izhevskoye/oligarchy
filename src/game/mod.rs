@@ -88,7 +88,7 @@ impl Game {
             //
             .add_system_set(
                 SystemSet::new()
-                    .with_system(ui::game::save_ui.system())
+                    .with_system(ui::state::save_ui.system())
                     .label(Label::Menu),
             )
             //
@@ -135,12 +135,10 @@ impl Game {
             // UI Systems
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
-                    .with_system(
-                        ui::info::info_ui
-                            .system()
-                            .before(UILabel::UIEnd)
-                            .label(UILabel::InfoUI),
-                    )
+                    .before(UILabel::UIEnd)
+                    // TODO: INFO CLICK PLACES ITEM!!
+                    .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
+                    .with_system(ui::goals::goals_ui.system())
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui
@@ -152,17 +150,13 @@ impl Game {
                             .system()
                             .after(UILabel::InfoUI),
                     )
-                    .with_system(
-                        ui::construction::construction_ui
-                            .system()
-                            .before(UILabel::UIEnd),
-                    )
-                    .with_system(ui::name::name_ui.system().before(UILabel::UIEnd))
-                    .with_system(
-                        ui::mouse_pos_to_tile::mouse_pos_to_tile
-                            .system()
-                            .label(UILabel::UIEnd),
-                    ),
+                    .with_system(ui::construction::construction_ui.system())
+                    .with_system(ui::name::name_ui.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .label(UILabel::UIEnd)
+                    .with_system(ui::mouse_pos_to_tile::mouse_pos_to_tile.system()),
             )
             // Current Tool
             .add_system_set(
