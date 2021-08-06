@@ -85,7 +85,7 @@ impl Game {
             //
             .add_system_set(
                 SystemSet::new()
-                    .with_system(state_manager::save_ui.system())
+                    .with_system(ui::game::save_ui.system())
                     .label(Label::Menu),
             )
             //
