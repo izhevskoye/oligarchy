@@ -1,12 +1,15 @@
 pub mod load_game;
 pub mod save_game;
 
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
     assets::{DeliveryStation, ExportStation, MapSettings, Name, Storage, Street},
     car::Car,
+    goals::Goal,
     statistics::Statistics,
 };
 
@@ -48,9 +51,9 @@ pub struct GameEntity {
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct GameState {
-    #[serde(default)]
     pub settings: MapSettings,
     pub entities: Vec<GameEntity>,
+    pub goals: HashMap<String, Goal>,
 }
 
 pub struct LoadGameEvent {

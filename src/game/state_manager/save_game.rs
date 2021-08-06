@@ -9,6 +9,7 @@ use crate::game::{
         Storage, Street,
     },
     car::Car,
+    goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
@@ -32,6 +33,7 @@ pub fn save_game(
     map_query: MapQuery,
     mut save_game: EventReader<SaveGameEvent>,
     map_settings: Res<MapSettings>,
+    goals: Res<GoalManager>,
 ) {
     let (
         name_query,
@@ -47,6 +49,7 @@ pub fn save_game(
     for _ in save_game.iter() {
         let mut state = GameState {
             settings: map_settings.clone(),
+            goals: goals.goals.clone(),
             ..Default::default()
         };
 

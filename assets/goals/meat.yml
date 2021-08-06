@@ -1,0 +1,13 @@
+- name: Meat Production
+  goals:
+    - resource: pork
+      amount:
+        small: 15000
+        medium: 35000
+        large: 200000
+
+    - resource: poultry
+      amount:
+        small: 15000
+        medium: 35000
+        large: 200000

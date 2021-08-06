@@ -1,5 +1,5 @@
 use crate::game::{
-    assets::MapSettings,
+    assets::{MapSettings, MapSize},
     state_manager::{GameState, LoadGameEvent, SaveGameEvent},
     AppState,
 };
@@ -101,6 +101,7 @@ pub fn save_ui(
                     commands.insert_resource(MapSettings {
                         width: 3,
                         height: 3,
+                        size: MapSize::Small,
                     });
 
                     app_state.push(AppState::InGame).unwrap();
@@ -110,6 +111,7 @@ pub fn save_ui(
                     commands.insert_resource(MapSettings {
                         width: 5,
                         height: 5,
+                        size: MapSize::Medium,
                     });
 
                     app_state.push(AppState::InGame).unwrap();
@@ -119,6 +121,7 @@ pub fn save_ui(
                     commands.insert_resource(MapSettings {
                         width: 8,
                         height: 8,
+                        size: MapSize::Large,
                     });
 
                     app_state.push(AppState::InGame).unwrap();

@@ -7,6 +7,7 @@ use crate::game::{
         StorageConsolidator,
     },
     building_specifications::BuildingSpecifications,
+    goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
@@ -18,9 +19,16 @@ pub fn load_game(
     mut map_query: MapQuery,
     buildings: Res<BuildingSpecifications>,
     mut load_game: EventReader<LoadGameEvent>,
+    mut goals: ResMut<GoalManager>,
 ) {
     for event in load_game.iter() {
-        load_state(&mut commands, &mut map_query, &event.state, &buildings);
+        load_state(
+            &mut commands,
+            &mut map_query,
+            &event.state,
+            &buildings,
+            &mut goals,
+        );
     }
 }
 
@@ -29,7 +37,10 @@ fn load_state(
     map_query: &mut MapQuery,
     state: &GameState,
     buildings: &Res<BuildingSpecifications>,
+    goals: &mut ResMut<GoalManager>,
 ) {
+    goals.goals = state.goals.clone();
+
     for game_entity in &state.entities {
         match &game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {
