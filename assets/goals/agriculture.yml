@@ -1,0 +1,13 @@
+- name: Farmstead
+  goals:
+    - resource: sunflower.oil
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
+
+    - resource: eggs
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000

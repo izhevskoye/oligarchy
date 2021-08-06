@@ -1,0 +1,19 @@
+- name: Dairy Production
+  goals:
+    - resource: cheese
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
+
+    - resource: sour_cream
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
+
+    - resource: butter
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000

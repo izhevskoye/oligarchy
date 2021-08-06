@@ -9,11 +9,13 @@ use crate::game::{
         Storage, Street,
     },
     car::Car,
+    goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
         Vehicle,
     },
+    statistics::Statistics,
 };
 
 #[allow(clippy::type_complexity)]
@@ -21,6 +23,7 @@ pub fn save_game(
     queries: (
         Query<&Name>,
         Query<(Entity, &Car, &Position)>,
+        Query<&Statistics>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&DeliveryStation>,
@@ -30,10 +33,12 @@ pub fn save_game(
     map_query: MapQuery,
     mut save_game: EventReader<SaveGameEvent>,
     map_settings: Res<MapSettings>,
+    goals: Res<GoalManager>,
 ) {
     let (
         name_query,
         car_query,
+        statistics_query,
         storage_query,
         export_station_query,
         delivery_station_query,
@@ -44,6 +49,7 @@ pub fn save_game(
     for _ in save_game.iter() {
         let mut state = GameState {
             settings: map_settings.clone(),
+            goals: goals.goals.clone(),
             ..Default::default()
         };
 
@@ -61,6 +67,7 @@ pub fn save_game(
             state.entities.push(GameEntity {
                 pos,
                 name: name.clone(),
+                statistics: None,
                 entity: GameEntityType::Vehicle(Vehicle {
                     car: car.clone(),
                     storage: storage.clone(),
@@ -81,6 +88,12 @@ pub fn save_game(
                         None
                     };
 
+                    let statistics = if let Ok(statistics) = statistics_query.get(entity) {
+                        Some(statistics.clone())
+                    } else {
+                        None
+                    };
+
                     if let Ok((building, production_building)) = building_query.get(entity) {
                         let active_product = if let Some(pb) = production_building {
                             pb.active_product
@@ -97,6 +110,7 @@ pub fn save_game(
                                     active_product,
                                 },
                             )),
+                            statistics: statistics.clone(),
                         });
                     }
 
@@ -107,6 +121,7 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::Storage(
                                 building.clone(),
                             )),
+                            statistics: statistics.clone(),
                         });
                     }
 
@@ -117,6 +132,7 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::ExportStation(
                                 building.clone(),
                             )),
+                            statistics: statistics.clone(),
                         });
                     }
 
@@ -127,6 +143,7 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::DeliveryStation(
                                 building.clone(),
                             )),
+                            statistics: statistics.clone(),
                         });
                     }
 
@@ -137,6 +154,7 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::Street(
                                 building.clone(),
                             )),
+                            statistics: statistics.clone(),
                         });
                     }
                 }

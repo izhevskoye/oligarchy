@@ -6,11 +6,13 @@ mod car;
 mod constants;
 mod current_selection;
 mod current_tool;
+mod goals;
 mod production;
 mod remove_update;
 mod resource_specifications;
 mod setup;
 mod state_manager;
+mod statistics;
 mod storage;
 mod street;
 mod texture;
@@ -20,15 +22,15 @@ use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude:
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
-use crate::game::{
-    assets::{ClickedTile, SelectedTool},
-    current_selection::CurrentlySelected,
-    state_manager::{LoadGameEvent, SaveGameEvent},
-};
-
 use self::{
-    assets::{MapSettings, RemovedBuildingEvent},
-    constants::{CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, PRODUCTION_TICK_SPEED},
+    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool},
+    constants::{
+        CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, GOAL_UPDATE_TICK_SPEED,
+        PRODUCTION_TICK_SPEED,
+    },
+    current_selection::CurrentlySelected,
+    goals::GoalManager,
+    state_manager::{LoadGameEvent, SaveGameEvent},
 };
 
 #[derive(Default)]
@@ -70,6 +72,7 @@ impl Game {
             .init_resource::<SelectedTool>()
             .init_resource::<ClickedTile>()
             .init_resource::<MapSettings>()
+            .init_resource::<GoalManager>()
             .insert_resource(building_specifications::load_specifications())
             .insert_resource(resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
@@ -85,14 +88,21 @@ impl Game {
             //
             .add_system_set(
                 SystemSet::new()
-                    .with_system(state_manager::save_ui.system())
+                    .with_system(ui::state::save_ui.system())
                     .label(Label::Menu),
             )
             //
             // GAME
             //
             .add_system_set(
-                SystemSet::on_enter(AppState::InGame).with_system(setup::setup_map.system()),
+                SystemSet::on_enter(AppState::InGame)
+                    .with_system(setup::setup_map.system())
+                    .with_system(goals::generate_goals.system()),
+            )
+            .add_system_set(
+                SystemSet::on_enter(AppState::InGame)
+                    .with_run_criteria(FixedTimestep::step(GOAL_UPDATE_TICK_SPEED))
+                    .with_system(goals::update_goals.system()),
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::InGame).with_system(setup::teardown.system()),
@@ -109,6 +119,7 @@ impl Game {
                     .with_system(
                         current_selection::current_selection
                             .system()
+                            .after(UILabel::UIEnd)
                             .label(Label::CurrentSelection),
                     )
                     .with_system(
@@ -125,12 +136,9 @@ impl Game {
             // UI Systems
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
-                    .with_system(
-                        ui::info::info_ui
-                            .system()
-                            .before(UILabel::UIEnd)
-                            .label(UILabel::InfoUI),
-                    )
+                    .before(UILabel::UIEnd)
+                    .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
+                    .with_system(ui::goals::goals_ui.system())
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui
@@ -142,17 +150,13 @@ impl Game {
                             .system()
                             .after(UILabel::InfoUI),
                     )
-                    .with_system(
-                        ui::construction::construction_ui
-                            .system()
-                            .before(UILabel::UIEnd),
-                    )
-                    .with_system(ui::name::name_ui.system().before(UILabel::UIEnd))
-                    .with_system(
-                        ui::mouse_pos_to_tile::mouse_pos_to_tile
-                            .system()
-                            .label(UILabel::UIEnd),
-                    ),
+                    .with_system(ui::construction::construction_ui.system())
+                    .with_system(ui::name::name_ui.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .label(UILabel::UIEnd)
+                    .with_system(ui::mouse_pos_to_tile::mouse_pos_to_tile.system()),
             )
             // Current Tool
             .add_system_set(

@@ -8,6 +8,7 @@ use crate::game::{
     },
     building_specifications::BuildingSpecifications,
     setup::BUILDING_LAYER_ID,
+    statistics::Statistics,
 };
 
 use super::get_entity;
@@ -40,6 +41,7 @@ pub fn building_placement(
                 if !building.products.is_empty() {
                     commands
                         .entity(entity)
+                        .insert(Statistics::default())
                         .insert(StorageConsolidator::default())
                         .insert(ProductionBuilding {
                             products: building.products.clone(),

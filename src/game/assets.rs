@@ -10,10 +10,18 @@ pub struct RemovedBuildingEvent {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+pub enum MapSize {
+    Small,
+    Medium,
+    Large,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct MapSettings {
     pub width: u32,
     pub height: u32,
+    pub size: MapSize,
 }
 
 impl Default for MapSettings {
@@ -21,6 +29,7 @@ impl Default for MapSettings {
         Self {
             width: 3,
             height: 3,
+            size: MapSize::Small,
         }
     }
 }

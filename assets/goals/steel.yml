@@ -1,0 +1,19 @@
+- name: New Steel Works
+  goals:
+    - resource: steel.slabs
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
+
+    - resource: steel.blooms
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
+
+    - resource: steel.billets
+      amount:
+        small: 3500
+        medium: 10000
+        large: 25000
