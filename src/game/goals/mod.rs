@@ -1,4 +1,6 @@
 mod loader;
+#[cfg(test)]
+mod tests;
 
 use rand::{prelude::SliceRandom, thread_rng};
 use serde::{Deserialize, Serialize};
@@ -54,7 +56,6 @@ impl Default for GoalManager {
     }
 }
 
-// TODO: TEST
 pub fn generate_goals(mut manager: ResMut<GoalManager>, map_settings: Res<MapSettings>) {
     let mut goal_sets = manager.goal_sets.clone();
     let mut random = thread_rng();
@@ -80,7 +81,6 @@ pub fn generate_goals(mut manager: ResMut<GoalManager>, map_settings: Res<MapSet
     }
 }
 
-// TODO: TEST
 pub fn update_goals(query: Query<&Statistics>, mut manager: ResMut<GoalManager>) {
     if manager.goals.is_empty() {
         return;
@@ -94,7 +94,7 @@ pub fn update_goals(query: Query<&Statistics>, mut manager: ResMut<GoalManager>)
             goal.current += statistic.export.get(resource);
         }
 
-        if goal.current > goal.amount {
+        if goal.current >= goal.amount {
             remove.push(resource.to_owned());
         }
     }
