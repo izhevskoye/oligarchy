@@ -116,11 +116,8 @@ fn insert_building(
                             .insert(ProductionBuilding {
                                 products: building.products.clone(),
                                 active_product: c.active_product,
-                            });
-
-                        if building.products.len() > 1 {
-                            commands.entity(entity).insert(Editable);
-                        }
+                            })
+                            .insert(Editable);
                     }
                 }
                 BuildingEntity::Street(c) => {

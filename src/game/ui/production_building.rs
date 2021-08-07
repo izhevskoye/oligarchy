@@ -27,6 +27,7 @@ pub fn edit_ui(
 
                 for (index, product) in production.products.clone().iter().enumerate() {
                     let resource = resources.get(&product.resource).unwrap();
+
                     let name = if product.requisites.is_empty() {
                         format!("{} ({:.2})", resource.name, product.rate)
                     } else {
@@ -46,7 +47,38 @@ pub fn edit_ui(
                         )
                     };
 
-                    ui.radio_value(&mut production.active_product, index, name);
+                    ui.radio_value(
+                        &mut production.active_product,
+                        index,
+                        format!("Produce {} {}", product.rate, resource.name),
+                    );
+
+                    if !product.byproducts.is_empty() {
+                        ui.label("It will also optionally produce:");
+                        for byproduct in product.byproducts.iter() {
+                            let resource = resources.get(&byproduct.resource).unwrap();
+                            ui.label(format!("{} {}", byproduct.rate, resource.name));
+                        }
+                    }
+
+                    if !product.requisites.is_empty() {
+                        ui.label("This will consume:");
+                        for requisite in product.requisites.iter() {
+                            let resource = resources.get(&requisite.resource).unwrap();
+                            ui.label(format!("{} {}", requisite.rate, resource.name));
+                        }
+                    }
+
+                    if !product.enhancers.is_empty() {
+                        ui.label("If the following is provided, it increases output:");
+                        for enhancer in product.enhancers.iter() {
+                            let resource = resources.get(&enhancer.resource).unwrap();
+                            ui.label(format!(
+                                "{} {} by {}x",
+                                enhancer.rate, resource.name, enhancer.modifier,
+                            ));
+                        }
+                    }
                 }
             });
         }
