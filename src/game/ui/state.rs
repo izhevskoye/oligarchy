@@ -1,4 +1,5 @@
 use crate::game::{
+    account::Account,
     assets::{MapSettings, MapSize},
     state_manager::{GameState, LoadGameEvent, SaveGameEvent},
     AppState,
@@ -55,10 +56,13 @@ pub fn save_ui(
     mut load_game: EventWriter<LoadGameEvent>,
     mut save_game: EventWriter<SaveGameEvent>,
     mut state: Local<MenuState>,
+    account: Res<Account>,
 ) {
     egui::Window::new("Game")
         .anchor(Align2::RIGHT_BOTTOM, [-10.0, -10.0])
         .show(egui_context.ctx(), |ui| {
+            ui.heading(format!("{}", account.value));
+
             if let AppState::MainMenu = app_state.current() {
                 if ui.button("new").clicked() {
                     *state = MenuState::OpenMenu;

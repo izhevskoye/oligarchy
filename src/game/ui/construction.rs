@@ -122,7 +122,13 @@ pub fn construction_ui(
                 egui::CollapsingHeader::new(format!("Building: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
                         for (index, (id, building)) in buildings.iter().enumerate() {
-                            if ui.small_button(&building.name).clicked() {
+                            let name = if building.cost.is_some() {
+                                format!("{} ({})", building.name, building.price(&resources))
+                            } else {
+                                building.name.to_owned()
+                            };
+
+                            if ui.small_button(name).clicked() {
                                 selected_tool.tool = Tool::Building(id.to_string());
                             }
 

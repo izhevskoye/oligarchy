@@ -3,13 +3,13 @@
   tile: 67
   products:
     - resource: steel.slabs
-      rate: 1.0
+      rate: 0.9
       requisites:
         - resource: steel
           rate: 1.0
 
     - resource: steel.blooms
-      rate: 1.0
+      rate: 0.95
       requisites:
         - resource: steel
           rate: 1.0

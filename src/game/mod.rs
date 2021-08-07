@@ -1,3 +1,4 @@
+mod account;
 mod asset_tiles;
 mod assets;
 mod building_specifications;
@@ -23,6 +24,7 @@ use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
 use self::{
+    account::{Account, AccountTransaction},
     assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool},
     constants::{
         CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, GOAL_UPDATE_TICK_SPEED,
@@ -73,6 +75,7 @@ impl Game {
             .init_resource::<ClickedTile>()
             .init_resource::<MapSettings>()
             .init_resource::<GoalManager>()
+            .init_resource::<Account>()
             .insert_resource(building_specifications::load_specifications())
             .insert_resource(resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
@@ -83,6 +86,7 @@ impl Game {
             .add_event::<LoadGameEvent>()
             .add_event::<SaveGameEvent>()
             .add_event::<RemovedBuildingEvent>()
+            .add_event::<AccountTransaction>()
             //
             // MENU
             //
@@ -222,6 +226,7 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .with_system(remove_update::remove_update.system())
+                    .with_system(account::account_transactions.system())
                     .label(Label::UpdateEnd),
             )
             .run();

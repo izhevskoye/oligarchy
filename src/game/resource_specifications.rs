@@ -1,9 +1,25 @@
 use glob::glob;
+use serde::Deserialize;
 use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
-use crate::game::assets::ResourceSpecification;
-
 pub type ResourceSpecifications = HashMap<String, ResourceSpecification>;
+
+#[derive(Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct CarTileDefinition {
+    pub horizontal: u16,
+    pub vertical: u16,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResourceSpecification {
+    pub name: String,
+    pub storage_tile: Option<u16>,
+    pub group: String,
+    pub car_tile: Option<CarTileDefinition>,
+    pub cost: Option<f64>,
+}
 
 pub fn load_file(resources: &mut ResourceSpecifications, file_name: &str) {
     let path = Path::new(file_name);
