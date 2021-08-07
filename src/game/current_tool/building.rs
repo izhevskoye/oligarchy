@@ -46,11 +46,8 @@ pub fn building_placement(
                         .insert(ProductionBuilding {
                             products: building.products.clone(),
                             active_product: 0,
-                        });
-
-                    if building.products.len() > 1 {
-                        commands.entity(entity).insert(Editable);
-                    }
+                        })
+                        .insert(Editable);
                 }
             }
         }
