@@ -15,6 +15,7 @@ use crate::game::{
 
 use super::get_entity;
 
+#[allow(clippy::too_many_arguments)]
 pub fn building_placement(
     mut commands: Commands,
     mut map_query: MapQuery,
