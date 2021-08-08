@@ -1,7 +1,8 @@
 use super::*;
 use crate::game::{
-    assets::{Product, ProductDependency, ProductEnhancer, Storage},
+    assets::{Product, ProductDependency, ProductEnhancer},
     statistics::Statistics,
+    storage::Storage,
 };
 use bevy::prelude::*;
 
