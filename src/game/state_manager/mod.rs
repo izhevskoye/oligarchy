@@ -8,11 +8,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::{
     account::Account,
-    assets::{DeliveryStation, ExportStation, MapSettings, Name, Street},
+    assets::{DeliveryStation, ExportStation, MapSettings, Name},
     car::Car,
     goals::Goal,
     statistics::Statistics,
     storage::Storage,
+    street::Street,
 };
 
 #[derive(Serialize, Deserialize, Clone)]

@@ -1,11 +1,23 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use super::{
-    assets::{Position, RequiresUpdate, Street},
+    account::PurchaseCost,
+    assets::{Position, RequiresUpdate},
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
+
+#[derive(Clone, Serialize, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Street;
+
+impl PurchaseCost for Street {
+    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+        100
+    }
+}
 
 #[derive(Default, Clone, Debug)]
 pub struct NeighborStructure {

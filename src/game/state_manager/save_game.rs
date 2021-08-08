@@ -7,7 +7,6 @@ use crate::game::{
     account::Account,
     assets::{
         Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
-        Street,
     },
     car::Car,
     goals::GoalManager,
@@ -18,6 +17,7 @@ use crate::game::{
     },
     statistics::Statistics,
     storage::Storage,
+    street::Street,
 };
 
 #[allow(clippy::type_complexity)]

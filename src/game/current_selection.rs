@@ -2,10 +2,11 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::{ClickedTile, Position, Street},
+    assets::{ClickedTile, Position},
     car::Car,
     constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_SELECTION_INDICATOR},
     setup::{BUILDING_LAYER_ID, MAP_ID},
+    street::Street,
 };
 
 #[derive(Default)]

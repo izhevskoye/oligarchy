@@ -8,11 +8,12 @@ use num_format::{Locale, ToFormattedString};
 
 use crate::game::{
     account::{Account, PurchaseCost},
-    assets::{SelectedTool, Tool},
+    assets::{DeliveryStation, ExportStation, SelectedTool, Tool},
     building_specifications::BuildingSpecifications,
     car::Car,
     resource_specifications::ResourceSpecifications,
     storage::Storage,
+    street::Street,
 };
 
 fn button(
@@ -53,14 +54,30 @@ pub fn construction_ui(
                 }
                 ui.end_row();
 
-                if ui.small_button("Street").clicked() {
+                if button(ui, "Street", &Street, &resources, &account).clicked() {
                     selected_tool.tool = Tool::Street;
                 }
-                if ui.small_button("Export Station").clicked() {
+                if button(
+                    ui,
+                    "Export Station",
+                    &ExportStation::default(),
+                    &resources,
+                    &account,
+                )
+                .clicked()
+                {
                     selected_tool.tool = Tool::ExportStation;
                 }
                 ui.end_row();
-                if ui.small_button("Delivery Station").clicked() {
+                if button(
+                    ui,
+                    "Delivery Station",
+                    &DeliveryStation,
+                    &resources,
+                    &account,
+                )
+                .clicked()
+                {
                     selected_tool.tool = Tool::DeliveryStation;
                 }
                 ui.end_row();

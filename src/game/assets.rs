@@ -5,6 +5,8 @@ use bevy_egui::egui::Ui;
 
 use crate::game::resource_specifications::ResourceSpecifications;
 
+use super::account::PurchaseCost;
+
 pub struct RemovedBuildingEvent {
     pub position: UVec2,
 }
@@ -81,19 +83,27 @@ pub struct ProductionBuilding {
 
 pub struct RequiresUpdate;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct ExportStation {
     pub goods: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+impl PurchaseCost for ExportStation {
+    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+        1200
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct DeliveryStation;
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Street;
+impl PurchaseCost for DeliveryStation {
+    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+        250
+    }
+}
 
 #[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub enum Direction {
