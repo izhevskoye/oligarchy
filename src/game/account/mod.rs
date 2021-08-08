@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::resource_specifications::ResourceSpecifications;
 
-const START_VALUE: i64 = 100000;
+const START_VALUE: i64 = 250000;
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
