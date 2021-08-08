@@ -10,6 +10,7 @@ use crate::game::{
     account::{Account, PurchaseCost},
     assets::{SelectedTool, Tool},
     building_specifications::BuildingSpecifications,
+    car::Car,
     resource_specifications::ResourceSpecifications,
     storage::Storage,
 };
@@ -86,9 +87,20 @@ pub fn construction_ui(
                 egui::CollapsingHeader::new(format!("Transport: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
                         for (index, (id, resource)) in resource_list.iter().enumerate() {
-                            if ui
-                                .small_button(format!("{} Truck", resource.name))
-                                .clicked()
+                            if button(
+                                ui,
+                                &format!("{} Truck", resource.name),
+                                &(
+                                    Car::default(),
+                                    Storage {
+                                        resource: id.to_string(),
+                                        ..Default::default()
+                                    },
+                                ),
+                                &resources,
+                                &account,
+                            )
+                            .clicked()
                             {
                                 selected_tool.tool = Tool::Car(id.to_string());
                             }

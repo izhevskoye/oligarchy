@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
+use crate::game::resource_specifications::ResourceSpecifications;
 
 pub struct RemovedBuildingEvent {
     pub position: UVec2,
@@ -169,13 +169,5 @@ impl InfoUI for ExportStation {
                 ui.label(&resource.name);
             });
         }
-    }
-}
-
-impl InfoUI for Car {
-    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
-        ui.horizontal(|ui| {
-            ui.label("Car");
-        });
     }
 }
