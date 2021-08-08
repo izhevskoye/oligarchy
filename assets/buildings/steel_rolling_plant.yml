@@ -3,13 +3,13 @@
   tile: 67
   products:
     - resource: steel.slabs
-      rate: 1.0
+      rate: 0.9
       requisites:
         - resource: steel
           rate: 1.0
 
     - resource: steel.blooms
-      rate: 1.0
+      rate: 0.95
       requisites:
         - resource: steel
           rate: 1.0
@@ -21,3 +21,9 @@
           rate: 1.0
 
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 20
+      steel.slabs: 50
+      steel.billets: 12
+    base: 1000

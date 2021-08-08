@@ -2,9 +2,10 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Building, ExportStation, RequiresUpdate, Storage},
+    assets::{Building, ExportStation, RequiresUpdate},
     building_specifications::BuildingSpecifications,
     constants::MapTile,
+    storage::Storage,
 };
 
 use super::{

@@ -4,14 +4,19 @@ mod tests;
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{ExportStation, Storage, StorageConsolidator},
+    account::AccountTransaction,
+    assets::ExportStation,
+    resource_specifications::ResourceSpecifications,
     statistics::Statistics,
     storage::fetch_from_storage,
+    storage::{Storage, StorageConsolidator},
 };
 
 pub fn export_station(
     mut export_station: Query<(&ExportStation, &StorageConsolidator, &mut Statistics)>,
     mut storage_query: Query<&mut Storage>,
+    resources: Res<ResourceSpecifications>,
+    mut events: EventWriter<AccountTransaction>,
 ) {
     for (export, consolidator, mut statistics) in export_station.iter_mut() {
         for resource in &export.goods {
@@ -19,8 +24,13 @@ pub fn export_station(
 
             if fetch_from_storage(&consolidator, &mut storage_query, &resource, amount) {
                 log::info!("Exporting {:?}", resource);
-                // TODO: add test!
                 statistics.export.track(resource, amount);
+
+                let resource = resources.get(resource).unwrap();
+
+                events.send(AccountTransaction {
+                    amount: resource.cost as i64,
+                });
             }
         }
     }

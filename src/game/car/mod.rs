@@ -3,18 +3,25 @@ pub mod drive_to_destination;
 pub mod instructions;
 
 use bevy::prelude::*;
+use bevy_egui::egui::Ui;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
-    assets::{CarTileDefinition, Direction, RequiresUpdate, Storage},
+    assets::{Direction, RequiresUpdate},
     constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
     resource_specifications::ResourceSpecifications,
+    storage::Storage,
 };
 
 pub use calculate_destination::calculate_destination;
 
-use super::{assets::Position, constants::Z_CAR};
+use super::{
+    account::PurchaseCost,
+    assets::{InfoUI, Position},
+    constants::Z_CAR,
+    resource_specifications::CarTileDefinition,
+};
 
 pub struct Destination {
     pub destination: UVec2,
@@ -85,6 +92,35 @@ pub struct Car {
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
     pub active: bool,
+}
+
+impl Default for Car {
+    fn default() -> Self {
+        Self {
+            direction: Direction::North,
+            instructions: vec![CarInstructions::Nop],
+            current_instruction: 0,
+            active: false,
+        }
+    }
+}
+
+impl PurchaseCost for (Car, Storage) {
+    fn price(&self, resources: &ResourceSpecifications) -> i64 {
+        let resource = resources
+            .get(&self.1.resource)
+            .unwrap_or_else(|| panic!("expected to find resource {} in spec", self.1.resource));
+
+        ((resource.cost * self.1.capacity) / 100.0) as i64 + 250
+    }
+}
+
+impl InfoUI for Car {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            ui.label("Car");
+        });
+    }
 }
 
 fn update_car_sprite(

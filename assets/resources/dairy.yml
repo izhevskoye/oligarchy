@@ -5,6 +5,7 @@
   car_tile:
     horizontal: 250
     vertical: 218
+  cost: 6
 
 "cheese":
   name: Cheese
@@ -13,6 +14,7 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  cost: 28
 
 "sour_cream":
   name: Sour Cream
@@ -21,6 +23,7 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  cost: 21
 
 "butter":
   name: Butter
@@ -29,3 +32,4 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  cost: 28

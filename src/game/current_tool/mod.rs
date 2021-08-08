@@ -10,8 +10,9 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use super::{
-    assets::{RequiresUpdate, Street},
+    assets::RequiresUpdate,
     setup::{BUILDING_LAYER_ID, MAP_ID},
+    street::Street,
 };
 
 fn get_entity(

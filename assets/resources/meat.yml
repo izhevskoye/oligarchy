@@ -5,38 +5,7 @@
   car_tile:
     horizontal: 252
     vertical: 220
-
-"pork":
-  name: Pork
-  storage_tile: 34
-  group: Meat
-  car_tile:
-    horizontal: 250
-    vertical: 218
-
-"cows":
-  name: Cows
-  storage_tile: 51
-  group: Meat
-  car_tile:
-    horizontal: 252
-    vertical: 220
-
-"hogs":
-  name: Hogs
-  storage_tile: 37
-  group: Meat
-  car_tile:
-    horizontal: 252
-    vertical: 220
-
-"beef":
-  name: Beef
-  storage_tile: 50
-  group: Meat
-  car_tile:
-    horizontal: 250
-    vertical: 218
+  cost: 22
 
 "poultry":
   name: Poultry
@@ -45,3 +14,40 @@
   car_tile:
     horizontal: 250
     vertical: 218
+  cost: 36
+
+"hogs":
+  name: Hogs
+  storage_tile: 37
+  group: Meat
+  car_tile:
+    horizontal: 252
+    vertical: 220
+  cost: 15
+
+"pork":
+  name: Pork
+  storage_tile: 34
+  group: Meat
+  car_tile:
+    horizontal: 250
+    vertical: 218
+  cost: 35
+
+"cows":
+  name: Cows
+  storage_tile: 51
+  group: Meat
+  car_tile:
+    horizontal: 252
+    vertical: 220
+  cost: 30
+
+"beef":
+  name: Beef
+  storage_tile: 50
+  group: Meat
+  car_tile:
+    horizontal: 250
+    vertical: 218
+  cost: 82

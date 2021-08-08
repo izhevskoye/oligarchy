@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-use crate::game::{car::Car, resource_specifications::ResourceSpecifications};
+use crate::game::resource_specifications::ResourceSpecifications;
+
+use super::account::PurchaseCost;
 
 pub struct RemovedBuildingEvent {
     pub position: UVec2,
@@ -36,31 +38,6 @@ impl Default for MapSettings {
 
 pub struct Position {
     pub position: UVec2,
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct BuildingSpecification {
-    pub name: String,
-    pub tile: u16,
-    pub products: Vec<Product>,
-    pub group: String,
-}
-
-#[derive(Deserialize, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct CarTileDefinition {
-    pub horizontal: u16,
-    pub vertical: u16,
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ResourceSpecification {
-    pub name: String,
-    pub storage_tile: Option<u16>,
-    pub group: String,
-    pub car_tile: Option<CarTileDefinition>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -104,34 +81,29 @@ pub struct ProductionBuilding {
     pub active_product: usize,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct Storage {
-    pub resource: String,
-    pub amount: f64,
-    pub capacity: f64,
-}
-
-#[derive(Default)]
-pub struct StorageConsolidator {
-    pub connected_storage: Vec<Entity>,
-}
-
 pub struct RequiresUpdate;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct ExportStation {
     pub goods: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+impl PurchaseCost for ExportStation {
+    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+        1200
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct DeliveryStation;
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Street;
+impl PurchaseCost for DeliveryStation {
+    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+        250
+    }
+}
 
 #[derive(PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub enum Direction {
@@ -194,19 +166,6 @@ impl InfoUI for Name {
     }
 }
 
-impl InfoUI for Storage {
-    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
-        ui.horizontal(|ui| {
-            let resource = resources.get(&self.resource).unwrap();
-
-            ui.label(format!(
-                "{} {:.2} / {:.2}",
-                resource.name, self.amount, self.capacity
-            ));
-        });
-    }
-}
-
 impl InfoUI for ExportStation {
     fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.horizontal(|ui| {
@@ -220,19 +179,5 @@ impl InfoUI for ExportStation {
                 ui.label(&resource.name);
             });
         }
-    }
-}
-
-impl InfoUI for BuildingSpecification {
-    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
-        ui.heading(&self.name);
-    }
-}
-
-impl InfoUI for Car {
-    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
-        ui.horizontal(|ui| {
-            ui.label("Car");
-        });
     }
 }

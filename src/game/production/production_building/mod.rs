@@ -4,9 +4,10 @@ mod tests;
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{ProductionBuilding, Storage, StorageConsolidator},
+    assets::ProductionBuilding,
     statistics::Statistics,
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
+    storage::{Storage, StorageConsolidator},
 };
 
 use super::Idle;

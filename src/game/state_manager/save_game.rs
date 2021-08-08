@@ -4,9 +4,9 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
+    account::Account,
     assets::{
         Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
-        Storage, Street,
     },
     car::Car,
     goals::GoalManager,
@@ -16,6 +16,8 @@ use crate::game::{
         Vehicle,
     },
     statistics::Statistics,
+    storage::Storage,
+    street::Street,
 };
 
 #[allow(clippy::type_complexity)]
@@ -34,6 +36,7 @@ pub fn save_game(
     mut save_game: EventReader<SaveGameEvent>,
     map_settings: Res<MapSettings>,
     goals: Res<GoalManager>,
+    account: Res<Account>,
 ) {
     let (
         name_query,
@@ -50,6 +53,7 @@ pub fn save_game(
         let mut state = GameState {
             settings: map_settings.clone(),
             goals: goals.goals.clone(),
+            account: account.clone(),
             ..Default::default()
         };
 

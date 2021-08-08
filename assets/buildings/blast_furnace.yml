@@ -12,3 +12,9 @@
         - resource: iron_ore
           rate: 0.75
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 10
+      steel.slabs: 50
+      steel.billets: 5
+    base: 1000

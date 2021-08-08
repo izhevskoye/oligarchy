@@ -20,3 +20,9 @@
         - resource: milk
           rate: 2.0
   group: Dairy
+  cost:
+    resources:
+      steel.blooms: 25
+      steel.slabs: 35
+      steel.billets: 10
+    base: 700

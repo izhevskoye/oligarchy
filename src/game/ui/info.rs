@@ -2,11 +2,12 @@ use bevy::{ecs::query::QueryEntityError, prelude::*};
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{Building, Editable, ExportStation, InfoUI, Name, Storage},
+    assets::{Building, Editable, ExportStation, InfoUI, Name},
     building_specifications::BuildingSpecifications,
     car::Car,
     current_selection::CurrentlySelected,
     resource_specifications::ResourceSpecifications,
+    storage::Storage,
 };
 
 fn query_resolve<'a, T>(items: &mut Vec<&'a dyn InfoUI>, item: Result<&'a T, QueryEntityError>)

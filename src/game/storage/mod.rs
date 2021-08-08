@@ -3,12 +3,63 @@ mod tests;
 
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use bevy_egui::egui::Ui;
 use rand::{prelude::SliceRandom, thread_rng};
+use serde::{Deserialize, Serialize};
 
 use super::{
-    assets::{Position, RequiresUpdate, Storage, StorageConsolidator},
+    account::PurchaseCost,
+    assets::{InfoUI, Position, RequiresUpdate},
+    constants::STORAGE_SIZE,
+    resource_specifications::ResourceSpecifications,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Storage {
+    pub resource: String,
+    pub amount: f64,
+    pub capacity: f64,
+}
+
+impl Default for Storage {
+    fn default() -> Self {
+        Self {
+            resource: "".to_owned(),
+            amount: 0.0,
+            capacity: STORAGE_SIZE,
+        }
+    }
+}
+
+impl PurchaseCost for Storage {
+    fn price(&self, resources: &ResourceSpecifications) -> i64 {
+        let resource = resources
+            .get(&self.resource)
+            .unwrap_or_else(|| panic!("expected to find resource {} in spec", self.resource));
+
+        ((resource.cost * self.capacity) / 25.0) as i64 + 1000
+    }
+}
+
+impl InfoUI for Storage {
+    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            let resource = resources.get(&self.resource).unwrap();
+
+            ui.label(format!(
+                "{} {:.2} / {:.2}",
+                resource.name, self.amount, self.capacity
+            ));
+        });
+    }
+}
+
+#[derive(Default)]
+pub struct StorageConsolidator {
+    pub connected_storage: Vec<Entity>,
+}
 
 pub fn distribute_to_storage(
     consolidator: &StorageConsolidator,

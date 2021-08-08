@@ -5,3 +5,5 @@
     - resource: sunflower.seeds
       rate: 0.05
   group: Agriculture
+  cost:
+    base: 1500

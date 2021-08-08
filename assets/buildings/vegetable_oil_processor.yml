@@ -8,3 +8,9 @@
         - resource: sunflower.seeds
           rate: 0.5
   group: Agriculture
+  cost:
+    resources:
+      steel.blooms: 5
+      steel.slabs: 20
+      steel.billets: 8
+    base: 1500

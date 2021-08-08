@@ -2,9 +2,10 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{DeliveryStation, Position, Storage, StorageConsolidator},
+    assets::{DeliveryStation, Position},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{distribute_to_storage, fetch_from_storage, has_space_in_storage},
+    storage::{Storage, StorageConsolidator},
 };
 
 use super::{Car, CarInstructions, Destination, Waypoints};

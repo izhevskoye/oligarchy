@@ -2,23 +2,30 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
+    account::{Account, AccountTransaction, PurchaseCost},
     assets::{
         Building, ClickedTile, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
-        SelectedTool, StorageConsolidator, Tool,
+        SelectedTool, Tool,
     },
     building_specifications::BuildingSpecifications,
+    resource_specifications::ResourceSpecifications,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
+    storage::StorageConsolidator,
 };
 
 use super::get_entity;
 
+#[allow(clippy::too_many_arguments)]
 pub fn building_placement(
     mut commands: Commands,
     mut map_query: MapQuery,
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
     buildings: Res<BuildingSpecifications>,
+    resources: Res<ResourceSpecifications>,
+    mut events: EventWriter<AccountTransaction>,
+    account: Res<Account>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -30,6 +37,13 @@ pub fn building_placement(
                 let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
                 let building = buildings.get(id).unwrap();
+
+                let price = building.price(&resources);
+                if account.value < price {
+                    return;
+                }
+
+                events.send(AccountTransaction { amount: -price });
 
                 commands
                     .entity(entity)

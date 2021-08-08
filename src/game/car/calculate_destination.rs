@@ -3,8 +3,9 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate, Street},
+    assets::{CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate},
     setup::{BUILDING_LAYER_ID, MAP_ID},
+    street::Street,
 };
 
 use super::{Car, Destination, Waypoints};

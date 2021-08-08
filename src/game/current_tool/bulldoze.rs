@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Street, Tool},
+    assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Tool},
     car::Car,
     constants::MapTile,
     production::Idle,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
+    street::Street,
 };
 
 use super::update_neighbor_streets;

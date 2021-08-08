@@ -2,10 +2,11 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{ClickedTile, Position, Storage},
+    assets::{ClickedTile, Position},
     car::{Car, CarInstructions},
     current_selection::CurrentlySelected,
     resource_specifications::ResourceSpecifications,
+    storage::Storage,
 };
 
 #[derive(Clone, Default)]

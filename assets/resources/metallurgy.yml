@@ -5,6 +5,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
+  cost: 80
 
 "iron_ore":
   name: Iron Ore
@@ -13,6 +14,7 @@
   car_tile:
     horizontal: 83
     vertical: 117
+  cost: 45
 
 "limestone":
   name: Limestone
@@ -21,6 +23,7 @@
   car_tile:
     horizontal: 83
     vertical: 117
+  cost: 5
 
 "steel":
   name: Steel
@@ -29,6 +32,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
+  cost: 88
 
 "steel.slabs":
   name: Steel Slabs
@@ -37,6 +41,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
+  cost: 100
 
 "steel.blooms":
   name: Steel Blooms
@@ -45,6 +50,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
+  cost: 95
 
 "steel.billets":
   name: Steel Billets
@@ -53,6 +59,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
+  cost: 90
 
 "coal":
   name: Coal
@@ -61,6 +68,7 @@
   car_tile:
     horizontal: 83
     vertical: 117
+  cost: 9
 
 "coke":
   name: Coke
@@ -69,3 +77,4 @@
   car_tile:
     horizontal: 83
     vertical: 117
+  cost: 10
