@@ -5,7 +5,6 @@ use crate::game::{
     account::Account,
     assets::{
         Building, CanDriveOver, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
-        StorageConsolidator,
     },
     building_specifications::BuildingSpecifications,
     goals::GoalManager,
@@ -13,6 +12,7 @@ use crate::game::{
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
     },
+    storage::StorageConsolidator,
 };
 
 pub fn load_game(

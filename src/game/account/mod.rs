@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use super::resource_specifications::ResourceSpecifications;
+
 const START_VALUE: i64 = 100000;
 
 #[derive(Serialize, Deserialize, Clone, Default)]
@@ -24,4 +26,8 @@ pub fn account_transactions(
 
 pub fn reset_account(mut account: ResMut<Account>) {
     account.value = START_VALUE;
+}
+
+pub trait PurchaseCost {
+    fn price(&self, resources: &ResourceSpecifications) -> i64;
 }

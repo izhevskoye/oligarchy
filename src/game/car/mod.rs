@@ -7,9 +7,10 @@ use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
-    assets::{Direction, RequiresUpdate, Storage},
+    assets::{Direction, RequiresUpdate},
     constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
     resource_specifications::ResourceSpecifications,
+    storage::Storage,
 };
 
 pub use calculate_destination::calculate_destination;

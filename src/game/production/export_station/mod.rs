@@ -5,10 +5,11 @@ use bevy::prelude::*;
 
 use crate::game::{
     account::AccountTransaction,
-    assets::{ExportStation, Storage, StorageConsolidator},
+    assets::ExportStation,
     resource_specifications::ResourceSpecifications,
     statistics::Statistics,
     storage::fetch_from_storage,
+    storage::{Storage, StorageConsolidator},
 };
 
 pub fn export_station(
@@ -27,11 +28,9 @@ pub fn export_station(
 
                 let resource = resources.get(resource).unwrap();
 
-                if let Some(amount) = resource.cost {
-                    events.send(AccountTransaction {
-                        amount: amount as i64,
-                    });
-                }
+                events.send(AccountTransaction {
+                    amount: resource.cost as i64,
+                });
             }
         }
     }

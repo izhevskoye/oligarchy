@@ -4,6 +4,7 @@ use serde::Deserialize;
 use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
 use super::{
+    account::PurchaseCost,
     assets::{InfoUI, Product},
     resource_specifications::ResourceSpecifications,
 };
@@ -25,22 +26,16 @@ pub struct BuildingSpecification {
     pub tile: u16,
     pub products: Vec<Product>,
     pub group: String,
-    pub cost: Option<BuildingSpecificationCost>,
+    pub cost: BuildingSpecificationCost,
 }
 
-impl BuildingSpecification {
-    pub fn price(&self, resources: &ResourceSpecifications) -> i64 {
-        let result = if let Some(cost) = &self.cost {
-            cost.base
-                + cost.resources.iter().fold(0.0, |acc, (r, a)| {
-                    let resource = resources.get(r).unwrap();
-                    acc + resource.cost.unwrap_or(0.0) * a
-                })
-        } else {
-            0.0
-        };
-
-        result as i64
+impl PurchaseCost for BuildingSpecification {
+    fn price(&self, resources: &ResourceSpecifications) -> i64 {
+        (self.cost.base
+            + self.cost.resources.iter().fold(0.0, |acc, (r, a)| {
+                let resource = resources.get(r).unwrap();
+                acc + resource.cost * a
+            })) as i64
     }
 }
 

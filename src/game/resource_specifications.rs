@@ -18,7 +18,7 @@ pub struct ResourceSpecification {
     pub storage_tile: Option<u16>,
     pub group: String,
     pub car_tile: Option<CarTileDefinition>,
-    pub cost: Option<f64>,
+    pub cost: f64,
 }
 
 pub fn load_file(resources: &mut ResourceSpecifications, file_name: &str) {

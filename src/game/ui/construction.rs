@@ -1,17 +1,37 @@
 use bevy::prelude::*;
 use bevy_egui::{
-    egui::{self, Align2},
+    egui::{self, Align2, Response, Ui},
     EguiContext,
 };
 use collecting_hashmap::CollectingHashMap;
 use num_format::{Locale, ToFormattedString};
 
 use crate::game::{
-    account::Account,
+    account::{Account, PurchaseCost},
     assets::{SelectedTool, Tool},
     building_specifications::BuildingSpecifications,
     resource_specifications::ResourceSpecifications,
+    storage::Storage,
 };
+
+fn button(
+    ui: &mut Ui,
+    name: &str,
+    item: &dyn PurchaseCost,
+    resources: &ResourceSpecifications,
+    account: &Account,
+) -> Response {
+    let price = item.price(&resources);
+    let name = format!("{} ({})", name, price.to_formatted_string(&Locale::en));
+
+    let mut button = ui.small_button(name);
+
+    if price >= account.value {
+        button = button.on_hover_text("You cannot afford this");
+    }
+
+    button
+}
 
 pub fn construction_ui(
     egui_context: ResMut<EguiContext>,
@@ -56,16 +76,16 @@ pub fn construction_ui(
             group_names.sort_by_key(|a| a.to_lowercase());
 
             for group in group_names.iter() {
-                let resources = groups.get_all_mut(group).unwrap();
-                resources.sort_by_key(|(_id, r)| r.name.to_lowercase());
+                let resource_list = groups.get_all_mut(group).unwrap();
+                resource_list.sort_by_key(|(_id, r)| r.name.to_lowercase());
             }
 
             for group in group_names.iter() {
-                let resources = groups.get_all(group).unwrap().clone();
+                let resource_list = groups.get_all(group).unwrap().clone();
 
                 egui::CollapsingHeader::new(format!("Transport: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
-                        for (index, (id, resource)) in resources.iter().enumerate() {
+                        for (index, (id, resource)) in resource_list.iter().enumerate() {
                             if ui
                                 .small_button(format!("{} Truck", resource.name))
                                 .clicked()
@@ -84,14 +104,22 @@ pub fn construction_ui(
             ui.heading("Storage");
 
             for group in group_names.iter() {
-                let resources = groups.get_all(group).unwrap().clone();
+                let resource_list = groups.get_all(group).unwrap().clone();
 
                 egui::CollapsingHeader::new(format!("Storage: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
-                        for (index, (id, resource)) in resources.iter().enumerate() {
-                            if ui
-                                .small_button(format!("{} Storage", resource.name))
-                                .clicked()
+                        for (index, (id, resource)) in resource_list.iter().enumerate() {
+                            if button(
+                                ui,
+                                &format!("{} Storage", resource.name),
+                                &Storage {
+                                    resource: id.to_string(),
+                                    ..Default::default()
+                                },
+                                &resources,
+                                &account,
+                            )
+                            .clicked()
                             {
                                 selected_tool.tool = Tool::Storage(id.to_string());
                             }
@@ -125,23 +153,8 @@ pub fn construction_ui(
                 egui::CollapsingHeader::new(format!("Building: {}", group)).show(ui, |ui| {
                     egui::Grid::new(group).show(ui, |ui| {
                         for (index, (id, building)) in buildings.iter().enumerate() {
-                            let name = if building.cost.is_some() {
-                                format!(
-                                    "{} ({})",
-                                    building.name,
-                                    building.price(&resources).to_formatted_string(&Locale::en)
-                                )
-                            } else {
-                                building.name.to_owned()
-                            };
-
-                            let mut button = ui.small_button(name);
-
-                            if building.price(&resources) >= account.value {
-                                button = button.on_hover_text("You cannot afford this");
-                            }
-
-                            if button.clicked() {
+                            if button(ui, &building.name, *building, &resources, &account).clicked()
+                            {
                                 selected_tool.tool = Tool::Building(id.to_string());
                             }
 

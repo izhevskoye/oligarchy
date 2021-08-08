@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Direction, Editable, Position, SelectedTool, Storage, Tool},
+    assets::{ClickedTile, Direction, Editable, Position, SelectedTool, Tool},
     car::{Car, CarInstructions},
     constants::CAR_STORAGE_SIZE,
+    storage::Storage,
 };
 
 pub fn car_placement(

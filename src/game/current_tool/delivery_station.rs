@@ -4,9 +4,10 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     assets::{
         CanDriveOver, ClickedTile, DeliveryStation, Occupied, Position, RequiresUpdate,
-        SelectedTool, StorageConsolidator, Tool,
+        SelectedTool, Tool,
     },
     setup::BUILDING_LAYER_ID,
+    storage::StorageConsolidator,
 };
 
 use super::get_entity;

@@ -4,10 +4,11 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     assets::{
         ClickedTile, Editable, ExportStation, Occupied, Position, RequiresUpdate, SelectedTool,
-        StorageConsolidator, Tool,
+        Tool,
     },
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
+    storage::StorageConsolidator,
 };
 
 use super::get_entity;

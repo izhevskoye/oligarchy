@@ -79,19 +79,6 @@ pub struct ProductionBuilding {
     pub active_product: usize,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct Storage {
-    pub resource: String,
-    pub amount: f64,
-    pub capacity: f64,
-}
-
-#[derive(Default)]
-pub struct StorageConsolidator {
-    pub connected_storage: Vec<Entity>,
-}
-
 pub struct RequiresUpdate;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -166,19 +153,6 @@ pub trait InfoUI {
 impl InfoUI for Name {
     fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
         ui.heading(&self.name);
-    }
-}
-
-impl InfoUI for Storage {
-    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
-        ui.horizontal(|ui| {
-            let resource = resources.get(&self.resource).unwrap();
-
-            ui.label(format!(
-                "{} {:.2} / {:.2}",
-                resource.name, self.amount, self.capacity
-            ));
-        });
     }
 }
 
