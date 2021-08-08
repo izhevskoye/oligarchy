@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
+    account::Account,
     assets::{
         Building, CanDriveOver, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
         StorageConsolidator,
@@ -20,15 +21,13 @@ pub fn load_game(
     buildings: Res<BuildingSpecifications>,
     mut load_game: EventReader<LoadGameEvent>,
     mut goals: ResMut<GoalManager>,
+    mut account: ResMut<Account>,
 ) {
     for event in load_game.iter() {
-        load_state(
-            &mut commands,
-            &mut map_query,
-            &event.state,
-            &buildings,
-            &mut goals,
-        );
+        goals.goals = event.state.goals.clone();
+        *account = event.state.account.clone();
+
+        load_state(&mut commands, &mut map_query, &event.state, &buildings);
     }
 }
 
@@ -37,10 +36,7 @@ fn load_state(
     map_query: &mut MapQuery,
     state: &GameState,
     buildings: &Res<BuildingSpecifications>,
-    goals: &mut ResMut<GoalManager>,
 ) {
-    goals.goals = state.goals.clone();
-
     for game_entity in &state.entities {
         match &game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {

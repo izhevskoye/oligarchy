@@ -5,6 +5,12 @@
     - resource: coal
       rate: 1
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 25
+      steel.slabs: 5
+      steel.billets: 25
+    base: 5000
 
 "quarry.iron_ore":
   name: Iron Ore Quarry
@@ -13,6 +19,12 @@
     - resource: iron_ore
       rate: 1
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 25
+      steel.slabs: 5
+      steel.billets: 25
+    base: 5000
 
 "quarry.limestone":
   name: Limestone Quarry
@@ -21,3 +33,9 @@
     - resource: limestone
       rate: 1
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 25
+      steel.slabs: 5
+      steel.billets: 25
+    base: 5000

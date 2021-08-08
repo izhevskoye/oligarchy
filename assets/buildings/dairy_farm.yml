@@ -12,3 +12,9 @@
           rate: 1.25
           modifier: 3.0
   group: Dairy
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 30
+      steel.billets: 15
+    base: 1000

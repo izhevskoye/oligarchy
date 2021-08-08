@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::AccountTransaction,
+    account::{Account, AccountTransaction},
     assets::{
         Building, ClickedTile, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
         SelectedTool, StorageConsolidator, Tool,
@@ -23,6 +23,7 @@ pub fn building_placement(
     buildings: Res<BuildingSpecifications>,
     resources: Res<ResourceSpecifications>,
     mut events: EventWriter<AccountTransaction>,
+    account: Res<Account>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -36,6 +37,10 @@ pub fn building_placement(
                 let building = buildings.get(id).unwrap();
 
                 if building.cost.is_some() {
+                    if account.value < building.price(&resources) {
+                        return;
+                    }
+
                     events.send(AccountTransaction {
                         amount: -building.price(&resources),
                     });

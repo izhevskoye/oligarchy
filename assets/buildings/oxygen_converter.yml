@@ -8,3 +8,9 @@
         - resource: iron
           rate: 1.1
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 30
+      steel.billets: 10
+    base: 700

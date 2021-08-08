@@ -1,5 +1,5 @@
-"poultry_farm":
-  name: Poultry Farm
+"chicken_farm":
+  name: Chicken Farm
   tile: 40
   products:
     - resource: eggs
@@ -16,3 +16,9 @@
           rate: 1.2
           modifier: 2.0
   group: Meat
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 30
+      steel.billets: 15
+    base: 1000

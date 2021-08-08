@@ -21,3 +21,9 @@
           rate: 1.0
 
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 20
+      steel.slabs: 50
+      steel.billets: 12
+    base: 1000

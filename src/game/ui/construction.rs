@@ -4,8 +4,10 @@ use bevy_egui::{
     EguiContext,
 };
 use collecting_hashmap::CollectingHashMap;
+use num_format::{Locale, ToFormattedString};
 
 use crate::game::{
+    account::Account,
     assets::{SelectedTool, Tool},
     building_specifications::BuildingSpecifications,
     resource_specifications::ResourceSpecifications,
@@ -16,6 +18,7 @@ pub fn construction_ui(
     mut selected_tool: ResMut<SelectedTool>,
     buildings: Res<BuildingSpecifications>,
     resources: Res<ResourceSpecifications>,
+    account: Res<Account>,
 ) {
     egui::Window::new("Construction")
         .anchor(Align2::RIGHT_TOP, [-10.0, 10.0])
@@ -123,12 +126,22 @@ pub fn construction_ui(
                     egui::Grid::new(group).show(ui, |ui| {
                         for (index, (id, building)) in buildings.iter().enumerate() {
                             let name = if building.cost.is_some() {
-                                format!("{} ({})", building.name, building.price(&resources))
+                                format!(
+                                    "{} ({})",
+                                    building.name,
+                                    building.price(&resources).to_formatted_string(&Locale::en)
+                                )
                             } else {
                                 building.name.to_owned()
                             };
 
-                            if ui.small_button(name).clicked() {
+                            let mut button = ui.small_button(name);
+
+                            if building.price(&resources) >= account.value {
+                                button = button.on_hover_text("You cannot afford this");
+                            }
+
+                            if button.clicked() {
                                 selected_tool.tool = Tool::Building(id.to_string());
                             }
 

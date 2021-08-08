@@ -1,15 +1,16 @@
 use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
 
-// TODO: load and reset
+const START_VALUE: i64 = 100000;
 
-#[derive(Default)]
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct Account {
-    // TODO: not f64!
-    pub value: f64,
+    pub value: i64,
 }
 
 pub struct AccountTransaction {
-    pub amount: f64,
+    pub amount: i64,
 }
 
 pub fn account_transactions(
@@ -19,4 +20,8 @@ pub fn account_transactions(
     for event in transactions.iter() {
         account.value += event.amount;
     }
+}
+
+pub fn reset_account(mut account: ResMut<Account>) {
+    account.value = START_VALUE;
 }

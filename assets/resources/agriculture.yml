@@ -5,6 +5,7 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  cost: 20
 
 "sunflower.seeds":
   name: Sunflower Seeds
@@ -13,6 +14,7 @@
   car_tile:
     horizontal: 253
     vertical: 221
+  cost: 10
 
 "sunflower.oil":
   name: Sunflower Oil
@@ -21,6 +23,7 @@
   car_tile:
     horizontal: 82
     vertical: 85
+  cost: 30
 
 "animal_feed":
   name: Animal Feed
@@ -29,6 +32,7 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  cost: 10
 
 "corn":
   name: Corn
@@ -37,6 +41,7 @@
   car_tile:
     horizontal: 253
     vertical: 221
+  cost: 5
 
 "wheat":
   name: Wheat
@@ -45,3 +50,4 @@
   car_tile:
     horizontal: 253
     vertical: 221
+  cost: 5

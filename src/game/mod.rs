@@ -101,6 +101,7 @@ impl Game {
             .add_system_set(
                 SystemSet::on_enter(AppState::InGame)
                     .with_system(setup::setup_map.system())
+                    .with_system(account::reset_account.system())
                     .with_system(goals::generate_goals.system()),
             )
             .add_system_set(
@@ -141,8 +142,9 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(UILabel::UIEnd)
+                    .with_system(ui::account::account_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
-                    .with_system(ui::goals::goals_ui.system())
+                    .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui

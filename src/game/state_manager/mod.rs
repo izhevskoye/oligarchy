@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
+    account::Account,
     assets::{DeliveryStation, ExportStation, MapSettings, Name, Storage, Street},
     car::Car,
     goals::Goal,
@@ -54,6 +55,7 @@ pub struct GameState {
     pub settings: MapSettings,
     pub entities: Vec<GameEntity>,
     pub goals: HashMap<String, Goal>,
+    pub account: Account,
 }
 
 pub struct LoadGameEvent {

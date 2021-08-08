@@ -8,3 +8,5 @@
     - resource: wheat
       rate: 0.75
   group: Agriculture
+  cost:
+    base: 1500

@@ -20,3 +20,9 @@
         - resource: cows
           rate: 2.5
   group: Meat
+  cost:
+    resources:
+      steel.blooms: 20
+      steel.slabs: 34
+      steel.billets: 12
+    base: 1200

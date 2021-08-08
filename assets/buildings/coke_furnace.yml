@@ -8,3 +8,9 @@
         - resource: coal
           rate: 1.5
   group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 5
+      steel.slabs: 40
+      steel.billets: 5
+    base: 750

@@ -13,6 +13,7 @@ pub type BuildingSpecifications = HashMap<String, BuildingSpecification>;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecificationCost {
+    #[serde(default)]
     pub resources: HashMap<String, f64>,
     pub base: f64,
 }
@@ -28,8 +29,8 @@ pub struct BuildingSpecification {
 }
 
 impl BuildingSpecification {
-    pub fn price(&self, resources: &ResourceSpecifications) -> f64 {
-        if let Some(cost) = &self.cost {
+    pub fn price(&self, resources: &ResourceSpecifications) -> i64 {
+        let result = if let Some(cost) = &self.cost {
             cost.base
                 + cost.resources.iter().fold(0.0, |acc, (r, a)| {
                     let resource = resources.get(r).unwrap();
@@ -37,7 +38,9 @@ impl BuildingSpecification {
                 })
         } else {
             0.0
-        }
+        };
+
+        result as i64
     }
 }
 
