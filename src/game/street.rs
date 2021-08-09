@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     account::PurchaseCost,
-    assets::{Position, RequiresUpdate},
+    assets::{resource_specifications::ResourceSpecifications, Position, RequiresUpdate},
     constants::MapTile,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -14,7 +14,7 @@ use super::{
 pub struct Street;
 
 impl PurchaseCost for Street {
-    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         100
     }
 }

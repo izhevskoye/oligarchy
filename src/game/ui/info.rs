@@ -2,11 +2,13 @@ use bevy::{ecs::query::QueryEntityError, prelude::*};
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{Building, Editable, ExportStation, InfoUI, Name},
-    building_specifications::BuildingSpecifications,
+    assets::{
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, Building, Editable, ExportStation, InfoUI,
+        Name,
+    },
     car::Car,
     current_selection::CurrentlySelected,
-    resource_specifications::ResourceSpecifications,
     storage::Storage,
 };
 

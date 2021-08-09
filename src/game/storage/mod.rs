@@ -9,9 +9,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     account::PurchaseCost,
-    assets::{InfoUI, Position, RequiresUpdate},
+    assets::{resource_specifications::ResourceSpecifications, InfoUI, Position, RequiresUpdate},
     constants::STORAGE_SIZE,
-    resource_specifications::ResourceSpecifications,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 

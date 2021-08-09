@@ -3,10 +3,9 @@ use glob::glob;
 use serde::Deserialize;
 use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
-use super::{
+use crate::game::{
     account::PurchaseCost,
-    assets::{InfoUI, Product},
-    resource_specifications::ResourceSpecifications,
+    assets::{resource_specifications::ResourceSpecifications, InfoUI, Product},
 };
 
 pub type BuildingSpecifications = HashMap<String, BuildingSpecification>;

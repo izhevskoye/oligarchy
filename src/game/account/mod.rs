@@ -4,7 +4,7 @@ mod tests;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::resource_specifications::ResourceSpecifications;
+use super::assets::resource_specifications::ResourceSpecifications;
 
 const START_VALUE: i64 = 250000;
 

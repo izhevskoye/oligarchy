@@ -1,7 +1,6 @@
 mod account;
 mod asset_tiles;
 mod assets;
-mod building_specifications;
 mod camera;
 mod car;
 mod constants;
@@ -10,7 +9,6 @@ mod current_tool;
 mod goals;
 mod production;
 mod remove_update;
-mod resource_specifications;
 mod setup;
 mod state_manager;
 mod statistics;
@@ -76,8 +74,8 @@ impl Game {
             .init_resource::<MapSettings>()
             .init_resource::<GoalManager>()
             .init_resource::<Account>()
-            .insert_resource(building_specifications::load_specifications())
-            .insert_resource(resource_specifications::load_specifications())
+            .insert_resource(assets::building_specifications::load_specifications())
+            .insert_resource(assets::resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -87,6 +85,7 @@ impl Game {
             .add_event::<SaveGameEvent>()
             .add_event::<RemovedBuildingEvent>()
             .add_event::<AccountTransaction>()
+            .add_startup_system(assets::integrity::integrity_check.system())
             //
             // MENU
             //
