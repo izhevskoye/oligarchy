@@ -4,9 +4,9 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     account::Account,
     assets::{
-        Building, CanDriveOver, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
+        building_specifications::BuildingSpecifications, Building, CanDriveOver, Editable,
+        Occupied, Position, ProductionBuilding, RequiresUpdate,
     },
-    building_specifications::BuildingSpecifications,
     goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{

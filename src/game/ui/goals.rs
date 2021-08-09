@@ -1,4 +1,4 @@
-use crate::game::{goals::GoalManager, resource_specifications::ResourceSpecifications};
+use crate::game::{assets::resource_specifications::ResourceSpecifications, goals::GoalManager};
 use bevy::prelude::*;
 use bevy_egui::{
     egui::{self, Align2},

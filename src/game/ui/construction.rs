@@ -8,10 +8,12 @@ use num_format::{Locale, ToFormattedString};
 
 use crate::game::{
     account::{Account, PurchaseCost},
-    assets::{DeliveryStation, ExportStation, SelectedTool, Tool},
-    building_specifications::BuildingSpecifications,
+    assets::{
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, DeliveryStation, ExportStation,
+        SelectedTool, Tool,
+    },
     car::Car,
-    resource_specifications::ResourceSpecifications,
     storage::Storage,
     street::Street,
 };

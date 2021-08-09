@@ -4,10 +4,9 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
-        CanDriveOver, ClickedTile, DeliveryStation, Occupied, Position, RequiresUpdate,
-        SelectedTool, Tool,
+        resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile,
+        DeliveryStation, Occupied, Position, RequiresUpdate, SelectedTool, Tool,
     },
-    resource_specifications::ResourceSpecifications,
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
 };

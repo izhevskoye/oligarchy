@@ -4,11 +4,10 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
-        Building, ClickedTile, Editable, Occupied, Position, ProductionBuilding, RequiresUpdate,
-        SelectedTool, Tool,
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable, Occupied,
+        Position, ProductionBuilding, RequiresUpdate, SelectedTool, Tool,
     },
-    building_specifications::BuildingSpecifications,
-    resource_specifications::ResourceSpecifications,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
     storage::StorageConsolidator,

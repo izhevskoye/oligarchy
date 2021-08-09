@@ -2,10 +2,11 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
-    assets::{Building, ProductionBuilding},
-    building_specifications::BuildingSpecifications,
+    assets::{
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, Building, ProductionBuilding,
+    },
     current_selection::CurrentlySelected,
-    resource_specifications::ResourceSpecifications,
 };
 
 pub fn edit_ui(

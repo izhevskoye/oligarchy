@@ -1,4 +1,4 @@
-use crate::game::resource_specifications::load_specifications;
+use crate::game::assets::resource_specifications::load_specifications;
 
 use super::*;
 use bevy::{app::Events, prelude::*};

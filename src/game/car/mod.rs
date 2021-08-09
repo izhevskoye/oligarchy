@@ -8,20 +8,16 @@ use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
-    assets::{Direction, RequiresUpdate},
-    constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
-    resource_specifications::ResourceSpecifications,
+    account::PurchaseCost,
+    assets::{
+        resource_specifications::{CarTileDefinition, ResourceSpecifications},
+        Direction, InfoUI, Position, RequiresUpdate,
+    },
+    constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_CAR},
     storage::Storage,
 };
 
 pub use calculate_destination::calculate_destination;
-
-use super::{
-    account::PurchaseCost,
-    assets::{InfoUI, Position},
-    constants::Z_CAR,
-    resource_specifications::CarTileDefinition,
-};
 
 pub struct Destination {
     pub destination: UVec2,

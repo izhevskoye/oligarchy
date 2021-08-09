@@ -1,9 +1,13 @@
+pub mod building_specifications;
+pub mod integrity;
+pub mod resource_specifications;
+
 use serde::{Deserialize, Serialize};
 
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-use crate::game::resource_specifications::ResourceSpecifications;
+use resource_specifications::ResourceSpecifications;
 
 use super::account::PurchaseCost;
 
@@ -90,7 +94,7 @@ pub struct ExportStation {
 }
 
 impl PurchaseCost for ExportStation {
-    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         1200
     }
 }
@@ -100,7 +104,7 @@ impl PurchaseCost for ExportStation {
 pub struct DeliveryStation;
 
 impl PurchaseCost for DeliveryStation {
-    fn price(&self, _resources: &super::resource_specifications::ResourceSpecifications) -> i64 {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         250
     }
 }

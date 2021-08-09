@@ -2,16 +2,14 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{Building, ExportStation, RequiresUpdate},
-    building_specifications::BuildingSpecifications,
+    assets::{
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, Building, DeliveryStation, ExportStation,
+        Occupied, Position, RequiresUpdate,
+    },
     constants::MapTile,
-    storage::Storage,
-};
-
-use super::{
-    assets::{DeliveryStation, Occupied, Position},
-    resource_specifications::ResourceSpecifications,
     setup::{GROUND_LAYER_ID, MAP_ID},
+    storage::Storage,
 };
 
 pub fn building_update(
