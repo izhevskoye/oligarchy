@@ -123,6 +123,21 @@ pub fn calculate_destination(
         } else {
             log::error!("No path found for car!");
             commands.entity(car_entity).remove::<Destination>();
+
+            // if car is on building somehow
+            if let Ok(entity) =
+                map_query.get_tile_entity(position.position / 2, MAP_ID, BUILDING_LAYER_ID)
+            {
+                if occupied_query.get(entity).is_ok() {
+                    log::error!("Car is on building!");
+
+                    let waypoints = vec![destination.destination];
+
+                    commands
+                        .entity(car_entity)
+                        .insert(Waypoints::new(waypoints));
+                }
+            }
         }
     }
 }

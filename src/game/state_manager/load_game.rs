@@ -146,6 +146,7 @@ fn insert_building(
                     commands
                         .entity(entity)
                         .insert(c.clone())
+                        .insert(CanDriveOver)
                         .insert(MaintenanceCost::new_from_cost(c.price(resources)));
                 }
                 BuildingEntity::Storage(c) => {

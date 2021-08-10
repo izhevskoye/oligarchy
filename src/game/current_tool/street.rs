@@ -4,8 +4,8 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
-        resource_specifications::ResourceSpecifications, ClickedTile, MaintenanceCost, Occupied,
-        Position, RequiresUpdate, SelectedTool, Tool,
+        resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile,
+        MaintenanceCost, Occupied, Position, RequiresUpdate, SelectedTool, Tool,
     },
     setup::BUILDING_LAYER_ID,
     street::Street,
@@ -44,6 +44,7 @@ pub fn street_placement(
             .insert(RequiresUpdate)
             .insert(MaintenanceCost::new_from_cost(price))
             .insert(Position { position: pos })
+            .insert(CanDriveOver)
             .insert(Occupied);
 
         update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
