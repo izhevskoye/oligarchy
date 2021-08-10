@@ -5,7 +5,7 @@ use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, ClickedTile, Editable, ExportStation,
-        Occupied, Position, RequiresUpdate, SelectedTool, Tool,
+        MaintenanceCost, Occupied, Position, RequiresUpdate, SelectedTool, Tool,
     },
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
@@ -43,6 +43,7 @@ pub fn export_station_placement(
                 .insert(ExportStation { goods: vec![] })
                 .insert(StorageConsolidator::default())
                 .insert(Statistics::default())
+                .insert(MaintenanceCost::new_from_cost(price))
                 .insert(RequiresUpdate)
                 .insert(Position { position: pos })
                 .insert(Editable)

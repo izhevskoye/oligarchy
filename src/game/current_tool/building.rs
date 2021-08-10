@@ -5,8 +5,9 @@ use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable, Occupied,
-        Position, ProductionBuilding, RequiresUpdate, SelectedTool, Tool,
+        resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable,
+        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate, SelectedTool,
+        Tool,
     },
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
@@ -48,6 +49,7 @@ pub fn building_placement(
                     .entity(entity)
                     .insert(Building { id: id.clone() })
                     .insert(Position { position: pos })
+                    .insert(MaintenanceCost::new_from_cost(price))
                     .insert(RequiresUpdate)
                     .insert(Occupied);
 

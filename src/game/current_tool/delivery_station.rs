@@ -5,7 +5,7 @@ use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile,
-        DeliveryStation, Occupied, Position, RequiresUpdate, SelectedTool, Tool,
+        DeliveryStation, MaintenanceCost, Occupied, Position, RequiresUpdate, SelectedTool, Tool,
     },
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
@@ -42,6 +42,7 @@ pub fn delivery_station_placement(
                 .entity(entity)
                 .insert(DeliveryStation)
                 .insert(StorageConsolidator::default())
+                .insert(MaintenanceCost::new_from_cost(price))
                 .insert(RequiresUpdate)
                 .insert(Position { position: pos })
                 .insert(CanDriveOver)

@@ -196,7 +196,8 @@ impl Game {
                             .system()
                             .after(IdleLabel::SpawnIdle),
                     )
-                    .with_system(production::spawn_idle.system().label(IdleLabel::SpawnIdle)),
+                    .with_system(production::spawn_idle.system().label(IdleLabel::SpawnIdle))
+                    .with_system(account::maintenance_cost.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)

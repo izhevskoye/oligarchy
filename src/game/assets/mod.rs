@@ -11,6 +11,18 @@ use resource_specifications::ResourceSpecifications;
 
 use super::account::PurchaseCost;
 
+pub struct MaintenanceCost {
+    pub amount: f64,
+}
+
+impl MaintenanceCost {
+    pub fn new_from_cost(cost: i64) -> Self {
+        Self {
+            amount: cost as f64 * 0.00005,
+        }
+    }
+}
+
 pub struct RemovedBuildingEvent {
     pub position: UVec2,
 }
