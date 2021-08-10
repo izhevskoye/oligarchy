@@ -4,7 +4,7 @@ mod tests;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::assets::resource_specifications::ResourceSpecifications;
+use super::assets::{resource_specifications::ResourceSpecifications, MaintenanceCost};
 
 const START_VALUE: i64 = 250000;
 
@@ -25,6 +25,15 @@ pub fn account_transactions(
     for event in transactions.iter() {
         account.value += event.amount;
     }
+}
+
+pub fn maintenance_cost(mut account: ResMut<Account>, query: Query<&MaintenanceCost>) {
+    let mut sum = 0.0;
+    for cost in query.iter() {
+        sum += cost.amount;
+    }
+
+    account.value -= sum as i64;
 }
 
 pub fn reset_account(mut account: ResMut<Account>) {
