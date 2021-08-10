@@ -91,7 +91,7 @@ pub fn drive_to_destination(
             Err(_) => false,
         };
 
-        let can_drive_to_new_pos = !contains_car && !(contains_building && !already_on_building);
+        let can_drive_to_new_pos = (already_on_building || !contains_building) && !contains_car;
 
         if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
