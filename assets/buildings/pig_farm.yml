@@ -11,7 +11,7 @@
   group: Meat
   cost:
     resources:
-      steel.blooms: 15
-      steel.slabs: 30
+      steel.blooms: 5
+      steel.slabs: 20
       steel.billets: 15
     base: 1000

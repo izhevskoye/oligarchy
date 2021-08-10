@@ -14,7 +14,7 @@
   group: Metallurgy
   cost:
     resources:
-      steel.blooms: 10
-      steel.slabs: 50
+      steel.blooms: 5
+      steel.slabs: 40
       steel.billets: 5
     base: 1000

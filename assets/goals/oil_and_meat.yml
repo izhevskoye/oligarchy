@@ -1,0 +1,13 @@
+- name: Oil and  Meat Production
+  goals:
+    - resource: pork
+      amount:
+        small: 1000
+        medium: 3000
+        large: 5000
+
+    - resource: sunflower.oil
+      amount:
+        small: 1000
+        medium: 3000
+        large: 5000

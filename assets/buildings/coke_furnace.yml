@@ -11,6 +11,6 @@
   cost:
     resources:
       steel.blooms: 5
-      steel.slabs: 40
+      steel.slabs: 30
       steel.billets: 5
     base: 750

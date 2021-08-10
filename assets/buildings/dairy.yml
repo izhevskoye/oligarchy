@@ -22,7 +22,7 @@
   group: Dairy
   cost:
     resources:
-      steel.blooms: 25
-      steel.slabs: 35
+      steel.blooms: 15
+      steel.slabs: 25
       steel.billets: 10
     base: 700
