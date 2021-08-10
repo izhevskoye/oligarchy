@@ -4,8 +4,8 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     account::{Account, AccountTransaction, PurchaseCost},
     assets::{
-        resource_specifications::ResourceSpecifications, ClickedTile, Occupied, Position,
-        RequiresUpdate, SelectedTool, Tool,
+        resource_specifications::ResourceSpecifications, ClickedTile, MaintenanceCost, Occupied,
+        Position, RequiresUpdate, SelectedTool, Tool,
     },
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{Storage, StorageConsolidator},
@@ -50,6 +50,7 @@ pub fn storage_placement(
                     .insert(storage)
                     .insert(RequiresUpdate)
                     .insert(Position { position: pos })
+                    .insert(MaintenanceCost::new_from_cost(price))
                     .insert(Occupied);
 
                 let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);

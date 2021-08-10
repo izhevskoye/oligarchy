@@ -2,10 +2,11 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::Account,
+    account::{Account, PurchaseCost},
     assets::{
-        building_specifications::BuildingSpecifications, Building, CanDriveOver, Editable,
-        Occupied, Position, ProductionBuilding, RequiresUpdate,
+        building_specifications::BuildingSpecifications,
+        resource_specifications::ResourceSpecifications, Building, CanDriveOver, Editable,
+        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate,
     },
     goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -22,12 +23,19 @@ pub fn load_game(
     mut load_game: EventReader<LoadGameEvent>,
     mut goals: ResMut<GoalManager>,
     mut account: ResMut<Account>,
+    resources: Res<ResourceSpecifications>,
 ) {
     for event in load_game.iter() {
         goals.goals = event.state.goals.clone();
         *account = event.state.account.clone();
 
-        load_state(&mut commands, &mut map_query, &event.state, &buildings);
+        load_state(
+            &mut commands,
+            &mut map_query,
+            &event.state,
+            &buildings,
+            &resources,
+        );
     }
 }
 
@@ -35,21 +43,36 @@ fn load_state(
     commands: &mut Commands,
     map_query: &mut MapQuery,
     state: &GameState,
-    buildings: &Res<BuildingSpecifications>,
+    buildings: &BuildingSpecifications,
+    resources: &ResourceSpecifications,
 ) {
     for game_entity in &state.entities {
         match &game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {
-                insert_car(commands, vehicle, game_entity);
+                insert_car(commands, vehicle, game_entity, resources);
             }
             GameEntityType::Building(building) => {
-                insert_building(commands, building, game_entity, map_query, buildings);
+                insert_building(
+                    commands,
+                    building,
+                    game_entity,
+                    map_query,
+                    buildings,
+                    resources,
+                );
             }
         }
     }
 }
 
-fn insert_car(commands: &mut Commands, vehicle: &Vehicle, game_entity: &GameEntity) {
+fn insert_car(
+    commands: &mut Commands,
+    vehicle: &Vehicle,
+    game_entity: &GameEntity,
+    resources: &ResourceSpecifications,
+) {
+    let price = (vehicle.car.clone(), vehicle.storage.clone()).price(resources);
+
     let entity = commands
         .spawn()
         .insert(RequiresUpdate)
@@ -59,6 +82,7 @@ fn insert_car(commands: &mut Commands, vehicle: &Vehicle, game_entity: &GameEnti
         .insert(vehicle.car.clone())
         .insert(vehicle.storage.clone())
         .insert(Editable)
+        .insert(MaintenanceCost::new_from_cost(price))
         .id();
 
     if let Some(name) = &game_entity.name {
@@ -71,7 +95,8 @@ fn insert_building(
     building: &BuildingEntity,
     game_entity: &GameEntity,
     map_query: &mut MapQuery,
-    buildings: &Res<BuildingSpecifications>,
+    buildings: &BuildingSpecifications,
+    resources: &ResourceSpecifications,
 ) {
     let tile = Tile {
         visible: false,
@@ -113,19 +138,27 @@ fn insert_building(
                                 products: building.products.clone(),
                                 active_product: c.active_product,
                             })
+                            .insert(MaintenanceCost::new_from_cost(building.price(resources)))
                             .insert(Editable);
                     }
                 }
                 BuildingEntity::Street(c) => {
-                    commands.entity(entity).insert(c.clone());
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)));
                 }
                 BuildingEntity::Storage(c) => {
-                    commands.entity(entity).insert(c.clone());
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)));
                 }
                 BuildingEntity::DeliveryStation(c) => {
                     commands
                         .entity(entity)
                         .insert(c.clone())
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)))
                         .insert(CanDriveOver)
                         .insert(StorageConsolidator::default());
                 }
@@ -133,6 +166,7 @@ fn insert_building(
                     commands
                         .entity(entity)
                         .insert(c.clone())
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)))
                         .insert(Editable)
                         .insert(StorageConsolidator::default());
                 }
