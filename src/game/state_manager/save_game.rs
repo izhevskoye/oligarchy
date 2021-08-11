@@ -49,7 +49,7 @@ pub fn save_game(
         building_query,
     ) = queries;
 
-    for _ in save_game.iter() {
+    for event in save_game.iter() {
         let mut state = GameState {
             settings: map_settings.clone(),
             goals: goals.goals.clone(),
@@ -165,7 +165,7 @@ pub fn save_game(
             }
         }
 
-        let path = Path::new("world.yaml");
+        let path = Path::new(&event.file_name);
         let mut file = File::create(&path).unwrap();
 
         let _ = file.write_all(serde_yaml::to_string(&state).unwrap().as_bytes());

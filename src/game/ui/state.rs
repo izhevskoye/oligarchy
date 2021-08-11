@@ -1,6 +1,6 @@
 use crate::game::{
     assets::{MapSettings, MapSize},
-    state_manager::{GameState, LoadGameEvent, SaveGameEvent},
+    state_manager::{helper::generate_save_game_path, GameState, LoadGameEvent, SaveGameEvent},
     AppState,
 };
 use bevy::prelude::*;
@@ -8,23 +8,39 @@ use bevy_egui::{
     egui::{self, Align2},
     EguiContext,
 };
+use glob::glob;
+use uuid::Uuid;
 
 use std::{fs::File, io::prelude::*, path::Path};
 
 #[derive(PartialEq, Eq)]
-pub enum MenuState {
+pub enum SubMenuState {
     None,
-    OpenMenu,
+    NewGameMenu,
+    LoadGameMenu,
+    SaveGameMenu,
+}
+
+pub struct MenuState {
+    pub sub_menu_state: SubMenuState,
+    pub save_game_path: String,
 }
 
 impl Default for MenuState {
     fn default() -> Self {
-        Self::None
+        Self {
+            sub_menu_state: SubMenuState::None,
+            save_game_path: generate_save_game_path(),
+        }
     }
 }
 
-pub fn emit_load_game(commands: &mut Commands, load_game: &mut EventWriter<LoadGameEvent>) {
-    let path = Path::new("world.yaml");
+pub fn emit_load_game(
+    commands: &mut Commands,
+    load_game: &mut EventWriter<LoadGameEvent>,
+    file_name: &str,
+) {
+    let path = Path::new(file_name);
     let mut file = match File::open(&path) {
         Ok(file) => file,
         Err(why) => {
@@ -61,12 +77,11 @@ pub fn save_ui(
         .show(egui_context.ctx(), |ui| {
             if let AppState::MainMenu = app_state.current() {
                 if ui.button("new").clicked() {
-                    *state = MenuState::OpenMenu;
+                    state.sub_menu_state = SubMenuState::NewGameMenu;
                 }
 
                 if ui.button("load").clicked() {
-                    app_state.push(AppState::InGame).unwrap();
-                    emit_load_game(&mut commands, &mut load_game);
+                    state.sub_menu_state = SubMenuState::LoadGameMenu;
                 }
 
                 if ui.button("exit").clicked() {
@@ -76,7 +91,7 @@ pub fn save_ui(
 
             if let AppState::InGame = app_state.current() {
                 if ui.button("save").clicked() {
-                    save_game.send(SaveGameEvent);
+                    state.sub_menu_state = SubMenuState::SaveGameMenu;
                 }
 
                 if ui.button("exit").clicked() {
@@ -87,13 +102,64 @@ pub fn save_ui(
             }
         });
 
-    if MenuState::None != *state {
-        if let AppState::InGame = app_state.current() {
-            *state = MenuState::None;
-        }
+    if SubMenuState::LoadGameMenu == state.sub_menu_state
+        || SubMenuState::SaveGameMenu == state.sub_menu_state
+    {
+        let title = match state.sub_menu_state {
+            SubMenuState::LoadGameMenu => "Load Game",
+            SubMenuState::SaveGameMenu => "Save Game",
+            _ => unreachable!("cannot happen"),
+        };
+
+        egui::Window::new(title)
+            .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(egui_context.ctx(), |ui| {
+                if SubMenuState::SaveGameMenu == state.sub_menu_state {
+                    if ui.button("New Save").clicked() {
+                        let file_name = format!(
+                            "{}/{}.yml",
+                            state.save_game_path,
+                            Uuid::new_v4().to_string()
+                        );
+
+                        save_game.send(SaveGameEvent { file_name });
+                        state.sub_menu_state = SubMenuState::None;
+                    }
+                }
+
+                for file in
+                    glob(&format!("{}/*.yml", state.save_game_path)).expect("Failed to read files")
+                {
+                    let file = file
+                        .unwrap()
+                        .file_name()
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .to_string();
+
+                    if ui.button(&file).clicked() {
+                        let file_name = format!("{}/{}", state.save_game_path, file);
+
+                        if SubMenuState::LoadGameMenu == state.sub_menu_state {
+                            app_state.push(AppState::InGame).unwrap();
+                            emit_load_game(&mut commands, &mut load_game, &file_name);
+                        }
+                        if SubMenuState::SaveGameMenu == state.sub_menu_state {
+                            save_game.send(SaveGameEvent { file_name });
+                        }
+
+                        state.sub_menu_state = SubMenuState::None;
+                    }
+                }
+
+                if ui.button("Abort").clicked() {
+                    state.sub_menu_state = SubMenuState::None;
+                }
+            });
     }
 
-    if MenuState::OpenMenu == *state {
+    if SubMenuState::NewGameMenu == state.sub_menu_state {
         egui::Window::new("New Game")
             .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
             .show(egui_context.ctx(), |ui| {
@@ -105,6 +171,7 @@ pub fn save_ui(
                     });
 
                     app_state.push(AppState::InGame).unwrap();
+                    state.sub_menu_state = SubMenuState::None;
                 }
 
                 if ui.button("medium").clicked() {
@@ -115,6 +182,7 @@ pub fn save_ui(
                     });
 
                     app_state.push(AppState::InGame).unwrap();
+                    state.sub_menu_state = SubMenuState::None;
                 }
 
                 if ui.button("large").clicked() {
@@ -125,6 +193,11 @@ pub fn save_ui(
                     });
 
                     app_state.push(AppState::InGame).unwrap();
+                    state.sub_menu_state = SubMenuState::None;
+                }
+
+                if ui.button("Abort").clicked() {
+                    state.sub_menu_state = SubMenuState::None;
                 }
             });
     }

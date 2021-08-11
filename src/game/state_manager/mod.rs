@@ -1,3 +1,4 @@
+pub mod helper;
 pub mod load_game;
 pub mod save_game;
 
@@ -63,4 +64,7 @@ pub struct GameState {
 pub struct LoadGameEvent {
     pub state: GameState,
 }
-pub struct SaveGameEvent;
+
+pub struct SaveGameEvent {
+    pub file_name: String,
+}
