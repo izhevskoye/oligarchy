@@ -6,7 +6,7 @@ use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building, CanDriveOver, Editable,
-        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate,
+        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate, StateName,
     },
     goals::GoalManager,
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -16,6 +16,7 @@ use crate::game::{
     storage::StorageConsolidator,
 };
 
+#[allow(clippy::too_many_arguments)]
 pub fn load_game(
     mut commands: Commands,
     mut map_query: MapQuery,
@@ -23,11 +24,13 @@ pub fn load_game(
     mut load_game: EventReader<LoadGameEvent>,
     mut goals: ResMut<GoalManager>,
     mut account: ResMut<Account>,
+    mut state_name: ResMut<StateName>,
     resources: Res<ResourceSpecifications>,
 ) {
     for event in load_game.iter() {
         goals.goals = event.state.goals.clone();
         *account = event.state.account.clone();
+        *state_name = event.state.state_name.clone();
 
         load_state(
             &mut commands,

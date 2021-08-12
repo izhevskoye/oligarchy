@@ -1,3 +1,4 @@
+pub mod helper;
 pub mod load_game;
 pub mod save_game;
 
@@ -15,6 +16,8 @@ use crate::game::{
     storage::Storage,
     street::Street,
 };
+
+use super::assets::StateName;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -54,6 +57,7 @@ pub struct GameEntity {
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct GameState {
+    pub state_name: StateName,
     pub settings: MapSettings,
     pub entities: Vec<GameEntity>,
     pub goals: HashMap<String, Goal>,
@@ -63,4 +67,7 @@ pub struct GameState {
 pub struct LoadGameEvent {
     pub state: GameState,
 }
-pub struct SaveGameEvent;
+
+pub struct SaveGameEvent {
+    pub file_name: String,
+}

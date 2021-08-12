@@ -7,6 +7,7 @@ use crate::game::{
     account::Account,
     assets::{
         Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
+        StateName,
     },
     car::Car,
     goals::GoalManager,
@@ -37,6 +38,7 @@ pub fn save_game(
     map_settings: Res<MapSettings>,
     goals: Res<GoalManager>,
     account: Res<Account>,
+    state_name: Res<StateName>,
 ) {
     let (
         name_query,
@@ -49,11 +51,12 @@ pub fn save_game(
         building_query,
     ) = queries;
 
-    for _ in save_game.iter() {
+    for event in save_game.iter() {
         let mut state = GameState {
             settings: map_settings.clone(),
             goals: goals.goals.clone(),
             account: account.clone(),
+            state_name: state_name.clone(),
             ..Default::default()
         };
 
@@ -165,7 +168,7 @@ pub fn save_game(
             }
         }
 
-        let path = Path::new("world.yaml");
+        let path = Path::new(&event.file_name);
         let mut file = File::create(&path).unwrap();
 
         let _ = file.write_all(serde_yaml::to_string(&state).unwrap().as_bytes());
