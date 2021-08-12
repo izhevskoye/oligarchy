@@ -16,6 +16,7 @@ use crate::game::{
     storage::StorageConsolidator,
 };
 
+#[allow(clippy::too_many_arguments)]
 pub fn load_game(
     mut commands: Commands,
     mut map_query: MapQuery,

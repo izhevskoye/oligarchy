@@ -90,7 +90,7 @@ pub fn get_state_name(file_name: &str) -> Option<String> {
     let state: Result<SaveGameState, serde_yaml::Error> = serde_yaml::from_str(&content);
 
     match state {
-        Ok(state) => Some(state.state_name.name.clone()),
+        Ok(state) => Some(state.state_name.name),
         Err(why) => {
             log::error!("Could not load state: {}", why);
             None
@@ -98,7 +98,7 @@ pub fn get_state_name(file_name: &str) -> Option<String> {
     }
 }
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn save_ui(
     mut commands: Commands,
     egui_context: ResMut<EguiContext>,
