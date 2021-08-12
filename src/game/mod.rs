@@ -23,7 +23,7 @@ use bevy_egui::EguiPlugin;
 
 use self::{
     account::{Account, AccountTransaction},
-    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool},
+    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool, StateName},
     constants::{
         CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, GOAL_UPDATE_TICK_SPEED,
         PRODUCTION_TICK_SPEED,
@@ -74,6 +74,7 @@ impl Game {
             .init_resource::<MapSettings>()
             .init_resource::<GoalManager>()
             .init_resource::<Account>()
+            .init_resource::<StateName>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .add_plugins(DefaultPlugins)

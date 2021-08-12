@@ -17,6 +17,8 @@ use crate::game::{
     street::Street,
 };
 
+use super::assets::StateName;
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct SerializedBuilding {
@@ -55,6 +57,7 @@ pub struct GameEntity {
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct GameState {
+    pub state_name: StateName,
     pub settings: MapSettings,
     pub entities: Vec<GameEntity>,
     pub goals: HashMap<String, Goal>,

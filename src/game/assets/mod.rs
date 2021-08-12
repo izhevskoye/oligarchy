@@ -11,6 +11,11 @@ use resource_specifications::ResourceSpecifications;
 
 use super::account::PurchaseCost;
 
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct StateName {
+    pub name: String,
+}
+
 pub struct MaintenanceCost {
     pub amount: f64,
 }

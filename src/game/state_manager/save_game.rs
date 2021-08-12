@@ -7,6 +7,7 @@ use crate::game::{
     account::Account,
     assets::{
         Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
+        StateName,
     },
     car::Car,
     goals::GoalManager,
@@ -37,6 +38,7 @@ pub fn save_game(
     map_settings: Res<MapSettings>,
     goals: Res<GoalManager>,
     account: Res<Account>,
+    state_name: Res<StateName>,
 ) {
     let (
         name_query,
@@ -54,6 +56,7 @@ pub fn save_game(
             settings: map_settings.clone(),
             goals: goals.goals.clone(),
             account: account.clone(),
+            state_name: state_name.clone(),
             ..Default::default()
         };
 
