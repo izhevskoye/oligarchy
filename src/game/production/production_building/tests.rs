@@ -399,7 +399,7 @@ fn random_production() {
     setup.stage.run(&mut setup.world);
 
     assert!(
-        (setup.get_storage_amount(coke_storage_id) == 1.0)
-            ^ (setup.get_storage_amount(coal_storage_id) == 1.0)
+        ((setup.get_storage_amount(coke_storage_id) - 1.0).abs() < f64::EPSILON)
+            ^ ((setup.get_storage_amount(coal_storage_id) - 1.0).abs() < f64::EPSILON)
     );
 }

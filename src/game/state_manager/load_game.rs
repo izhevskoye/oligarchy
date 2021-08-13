@@ -142,7 +142,7 @@ fn insert_building(
                             .map(|(index, product)| {
                                 (
                                     product.clone(),
-                                    c.active_products.get(index).unwrap_or(&false).clone(),
+                                    *c.active_products.get(index).unwrap_or(&false),
                                 )
                             })
                             .collect::<Vec<(Product, bool)>>();
