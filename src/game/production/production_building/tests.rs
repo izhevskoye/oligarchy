@@ -1,6 +1,6 @@
 use super::*;
 use crate::game::{
-    assets::{Product, ProductDependency, ProductEnhancer},
+    production::{Product, ProductDependency, ProductEnhancer},
     statistics::Statistics,
     storage::Storage,
 };
@@ -23,8 +23,12 @@ impl TestSetup {
             .id()
     }
 
+    fn get_storage_amount(&self, entity: Entity) -> f64 {
+        self.world.get::<Storage>(entity).unwrap().amount
+    }
+
     fn assert_storage_amount(&self, entity: Entity, amount: f64) {
-        assert!((self.world.get::<Storage>(entity).unwrap().amount - amount).abs() < f64::EPSILON);
+        assert!((self.get_storage_amount(entity) - amount).abs() < f64::EPSILON);
     }
 
     fn set_storage_amount(&mut self, entity: Entity, amount: f64) {
@@ -89,26 +93,31 @@ fn produces_resource() {
         .insert(Statistics::default())
         .insert(ProductionBuilding {
             products: vec![
-                Product {
-                    resource: coke.to_owned(),
-                    rate: 1.0,
-                    requisites: vec![ProductDependency {
-                        resource: coal.to_owned(),
-                        rate: 2.0,
-                    }],
-                    ..Default::default()
-                },
-                Product {
-                    resource: coke.to_owned(),
-                    rate: 1.0,
-                    requisites: vec![ProductDependency {
-                        resource: coal.to_owned(),
-                        rate: 2.0,
-                    }],
-                    ..Default::default()
-                },
+                (
+                    Product {
+                        resource: coke.to_owned(),
+                        rate: 1.0,
+                        requisites: vec![ProductDependency {
+                            resource: coal.to_owned(),
+                            rate: 2.0,
+                        }],
+                        ..Default::default()
+                    },
+                    true,
+                ),
+                (
+                    Product {
+                        resource: coke.to_owned(),
+                        rate: 1.0,
+                        requisites: vec![ProductDependency {
+                            resource: coal.to_owned(),
+                            rate: 2.0,
+                        }],
+                        ..Default::default()
+                    },
+                    false,
+                ),
             ],
-            active_product: 0,
         })
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id],
@@ -165,20 +174,22 @@ fn produces_byproducts() {
         .spawn()
         .insert(Statistics::default())
         .insert(ProductionBuilding {
-            products: vec![Product {
-                resource: coke.to_owned(),
-                rate: 1.0,
-                requisites: vec![ProductDependency {
-                    resource: coal.to_owned(),
-                    rate: 2.0,
-                }],
-                byproducts: vec![ProductDependency {
-                    resource: slug.to_owned(),
+            products: vec![(
+                Product {
+                    resource: coke.to_owned(),
                     rate: 1.0,
-                }],
-                ..Default::default()
-            }],
-            active_product: 0,
+                    requisites: vec![ProductDependency {
+                        resource: coal.to_owned(),
+                        rate: 2.0,
+                    }],
+                    byproducts: vec![ProductDependency {
+                        resource: slug.to_owned(),
+                        rate: 1.0,
+                    }],
+                    ..Default::default()
+                },
+                true,
+            )],
         })
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id],
@@ -232,24 +243,26 @@ fn increases_production_with_enhancers() {
         .spawn()
         .insert(Statistics::default())
         .insert(ProductionBuilding {
-            products: vec![Product {
-                resource: coke.to_owned(),
-                rate: 1.0,
-                requisites: vec![ProductDependency {
-                    resource: coal.to_owned(),
-                    rate: 2.0,
-                }],
-                enhancers: vec![ProductEnhancer {
-                    resource: enhancer.to_owned(),
+            products: vec![(
+                Product {
+                    resource: coke.to_owned(),
                     rate: 1.0,
-                    modifier: 2.0,
-                }],
-                byproducts: vec![ProductDependency {
-                    resource: slug.to_owned(),
-                    rate: 1.0,
-                }],
-            }],
-            active_product: 0,
+                    requisites: vec![ProductDependency {
+                        resource: coal.to_owned(),
+                        rate: 2.0,
+                    }],
+                    enhancers: vec![ProductEnhancer {
+                        resource: enhancer.to_owned(),
+                        rate: 1.0,
+                        modifier: 2.0,
+                    }],
+                    byproducts: vec![ProductDependency {
+                        resource: slug.to_owned(),
+                        rate: 1.0,
+                    }],
+                },
+                true,
+            )],
         })
         .insert(StorageConsolidator {
             connected_storage: vec![coal_storage_id, coke_storage_id, slug_storage_id],
@@ -308,16 +321,18 @@ fn no_production_is_marked_idle() {
         .spawn()
         .insert(Statistics::default())
         .insert(ProductionBuilding {
-            products: vec![Product {
-                resource: coke.to_owned(),
-                rate: 1.0,
-                requisites: vec![ProductDependency {
-                    resource: coal.to_owned(),
-                    rate: 2.0,
-                }],
-                ..Default::default()
-            }],
-            active_product: 0,
+            products: vec![(
+                Product {
+                    resource: coke.to_owned(),
+                    rate: 1.0,
+                    requisites: vec![ProductDependency {
+                        resource: coal.to_owned(),
+                        rate: 2.0,
+                    }],
+                    ..Default::default()
+                },
+                true,
+            )],
         })
         .insert(StorageConsolidator {
             connected_storage: vec![],
@@ -339,4 +354,52 @@ fn no_production_is_marked_idle() {
     setup.stage.run(&mut setup.world);
 
     assert!(setup.world.get::<Idle>(building_id).is_none());
+}
+
+#[test]
+fn random_production() {
+    let mut setup = setup_test();
+
+    let coke = "coke";
+    let coal = "coal";
+
+    let coke_storage_id = setup.add_storage(coke, 0.0);
+    let coal_storage_id = setup.add_storage(coal, 0.0);
+
+    setup
+        .world
+        .spawn()
+        .insert(Statistics::default())
+        .insert(ProductionBuilding {
+            products: vec![
+                (
+                    Product {
+                        resource: coal.to_owned(),
+                        rate: 1.0,
+                        requisites: vec![],
+                        ..Default::default()
+                    },
+                    true,
+                ),
+                (
+                    Product {
+                        resource: coke.to_owned(),
+                        rate: 1.0,
+                        requisites: vec![],
+                        ..Default::default()
+                    },
+                    true,
+                ),
+            ],
+        })
+        .insert(StorageConsolidator {
+            connected_storage: vec![coal_storage_id, coke_storage_id],
+        });
+
+    setup.stage.run(&mut setup.world);
+
+    assert!(
+        ((setup.get_storage_amount(coke_storage_id) - 1.0).abs() < f64::EPSILON)
+            ^ ((setup.get_storage_amount(coal_storage_id) - 1.0).abs() < f64::EPSILON)
+    );
 }

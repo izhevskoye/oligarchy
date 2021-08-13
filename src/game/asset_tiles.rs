@@ -4,10 +4,11 @@ use bevy_ecs_tilemap::prelude::*;
 use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, DeliveryStation, ExportStation,
-        Occupied, Position, RequiresUpdate,
+        resource_specifications::ResourceSpecifications, Building, Occupied, Position,
+        RequiresUpdate,
     },
     constants::MapTile,
+    production::{DeliveryStation, ExportStation},
     setup::{GROUND_LAYER_ID, MAP_ID},
     storage::Storage,
 };

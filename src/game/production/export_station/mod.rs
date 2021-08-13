@@ -5,7 +5,8 @@ use bevy::prelude::*;
 
 use crate::game::{
     account::AccountTransaction,
-    assets::{resource_specifications::ResourceSpecifications, ExportStation},
+    assets::resource_specifications::ResourceSpecifications,
+    production::ExportStation,
     statistics::Statistics,
     storage::fetch_from_storage,
     storage::{Storage, StorageConsolidator},

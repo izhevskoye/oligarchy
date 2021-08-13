@@ -3,8 +3,8 @@ use bevy_egui::{egui, EguiContext};
 use collecting_hashmap::CollectingHashMap;
 
 use crate::game::{
-    assets::{resource_specifications::ResourceSpecifications, ExportStation},
-    current_selection::CurrentlySelected,
+    assets::resource_specifications::ResourceSpecifications, current_selection::CurrentlySelected,
+    production::ExportStation,
 };
 
 pub fn edit_ui(

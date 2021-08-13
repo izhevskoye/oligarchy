@@ -5,7 +5,8 @@ use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
 use crate::game::{
     account::PurchaseCost,
-    assets::{resource_specifications::ResourceSpecifications, InfoUI, Product},
+    assets::{resource_specifications::ResourceSpecifications, InfoUI},
+    production::Product,
 };
 
 pub type BuildingSpecifications = HashMap<String, BuildingSpecification>;

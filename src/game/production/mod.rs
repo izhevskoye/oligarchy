@@ -1,11 +1,14 @@
 pub mod export_station;
+pub mod idle;
 pub mod production_building;
 
 use bevy::prelude::*;
+use bevy_egui::egui::Ui;
+use serde::{Deserialize, Serialize};
 
 use super::{
-    assets::Position,
-    constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_IDLE_INDICATOR},
+    account::PurchaseCost,
+    assets::{resource_specifications::ResourceSpecifications, InfoUI},
 };
 
 #[derive(Default)]
@@ -13,44 +16,74 @@ pub struct Idle {
     pub entity: Option<Entity>,
 }
 
-pub fn spawn_idle(
-    mut commands: Commands,
-    mut idle_query: Query<(&mut Idle, &Position)>,
-    assets: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
-    for (mut idle, position) in idle_query.iter_mut() {
-        if idle.entity.is_some() {
-            continue;
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ProductionBuilding {
+    pub products: Vec<(Product, bool)>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ProductDependency {
+    pub resource: String,
+    pub rate: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ProductEnhancer {
+    pub resource: String,
+    pub rate: f64,
+    pub modifier: f64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Product {
+    pub resource: String,
+    pub rate: f64,
+    #[serde(default)]
+    pub requisites: Vec<ProductDependency>,
+    #[serde(default)]
+    pub byproducts: Vec<ProductDependency>,
+    #[serde(default)]
+    pub enhancers: Vec<ProductEnhancer>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct ExportStation {
+    pub goods: Vec<String>,
+}
+
+impl PurchaseCost for ExportStation {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
+        1200
+    }
+}
+
+impl InfoUI for ExportStation {
+    fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            ui.label("Export Station for:");
+        });
+
+        for resource in self.goods.iter() {
+            let resource = resources.get(resource).unwrap();
+
+            ui.horizontal(|ui| {
+                ui.label(&resource.name);
+            });
         }
+    }
+}
 
-        let texture_handle = assets.load("oligarchy_tiles.png");
-        let texture_atlas = TextureAtlas::from_grid(
-            texture_handle,
-            Vec2::splat(TILE_SIZE),
-            TILE_MAP_WIDTH as usize,
-            TILE_MAP_HEIGHT as usize,
-        );
-        let texture_atlas_handle = texture_atlases.add(texture_atlas);
-        let sprite = TextureAtlasSprite::new(63);
-        let mut transform = Transform::default();
-        let position = Vec2::new(
-            position.position.x as f32 + 0.5,
-            position.position.y as f32 + 0.5,
-        );
-        let translation = (position * TILE_SIZE).extend(Z_IDLE_INDICATOR);
-        transform.translation = translation;
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct DeliveryStation;
 
-        let entity = commands
-            .spawn()
-            .insert_bundle(SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
-                sprite,
-                transform,
-                ..Default::default()
-            })
-            .id();
-
-        idle.entity = Some(entity);
+impl PurchaseCost for DeliveryStation {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
+        250
     }
 }

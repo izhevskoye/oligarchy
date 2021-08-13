@@ -5,12 +5,10 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     account::Account,
-    assets::{
-        Building, DeliveryStation, ExportStation, MapSettings, Name, Position, ProductionBuilding,
-        StateName,
-    },
+    assets::{Building, MapSettings, Name, Position, StateName},
     car::Car,
     goals::GoalManager,
+    production::{DeliveryStation, ExportStation, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
@@ -102,10 +100,10 @@ pub fn save_game(
                     };
 
                     if let Ok((building, production_building)) = building_query.get(entity) {
-                        let active_product = if let Some(pb) = production_building {
-                            pb.active_product
+                        let active_products = if let Some(pb) = production_building {
+                            pb.products.iter().map(|(_, active)| *active).collect()
                         } else {
-                            0
+                            vec![]
                         };
 
                         state.entities.push(GameEntity {
@@ -114,7 +112,7 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::Building(
                                 SerializedBuilding {
                                     id: building.id.clone(),
-                                    active_product,
+                                    active_products,
                                 },
                             )),
                             statistics: statistics.clone(),
