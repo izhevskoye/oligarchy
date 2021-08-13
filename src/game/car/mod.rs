@@ -2,7 +2,7 @@ pub mod calculate_destination;
 pub mod drive_to_destination;
 pub mod instructions;
 
-use bevy::prelude::*;
+use bevy::{math::Vec3Swizzles, prelude::*};
 use bevy_egui::egui::Ui;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
@@ -11,13 +11,15 @@ use crate::game::{
     account::PurchaseCost,
     assets::{
         resource_specifications::{CarTileDefinition, ResourceSpecifications},
-        Direction, InfoUI, Position, RequiresUpdate,
+        Direction, InfoUI, Position,
     },
     constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_CAR},
     storage::Storage,
 };
 
 pub use calculate_destination::calculate_destination;
+
+use super::constants::CAR_DRIVE_TICK_SPEED;
 
 pub struct Destination {
     pub destination: UVec2,
@@ -123,7 +125,7 @@ fn update_car_sprite(
     sprite: &mut TextureAtlasSprite,
     transform: &mut Transform,
     car: &Car,
-    position: &Position,
+    position: &Vec2,
     storage: &Storage,
     resources: &Res<ResourceSpecifications>,
 ) {
@@ -138,10 +140,7 @@ fn update_car_sprite(
     };
 
     let tile_size = TILE_SIZE / 2.0;
-    let position = Vec2::new(
-        position.position.x as f32 + 0.5,
-        position.position.y as f32 + 0.5,
-    );
+    let position = Vec2::new(position.x + 0.5, position.y + 0.5);
     let translation = (position * tile_size).extend(Z_CAR);
     transform.translation = translation;
 
@@ -177,7 +176,7 @@ pub fn spawn_car(
             &mut sprite,
             &mut transform,
             car,
-            position,
+            &position.position.as_f32(),
             storage,
             &resources,
         );
@@ -193,28 +192,45 @@ pub fn spawn_car(
 
 #[allow(clippy::type_complexity)]
 pub fn update_car(
-    mut commands: Commands,
-    mut car_query: Query<
-        (
-            Entity,
-            &Car,
-            &Position,
-            &Storage,
-            &mut Transform,
-            &mut TextureAtlasSprite,
-        ),
-        With<RequiresUpdate>,
-    >,
+    time: Res<Time>,
+    mut car_query: Query<(
+        &Car,
+        &Position,
+        &Storage,
+        &mut Transform,
+        &mut TextureAtlasSprite,
+    )>,
     resources: Res<ResourceSpecifications>,
 ) {
-    for (entity, car, position, storage, mut transform, mut sprite) in car_query.iter_mut() {
-        commands.entity(entity).remove::<RequiresUpdate>();
+    for (car, position, storage, mut transform, mut sprite) in car_query.iter_mut() {
+        let tile_size = TILE_SIZE / 2.0;
+        let current = transform.translation.xy() / tile_size - Vec2::new(0.5, 0.5);
+
+        let delta = time.delta_seconds() as f64;
+
+        let mut diff = position.position.as_f64() - current.as_f64();
+        let ignore = 0.05;
+        if diff.x.abs() > f64::EPSILON && diff.x.abs() < ignore {
+            diff.x = 0.0;
+        }
+        if diff.y.abs() > f64::EPSILON && diff.y.abs() < ignore {
+            diff.y = 0.0;
+        }
+
+        let normalized = diff.normalize_or_zero();
+
+        if normalized.length() < f64::EPSILON {
+            continue;
+        }
+
+        let speed = normalized / CAR_DRIVE_TICK_SPEED / 1.5;
+        let ref_position = current + (speed * delta).as_f32();
 
         update_car_sprite(
             &mut sprite,
             &mut transform,
             car,
-            position,
+            &ref_position,
             storage,
             &resources,
         );
