@@ -2,13 +2,13 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, PurchaseCost},
+    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable,
-        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate, SelectedTool,
-        Tool,
+        resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable, Occupied,
+        Position, RequiresUpdate, SelectedTool, Tool,
     },
+    production::ProductionBuilding,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
     storage::StorageConsolidator,
@@ -59,8 +59,11 @@ pub fn building_placement(
                         .insert(Statistics::default())
                         .insert(StorageConsolidator::default())
                         .insert(ProductionBuilding {
-                            products: building.products.clone(),
-                            active_product: 0,
+                            products: building
+                                .products
+                                .iter()
+                                .map(|product| (product.clone(), true))
+                                .collect(),
                         })
                         .insert(Editable);
                 }

@@ -4,9 +4,10 @@ use bevy_egui::{egui, EguiContext};
 use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, ProductionBuilding,
+        resource_specifications::ResourceSpecifications, Building,
     },
     current_selection::CurrentlySelected,
+    production::ProductionBuilding,
 };
 
 pub fn edit_ui(
@@ -26,12 +27,11 @@ pub fn edit_ui(
                 let building = buildings.get(&building.id).unwrap();
                 ui.heading(&building.name);
 
-                for (index, product) in production.products.clone().iter().enumerate() {
+                for (product, active) in &mut production.products {
                     let resource = resources.get(&product.resource).unwrap();
 
-                    ui.radio_value(
-                        &mut production.active_product,
-                        index,
+                    ui.checkbox(
+                        active,
                         format!("Produce {} {}", product.rate, resource.name),
                     );
 

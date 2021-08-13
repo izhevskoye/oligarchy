@@ -4,11 +4,11 @@ use bevy_egui::{egui, EguiContext};
 use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, Editable, ExportStation, InfoUI,
-        Name,
+        resource_specifications::ResourceSpecifications, Building, Editable, InfoUI, Name,
     },
     car::Car,
     current_selection::CurrentlySelected,
+    production::ExportStation,
     storage::Storage,
 };
 

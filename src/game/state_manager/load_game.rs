@@ -2,13 +2,14 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, PurchaseCost},
+    account::{Account, MaintenanceCost, PurchaseCost},
     assets::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building, CanDriveOver, Editable,
-        MaintenanceCost, Occupied, Position, ProductionBuilding, RequiresUpdate, StateName,
+        Occupied, Position, RequiresUpdate, StateName,
     },
     goals::GoalManager,
+    production::{Product, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
@@ -134,13 +135,22 @@ fn insert_building(
                         .insert(Building { id: c.id.clone() });
 
                     if !building.products.is_empty() {
+                        let products = building
+                            .products
+                            .iter()
+                            .enumerate()
+                            .map(|(index, product)| {
+                                (
+                                    product.clone(),
+                                    c.active_products.get(index).unwrap_or(&false).clone(),
+                                )
+                            })
+                            .collect::<Vec<(Product, bool)>>();
+
                         commands
                             .entity(entity)
                             .insert(StorageConsolidator::default())
-                            .insert(ProductionBuilding {
-                                products: building.products.clone(),
-                                active_product: c.active_product,
-                            })
+                            .insert(ProductionBuilding { products })
                             .insert(MaintenanceCost::new_from_cost(building.price(resources)))
                             .insert(Editable);
                     }

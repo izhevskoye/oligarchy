@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 
-use super::{
-    building_specifications::{BuildingSpecificationCost, BuildingSpecifications},
-    resource_specifications::ResourceSpecifications,
-    Product,
+use crate::game::{
+    assets::{
+        building_specifications::{BuildingSpecificationCost, BuildingSpecifications},
+        resource_specifications::ResourceSpecifications,
+    },
+    production::Product,
 };
 
 pub fn integrity_check(

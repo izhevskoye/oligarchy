@@ -9,9 +9,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::{
     account::Account,
-    assets::{DeliveryStation, ExportStation, MapSettings, Name},
+    assets::{MapSettings, Name},
     car::Car,
     goals::Goal,
+    production::{DeliveryStation, ExportStation},
     statistics::Statistics,
     storage::Storage,
     street::Street,
@@ -23,7 +24,7 @@ use super::assets::StateName;
 #[serde(deny_unknown_fields)]
 pub struct SerializedBuilding {
     pub id: String,
-    pub active_product: usize,
+    pub active_products: Vec<bool>,
 }
 
 #[derive(Serialize, Deserialize)]

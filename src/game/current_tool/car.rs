@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, PurchaseCost},
+    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
     assets::{
-        resource_specifications::ResourceSpecifications, ClickedTile, Editable, MaintenanceCost,
-        Position, SelectedTool, Tool,
+        resource_specifications::ResourceSpecifications, ClickedTile, Editable, Position,
+        SelectedTool, Tool,
     },
     car::Car,
     constants::CAR_STORAGE_SIZE,
