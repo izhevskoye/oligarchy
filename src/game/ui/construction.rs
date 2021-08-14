@@ -97,14 +97,14 @@ pub fn construction_ui(
                 if !building_names.is_empty() {
                     let group_title = "Building: General";
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
-                        if filter.match_name("Street") {
-                            if button(ui, "Street", &Street, &resources, &account).clicked() {
-                                selected_tool.tool = Tool::Street;
-                            }
+                        if filter.match_name("Street")
+                            && button(ui, "Street", &Street, &resources, &account).clicked()
+                        {
+                            selected_tool.tool = Tool::Street;
                         }
 
-                        if filter.match_name("Export Station") {
-                            if button(
+                        if filter.match_name("Export Station")
+                            && button(
                                 ui,
                                 "Export Station",
                                 &ExportStation::default(),
@@ -112,13 +112,12 @@ pub fn construction_ui(
                                 &account,
                             )
                             .clicked()
-                            {
-                                selected_tool.tool = Tool::ExportStation;
-                            }
+                        {
+                            selected_tool.tool = Tool::ExportStation;
                         }
 
-                        if filter.match_name("Delivery Station") {
-                            if button(
+                        if filter.match_name("Delivery Station")
+                            && button(
                                 ui,
                                 "Delivery Station",
                                 &DeliveryStation,
@@ -126,9 +125,8 @@ pub fn construction_ui(
                                 &account,
                             )
                             .clicked()
-                            {
-                                selected_tool.tool = Tool::DeliveryStation;
-                            }
+                        {
+                            selected_tool.tool = Tool::DeliveryStation;
                         }
                     });
 
