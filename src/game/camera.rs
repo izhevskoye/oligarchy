@@ -27,42 +27,10 @@ pub fn movement(
         return;
     }
 
-    if selected_tool.tool != Tool::None {
-        return;
-    }
-
+    let win = windows.get_primary().expect("no primary window");
     let mut transform = query.single_mut().unwrap();
 
-    let mut direction = Vec3::ZERO;
-
-    let mut delta_since = Vec2::ZERO;
-    for MouseMotion { delta } in mouse_motion_events.iter() {
-        delta_since += *delta;
-    }
-
-    if mouse_input.pressed(MouseButton::Left) {
-        direction += Vec3::new(-delta_since.x, delta_since.y, 0.0) * transform.scale;
-    }
-
-    transform.translation += time.delta_seconds() * direction * 50.;
-
-    let mut direction = Vec3::ZERO;
-
-    if keyboard_input.pressed(KeyCode::A) {
-        direction -= Vec3::new(1.0, 0.0, 0.0);
-    }
-
-    if keyboard_input.pressed(KeyCode::D) {
-        direction += Vec3::new(1.0, 0.0, 0.0);
-    }
-
-    if keyboard_input.pressed(KeyCode::W) {
-        direction += Vec3::new(0.0, 1.0, 0.0);
-    }
-
-    if keyboard_input.pressed(KeyCode::S) {
-        direction -= Vec3::new(0.0, 1.0, 0.0);
-    }
+    // scroll
 
     let mut scroll = 0.0;
     for ev in ev_scroll.iter() {
@@ -70,8 +38,6 @@ pub fn movement(
     }
 
     let mut scale = transform.scale.x + scroll * time.delta_seconds() * 0.4;
-
-    let win = windows.get_primary().expect("no primary window");
 
     if scale > MAX_ZOOM_IN {
         scale = MAX_ZOOM_IN;
@@ -99,6 +65,49 @@ pub fn movement(
 
             transform.scale = Vec3::splat(scale);
         }
+    }
+
+    // disable if tool
+
+    if selected_tool.tool != Tool::None {
+        return;
+    }
+
+    // move by mouse
+
+    let mut transform = query.single_mut().unwrap();
+
+    let mut direction = Vec3::ZERO;
+
+    let mut delta_since = Vec2::ZERO;
+    for MouseMotion { delta } in mouse_motion_events.iter() {
+        delta_since += *delta;
+    }
+
+    if mouse_input.pressed(MouseButton::Left) {
+        direction += Vec3::new(-delta_since.x, delta_since.y, 0.0) * transform.scale;
+    }
+
+    transform.translation += time.delta_seconds() * direction * 50.;
+
+    // move by keys
+
+    let mut direction = Vec3::ZERO;
+
+    if keyboard_input.pressed(KeyCode::A) {
+        direction -= Vec3::new(1.0, 0.0, 0.0);
+    }
+
+    if keyboard_input.pressed(KeyCode::D) {
+        direction += Vec3::new(1.0, 0.0, 0.0);
+    }
+
+    if keyboard_input.pressed(KeyCode::W) {
+        direction += Vec3::new(0.0, 1.0, 0.0);
+    }
+
+    if keyboard_input.pressed(KeyCode::S) {
+        direction -= Vec3::new(0.0, 1.0, 0.0);
     }
 
     transform.translation += time.delta_seconds() * direction * 500.;
