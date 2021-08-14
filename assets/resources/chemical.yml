@@ -5,7 +5,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
-  cost: 3
+  cost: 5
 
 "sulfur.acid":
   name: Sulfuric Acid
@@ -14,7 +14,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
-  cost: 8
+  cost: 14
 
 "phosphor":
   name: Phosphor
@@ -23,7 +23,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
-  cost: 3
+  cost: 5
 
 "phosphoric_acid":
   name: Phosphoric Acid
@@ -32,7 +32,7 @@
   car_tile:
     horizontal: 115
     vertical: 116
-  cost: 13
+  cost: 20
 
 "phosphoric_fertilizer":
   name: Phosphoric Fertilizer
@@ -41,4 +41,4 @@
   car_tile:
     horizontal: 115
     vertical: 116
-  cost: 17
+  cost: 28

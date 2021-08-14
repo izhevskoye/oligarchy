@@ -24,7 +24,9 @@ pub fn edit_ui(
 
                 let mut groups = CollectingHashMap::new();
                 for (id, resource) in resources.iter() {
-                    groups.insert(resource.group.clone(), (id, resource));
+                    if resource.cost > f64::EPSILON && !resource.virtual_resource {
+                        groups.insert(resource.group.clone(), (id, resource));
+                    }
                 }
 
                 let mut group_names: Vec<String> = groups.keys().cloned().collect();

@@ -10,7 +10,7 @@
           modifier: 2.0
       byproducts:
         - resource: manure
-          rate: 0.075
+          rate: 0.05
   group: Meat
   cost:
     resources:

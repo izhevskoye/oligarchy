@@ -9,7 +9,7 @@
           rate: 0.08
 
         - resource: manure
-          rate: 0.1
+          rate: 0.025
       enhancers:
         - resource: animal_feed
           rate: 1.25

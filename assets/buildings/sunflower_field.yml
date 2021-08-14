@@ -6,7 +6,7 @@
       rate: 0.05
       enhancers:
         - resource: fertilizer
-          rate: 0.5
+          rate: 0.05
           modifier: 1.5
 
   group: Agriculture
