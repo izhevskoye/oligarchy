@@ -35,6 +35,7 @@ pub fn production_building(
             let mut modifier = 1.0;
             let mut consumed_resources = vec![];
 
+            let mut has_requisites = true;
             for requisite in product.requisites.iter() {
                 if !has_in_storage(
                     &consolidator,
@@ -42,8 +43,12 @@ pub fn production_building(
                     &requisite.resource,
                     requisite.rate,
                 ) {
-                    consumed_resources.push((&requisite.resource, requisite.rate));
+                    has_requisites = false;
                 }
+                consumed_resources.push((&requisite.resource, requisite.rate));
+            }
+            if !has_requisites {
+                continue;
             }
 
             for enhancer in &product.enhancers {

@@ -11,7 +11,7 @@ pub struct CarTileDefinition {
     pub vertical: u16,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct ResourceSpecification {
     pub name: String,
