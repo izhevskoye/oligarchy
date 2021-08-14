@@ -1,0 +1,44 @@
+"sulfur":
+  name: Sulfur
+  storage_tile: 69
+  group: Chemical
+  car_tile:
+    horizontal: 115
+    vertical: 116
+  cost: 3
+
+"sulfur.acid":
+  name: Sulfuric Acid
+  storage_tile: 70
+  group: Chemical
+  car_tile:
+    horizontal: 115
+    vertical: 116
+  cost: 8
+
+"phosphor":
+  name: Phosphor
+  storage_tile: 72
+  group: Chemical
+  car_tile:
+    horizontal: 115
+    vertical: 116
+  cost: 3
+
+"phosphoric_acid":
+  name: Phosphoric Acid
+  storage_tile: 71
+  group: Chemical
+  car_tile:
+    horizontal: 115
+    vertical: 116
+  cost: 13
+
+"phosphoric_fertilizer":
+  name: Phosphoric Fertilizer
+  storage_tile: 73
+  group: Agriculture
+  car_tile:
+    horizontal: 115
+    vertical: 116
+  cost: 17

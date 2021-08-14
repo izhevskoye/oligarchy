@@ -1,0 +1,16 @@
+"phosphor_fertilizer_plant":
+  name: Phosphor Fertilizer Plant
+  tile: 87
+  products:
+    - resource: phosphoric_fertilizer
+      rate: 1
+      requisites:
+        - resource: phosphoric_acid
+          rate: 1.2
+  group: Chemical
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 20
+      steel.billets: 10
+    base: 700

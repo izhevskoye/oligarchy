@@ -62,6 +62,7 @@
   virtual: true
   substitute:
     manure: 0.75
+    phosphoric_fertilizer: 0.9
 
 "manure":
   name: Manure
@@ -70,3 +71,4 @@
   car_tile:
     horizontal: 252
     vertical: 220
+  cost: 10
