@@ -61,7 +61,8 @@
   group: Agriculture
   virtual: true
   substitute:
-    manure: 0.75
+    manure: 0.6
+    phosphoric_fertilizer: 0.9
 
 "manure":
   name: Manure

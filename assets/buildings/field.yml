@@ -6,15 +6,15 @@
       rate: 0.75
       enhancers:
         - resource: fertilizer
-          rate: 1.0
-          modifier: 2.0
+          rate: 0.15
+          modifier: 3.0
 
     - resource: wheat
       rate: 0.75
       enhancers:
         - resource: fertilizer
-          rate: 1.0
-          modifier: 2.0
+          rate: 0.15
+          modifier: 3.0
   group: Agriculture
   cost:
     base: 1500

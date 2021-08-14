@@ -1,0 +1,19 @@
+"phosphoric_acid_processing":
+  name: Phosphoric Acid Processing
+  tile: 85
+  products:
+    - resource: phosphoric_acid
+      rate: 1
+      requisites:
+        - resource: phosphor
+          rate: 2
+
+        - resource: sulfur.acid
+          rate: 0.5
+  group: Chemical
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 20
+      steel.billets: 10
+    base: 700

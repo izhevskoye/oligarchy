@@ -1,0 +1,16 @@
+"sulfuric_acid_processing":
+  name: Sulfuric Acid Processing
+  tile: 86
+  products:
+    - resource: sulfur.acid
+      rate: 1
+      requisites:
+        - resource: sulfur
+          rate: 2.25
+  group: Chemical
+  cost:
+    resources:
+      steel.blooms: 15
+      steel.slabs: 20
+      steel.billets: 10
+    base: 700
