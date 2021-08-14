@@ -4,6 +4,11 @@
   products:
     - resource: sunflower.seeds
       rate: 0.05
+      enhancers:
+        - resource: fertilizer
+          rate: 0.5
+          modifier: 1.5
+
   group: Agriculture
   cost:
     base: 1500

@@ -32,6 +32,10 @@
   car_tile:
     horizontal: 251
     vertical: 219
+  substitute:
+    corn: 0.8
+    wheat: 0.8
+    sunflower.seeds: 0.4
   cost: 10
 
 "corn":
@@ -51,3 +55,18 @@
     horizontal: 253
     vertical: 221
   cost: 5
+
+"fertilizer":
+  name: Fertilizer
+  group: Agriculture
+  virtual: true
+  substitute:
+    manure: 0.75
+
+"manure":
+  name: Manure
+  storage_tile: 68
+  group: Agriculture
+  car_tile:
+    horizontal: 252
+    vertical: 220

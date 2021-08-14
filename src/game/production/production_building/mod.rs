@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use rand::{prelude::SliceRandom, thread_rng};
 
 use crate::game::{
+    assets::resource_specifications::ResourceSpecifications,
     production::{Idle, ProductionBuilding},
     statistics::Statistics,
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
@@ -21,6 +22,7 @@ pub fn production_building(
         Option<&Idle>,
     )>,
     mut storage_query: Query<&mut Storage>,
+    resources: Res<ResourceSpecifications>,
 ) {
     for (entity, building, consolidator, mut statistics, idle) in building_query.iter_mut() {
         let mut available_products = vec![];
@@ -30,37 +32,56 @@ pub fn production_building(
                 continue;
             };
 
-            let has_requisites = product.requisites.iter().all(|requisite| {
-                has_in_storage(
+            let mut modifier = 1.0;
+            let mut consumed_resources = vec![];
+
+            for requisite in product.requisites.iter() {
+                if !has_in_storage(
                     &consolidator,
                     &mut storage_query,
                     &requisite.resource,
                     requisite.rate,
-                )
-            });
-
-            let mut modifier = 1.0;
+                ) {
+                    consumed_resources.push((&requisite.resource, requisite.rate));
+                }
+            }
 
             for enhancer in &product.enhancers {
-                if has_in_storage(
+                let enhancer_present = has_in_storage(
                     consolidator,
                     &mut storage_query,
                     &enhancer.resource,
                     enhancer.rate,
-                ) {
+                );
+
+                if enhancer_present {
                     modifier *= enhancer.modifier;
+                    consumed_resources.push((&enhancer.resource, enhancer.rate));
+                    continue;
+                }
+
+                let enhancer_resource = resources.get(&enhancer.resource).unwrap();
+                for (substitute, rate) in enhancer_resource.substitute.iter() {
+                    if has_in_storage(
+                        consolidator,
+                        &mut storage_query,
+                        &substitute,
+                        enhancer.rate / rate,
+                    ) {
+                        modifier *= enhancer.modifier;
+                        consumed_resources.push((&substitute, enhancer.rate / rate));
+                        continue;
+                    }
                 }
             }
 
-            if has_requisites
-                && has_space_in_storage(
-                    &consolidator,
-                    &mut storage_query,
-                    &product.resource,
-                    product.rate * modifier,
-                )
-            {
-                available_products.push((index, modifier));
+            if has_space_in_storage(
+                &consolidator,
+                &mut storage_query,
+                &product.resource,
+                product.rate * modifier,
+            ) {
+                available_products.push((index, modifier, consumed_resources));
             }
         }
 
@@ -78,31 +99,11 @@ pub fn production_building(
 
         let product = &building.products[available_products[0].0].0;
         let modifier = available_products[0].1;
+        let consumed_resources = &available_products[0].2;
 
-        for requisite in &product.requisites {
-            fetch_from_storage(
-                consolidator,
-                &mut storage_query,
-                &requisite.resource,
-                requisite.rate,
-            );
-
-            statistics
-                .consumption
-                .track(&requisite.resource, requisite.rate);
-        }
-
-        for enhancer in &product.enhancers {
-            if fetch_from_storage(
-                consolidator,
-                &mut storage_query,
-                &enhancer.resource,
-                enhancer.rate,
-            ) {
-                statistics
-                    .consumption
-                    .track(&enhancer.resource, enhancer.rate);
-            }
+        for (resource, amount) in consumed_resources {
+            fetch_from_storage(consolidator, &mut storage_query, &resource, *amount);
+            statistics.consumption.track(&resource, *amount);
         }
 
         distribute_to_storage(

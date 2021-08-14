@@ -10,6 +10,26 @@ use crate::game::{
     production::ProductionBuilding,
 };
 
+fn resource_name(resource: &String, resources: &ResourceSpecifications) -> String {
+    let resource = resources.get(resource).unwrap();
+
+    if !resource.substitute.is_empty() {
+        let items = resource
+            .substitute
+            .iter()
+            .map(|(substitute, efficiency)| {
+                let resource = resources.get(substitute).unwrap();
+                format!("{} {}x", resource.name, efficiency)
+            })
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        format!("{} ({})", resource.name, items)
+    } else {
+        resource.name.to_owned()
+    }
+}
+
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
     mut building_query: Query<(&mut ProductionBuilding, &Building)>,
@@ -38,26 +58,33 @@ pub fn edit_ui(
                     if !product.byproducts.is_empty() {
                         ui.label("It will also optionally produce:");
                         for byproduct in product.byproducts.iter() {
-                            let resource = resources.get(&byproduct.resource).unwrap();
-                            ui.label(format!("{} {}", byproduct.rate, resource.name));
+                            ui.label(format!(
+                                "{} {}",
+                                byproduct.rate,
+                                resource_name(&byproduct.resource, &resources)
+                            ));
                         }
                     }
 
                     if !product.requisites.is_empty() {
                         ui.label("This will consume:");
                         for requisite in product.requisites.iter() {
-                            let resource = resources.get(&requisite.resource).unwrap();
-                            ui.label(format!("{} {}", requisite.rate, resource.name));
+                            ui.label(format!(
+                                "{} {}",
+                                requisite.rate,
+                                resource_name(&requisite.resource, &resources)
+                            ));
                         }
                     }
 
                     if !product.enhancers.is_empty() {
                         ui.label("If the following is provided, it increases output:");
                         for enhancer in product.enhancers.iter() {
-                            let resource = resources.get(&enhancer.resource).unwrap();
                             ui.label(format!(
                                 "{} {} by {}x",
-                                enhancer.rate, resource.name, enhancer.modifier,
+                                enhancer.rate,
+                                resource_name(&enhancer.resource, &resources),
+                                enhancer.modifier,
                             ));
                         }
                     }
