@@ -1,10 +1,19 @@
+use std::collections::HashMap;
+
 use super::*;
 use crate::game::{
+    assets::resource_specifications::ResourceSpecification,
     production::{Product, ProductDependency, ProductEnhancer},
     statistics::Statistics,
     storage::Storage,
 };
 use bevy::prelude::*;
+
+const COKE: &str = "coke";
+const SLUG: &str = "slug";
+const ENHANCER: &str = "enhancer";
+const ENHANCER_REPLACEMENT: &str = "enhancer_replacement";
+const COAL: &str = "coal";
 
 struct TestSetup {
     world: World,
@@ -69,7 +78,27 @@ impl TestSetup {
 }
 
 fn setup_test() -> TestSetup {
-    let world = World::default();
+    let mut world = World::default();
+
+    let mut resource_specifications = ResourceSpecifications::new();
+    resource_specifications.insert(COKE.to_owned(), ResourceSpecification::default());
+    resource_specifications.insert(COAL.to_owned(), ResourceSpecification::default());
+    resource_specifications.insert(SLUG.to_owned(), ResourceSpecification::default());
+    resource_specifications.insert(
+        ENHANCER_REPLACEMENT.to_owned(),
+        ResourceSpecification::default(),
+    );
+    let mut substitute = HashMap::new();
+    substitute.insert(ENHANCER_REPLACEMENT.to_owned(), 1.0);
+    resource_specifications.insert(
+        ENHANCER.to_owned(),
+        ResourceSpecification {
+            substitute,
+            ..Default::default()
+        },
+    );
+
+    world.insert_resource(resource_specifications);
 
     let mut stage = SystemStage::parallel();
     stage.add_system(production_building.system());
@@ -81,11 +110,8 @@ fn setup_test() -> TestSetup {
 fn produces_resource() {
     let mut setup = setup_test();
 
-    let coke = "coke";
-    let coal = "coal";
-
-    let coke_storage_id = setup.add_storage(coke, 0.0);
-    let coal_storage_id = setup.add_storage(coal, 10.0);
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 10.0);
 
     let building_id = setup
         .world
@@ -95,10 +121,10 @@ fn produces_resource() {
             products: vec![
                 (
                     Product {
-                        resource: coke.to_owned(),
+                        resource: COKE.to_owned(),
                         rate: 1.0,
                         requisites: vec![ProductDependency {
-                            resource: coal.to_owned(),
+                            resource: COAL.to_owned(),
                             rate: 2.0,
                         }],
                         ..Default::default()
@@ -107,10 +133,10 @@ fn produces_resource() {
                 ),
                 (
                     Product {
-                        resource: coke.to_owned(),
+                        resource: COKE.to_owned(),
                         rate: 1.0,
                         requisites: vec![ProductDependency {
-                            resource: coal.to_owned(),
+                            resource: COAL.to_owned(),
                             rate: 2.0,
                         }],
                         ..Default::default()
@@ -128,8 +154,8 @@ fn produces_resource() {
 
     setup.assert_storage_amount(coke_storage_id, 1.0);
     setup.assert_storage_amount(coal_storage_id, 8.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 
     // if already full
     setup.set_storage_amount(coke_storage_id, 10.0);
@@ -139,35 +165,31 @@ fn produces_resource() {
     // no overflow
     setup.assert_storage_amount(coke_storage_id, 10.0);
     setup.assert_storage_amount(coal_storage_id, 8.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 
     // no requisites left
     setup.set_storage_amount(coal_storage_id, 0.0);
     setup.set_storage_amount(coke_storage_id, 0.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 
     setup.stage.run(&mut setup.world);
 
     // no production
     setup.assert_storage_amount(coke_storage_id, 0.0);
     setup.assert_storage_amount(coal_storage_id, 0.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 }
 
 #[test]
 fn produces_byproducts() {
     let mut setup = setup_test();
 
-    let coke = "coke";
-    let slug = "slug";
-    let coal = "coal";
-
-    let coke_storage_id = setup.add_storage(coke, 0.0);
-    let coal_storage_id = setup.add_storage(coal, 10.0);
-    let slug_storage_id = setup.add_storage(slug, 0.0);
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 10.0);
+    let slug_storage_id = setup.add_storage(SLUG, 0.0);
 
     let building_id = setup
         .world
@@ -176,14 +198,14 @@ fn produces_byproducts() {
         .insert(ProductionBuilding {
             products: vec![(
                 Product {
-                    resource: coke.to_owned(),
+                    resource: COKE.to_owned(),
                     rate: 1.0,
                     requisites: vec![ProductDependency {
-                        resource: coal.to_owned(),
+                        resource: COAL.to_owned(),
                         rate: 2.0,
                     }],
                     byproducts: vec![ProductDependency {
-                        resource: slug.to_owned(),
+                        resource: SLUG.to_owned(),
                         rate: 1.0,
                     }],
                     ..Default::default()
@@ -201,9 +223,9 @@ fn produces_byproducts() {
     setup.assert_storage_amount(coke_storage_id, 1.0);
     setup.assert_storage_amount(coal_storage_id, 8.0);
     setup.assert_storage_amount(slug_storage_id, 0.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_production_statistic(slug, building_id, 0.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_production_statistic(SLUG, building_id, 0.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 
     // slug storage connected
     setup
@@ -219,24 +241,19 @@ fn produces_byproducts() {
     setup.assert_storage_amount(coke_storage_id, 2.0);
     setup.assert_storage_amount(coal_storage_id, 6.0);
     setup.assert_storage_amount(slug_storage_id, 1.0);
-    setup.assert_production_statistic(coke, building_id, 2.0);
-    setup.assert_production_statistic(slug, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 4.0);
+    setup.assert_production_statistic(COKE, building_id, 2.0);
+    setup.assert_production_statistic(SLUG, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 4.0);
 }
 
 #[test]
 fn increases_production_with_enhancers() {
     let mut setup = setup_test();
 
-    let coke = "coke";
-    let slug = "slug";
-    let enhancer = "enhancer";
-    let coal = "coal";
-
-    let coke_storage_id = setup.add_storage(coke, 0.0);
-    let coal_storage_id = setup.add_storage(coal, 10.0);
-    let enhancer_storage_id = setup.add_storage(enhancer, 10.0);
-    let slug_storage_id = setup.add_storage(slug, 0.0);
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 10.0);
+    let enhancer_storage_id = setup.add_storage(ENHANCER, 10.0);
+    let slug_storage_id = setup.add_storage(SLUG, 0.0);
 
     let building_id = setup
         .world
@@ -245,19 +262,19 @@ fn increases_production_with_enhancers() {
         .insert(ProductionBuilding {
             products: vec![(
                 Product {
-                    resource: coke.to_owned(),
+                    resource: COKE.to_owned(),
                     rate: 1.0,
                     requisites: vec![ProductDependency {
-                        resource: coal.to_owned(),
+                        resource: COAL.to_owned(),
                         rate: 2.0,
                     }],
                     enhancers: vec![ProductEnhancer {
-                        resource: enhancer.to_owned(),
+                        resource: ENHANCER.to_owned(),
                         rate: 1.0,
                         modifier: 2.0,
                     }],
                     byproducts: vec![ProductDependency {
-                        resource: slug.to_owned(),
+                        resource: SLUG.to_owned(),
                         rate: 1.0,
                     }],
                 },
@@ -275,10 +292,10 @@ fn increases_production_with_enhancers() {
     setup.assert_storage_amount(coal_storage_id, 8.0);
     setup.assert_storage_amount(slug_storage_id, 1.0);
     setup.assert_storage_amount(enhancer_storage_id, 10.0);
-    setup.assert_production_statistic(coke, building_id, 1.0);
-    setup.assert_production_statistic(slug, building_id, 1.0);
-    setup.assert_consumption_statistic(enhancer, building_id, 0.0);
-    setup.assert_consumption_statistic(coal, building_id, 2.0);
+    setup.assert_production_statistic(COKE, building_id, 1.0);
+    setup.assert_production_statistic(SLUG, building_id, 1.0);
+    setup.assert_consumption_statistic(ENHANCER, building_id, 0.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
 
     // enhancer storage connected
     setup
@@ -300,21 +317,20 @@ fn increases_production_with_enhancers() {
     setup.assert_storage_amount(coal_storage_id, 6.0);
     setup.assert_storage_amount(slug_storage_id, 3.0);
     setup.assert_storage_amount(enhancer_storage_id, 9.0);
-    setup.assert_production_statistic(coke, building_id, 3.0);
-    setup.assert_production_statistic(slug, building_id, 3.0);
-    setup.assert_consumption_statistic(enhancer, building_id, 1.0);
-    setup.assert_consumption_statistic(coal, building_id, 4.0);
+    setup.assert_production_statistic(COKE, building_id, 3.0);
+    setup.assert_production_statistic(SLUG, building_id, 3.0);
+    setup.assert_consumption_statistic(ENHANCER, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 4.0);
 }
 
 #[test]
-fn no_production_is_marked_idle() {
+fn increases_production_with_enhancer_substitute() {
     let mut setup = setup_test();
 
-    let coke = "coke";
-    let coal = "coal";
-
-    let coke_storage_id = setup.add_storage(coke, 0.0);
-    let coal_storage_id = setup.add_storage(coal, 10.0);
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 10.0);
+    let enhancer_storage_id = setup.add_storage(ENHANCER_REPLACEMENT, 10.0);
+    let slug_storage_id = setup.add_storage(SLUG, 0.0);
 
     let building_id = setup
         .world
@@ -323,10 +339,65 @@ fn no_production_is_marked_idle() {
         .insert(ProductionBuilding {
             products: vec![(
                 Product {
-                    resource: coke.to_owned(),
+                    resource: COKE.to_owned(),
                     rate: 1.0,
                     requisites: vec![ProductDependency {
-                        resource: coal.to_owned(),
+                        resource: COAL.to_owned(),
+                        rate: 2.0,
+                    }],
+                    enhancers: vec![ProductEnhancer {
+                        resource: ENHANCER.to_owned(),
+                        rate: 1.0,
+                        modifier: 2.0,
+                    }],
+                    byproducts: vec![ProductDependency {
+                        resource: SLUG.to_owned(),
+                        rate: 1.0,
+                    }],
+                },
+                true,
+            )],
+        })
+        .insert(StorageConsolidator {
+            connected_storage: vec![
+                coal_storage_id,
+                coke_storage_id,
+                slug_storage_id,
+                enhancer_storage_id,
+            ],
+        })
+        .id();
+
+    setup.stage.run(&mut setup.world);
+
+    setup.assert_storage_amount(coke_storage_id, 2.0);
+    setup.assert_storage_amount(coal_storage_id, 8.0);
+    setup.assert_storage_amount(slug_storage_id, 2.0);
+    setup.assert_storage_amount(enhancer_storage_id, 9.0);
+    setup.assert_production_statistic(COKE, building_id, 2.0);
+    setup.assert_production_statistic(SLUG, building_id, 2.0);
+    setup.assert_consumption_statistic(ENHANCER_REPLACEMENT, building_id, 1.0);
+    setup.assert_consumption_statistic(COAL, building_id, 2.0);
+}
+
+#[test]
+fn no_production_is_marked_idle() {
+    let mut setup = setup_test();
+
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 10.0);
+
+    let building_id = setup
+        .world
+        .spawn()
+        .insert(Statistics::default())
+        .insert(ProductionBuilding {
+            products: vec![(
+                Product {
+                    resource: COKE.to_owned(),
+                    rate: 1.0,
+                    requisites: vec![ProductDependency {
+                        resource: COAL.to_owned(),
                         rate: 2.0,
                     }],
                     ..Default::default()
@@ -360,11 +431,8 @@ fn no_production_is_marked_idle() {
 fn random_production() {
     let mut setup = setup_test();
 
-    let coke = "coke";
-    let coal = "coal";
-
-    let coke_storage_id = setup.add_storage(coke, 0.0);
-    let coal_storage_id = setup.add_storage(coal, 0.0);
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+    let coal_storage_id = setup.add_storage(COAL, 0.0);
 
     setup
         .world
@@ -374,7 +442,7 @@ fn random_production() {
             products: vec![
                 (
                     Product {
-                        resource: coal.to_owned(),
+                        resource: COAL.to_owned(),
                         rate: 1.0,
                         requisites: vec![],
                         ..Default::default()
@@ -383,7 +451,7 @@ fn random_production() {
                 ),
                 (
                     Product {
-                        resource: coke.to_owned(),
+                        resource: COKE.to_owned(),
                         rate: 1.0,
                         requisites: vec![],
                         ..Default::default()

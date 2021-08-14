@@ -4,9 +4,17 @@
   products:
     - resource: corn
       rate: 0.75
+      enhancers:
+        - resource: fertilizer
+          rate: 1.0
+          modifier: 2.0
 
     - resource: wheat
       rate: 0.75
+      enhancers:
+        - resource: fertilizer
+          rate: 1.0
+          modifier: 2.0
   group: Agriculture
   cost:
     base: 1500

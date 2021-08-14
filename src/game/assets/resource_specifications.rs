@@ -11,14 +11,21 @@ pub struct CarTileDefinition {
     pub vertical: u16,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct ResourceSpecification {
     pub name: String,
+    #[serde(default)]
     pub storage_tile: Option<u16>,
     pub group: String,
+    #[serde(default)]
     pub car_tile: Option<CarTileDefinition>,
+    #[serde(default)]
     pub cost: f64,
+    #[serde(default)]
+    pub substitute: HashMap<String, f64>,
+    #[serde(default, rename = "virtual")]
+    pub virtual_resource: bool,
 }
 
 pub fn load_file(resources: &mut ResourceSpecifications, file_name: &str) {
