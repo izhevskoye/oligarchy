@@ -10,7 +10,7 @@ use crate::game::{
     production::ProductionBuilding,
 };
 
-fn resource_name(resource: &String, resources: &ResourceSpecifications) -> String {
+fn resource_name(resource: &str, resources: &ResourceSpecifications) -> String {
     let resource = resources.get(resource).unwrap();
 
     if !resource.substitute.is_empty() {
