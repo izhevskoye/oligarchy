@@ -4,6 +4,8 @@ mod tests;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use crate::game::constants::CURRENCY;
+
 use super::assets::resource_specifications::ResourceSpecifications;
 
 const START_VALUE: i64 = 250000;
@@ -54,4 +56,12 @@ pub fn reset_account(mut account: ResMut<Account>) {
 
 pub trait PurchaseCost {
     fn price(&self, resources: &ResourceSpecifications) -> i64;
+
+    fn price_description(&self, resources: &ResourceSpecifications) -> String {
+        format!(
+            "Labor and material worth {} {}",
+            self.price(resources),
+            CURRENCY
+        )
+    }
 }

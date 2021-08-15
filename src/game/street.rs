@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::{
+use crate::game::{
     account::PurchaseCost,
     assets::{resource_specifications::ResourceSpecifications, Position, RequiresUpdate},
     constants::MapTile,

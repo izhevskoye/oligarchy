@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use bevy_egui::egui::Ui;
 use glob::glob;
 use serde::Deserialize;
@@ -6,12 +9,13 @@ use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 use crate::game::{
     account::PurchaseCost,
     assets::{resource_specifications::ResourceSpecifications, InfoUI},
+    constants::CURRENCY,
     production::Product,
 };
 
 pub type BuildingSpecifications = HashMap<String, BuildingSpecification>;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecificationCost {
     #[serde(default)]
@@ -19,7 +23,7 @@ pub struct BuildingSpecificationCost {
     pub base: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {
     pub name: String,
@@ -36,6 +40,27 @@ impl PurchaseCost for BuildingSpecification {
                 let resource = resources.get(r).unwrap();
                 acc + resource.cost * a
             })) as i64
+    }
+
+    fn price_description(&self, resources: &ResourceSpecifications) -> String {
+        let mut items = vec![];
+
+        if self.cost.base > f64::EPSILON {
+            items.push(format!("Labor worth {} {}", self.cost.base, CURRENCY));
+        }
+
+        for (resource, amount) in self.cost.resources.iter() {
+            let resource = resources.get(resource).unwrap();
+            items.push(format!(
+                "{} {} worth {} {}",
+                amount,
+                resource.name,
+                resource.cost * amount,
+                CURRENCY
+            ));
+        }
+
+        items.join("\n")
     }
 }
 
