@@ -7,6 +7,8 @@ use bevy_egui::egui::Ui;
 use rand::{prelude::SliceRandom, thread_rng};
 use serde::{Deserialize, Serialize};
 
+use crate::game::constants::UNIT;
+
 use super::{
     account::PurchaseCost,
     assets::{resource_specifications::ResourceSpecifications, InfoUI, Position, RequiresUpdate},
@@ -48,8 +50,8 @@ impl InfoUI for Storage {
             let resource = resources.get(&self.resource).unwrap();
 
             ui.label(format!(
-                "{} {:.2} / {:.2}",
-                resource.name, self.amount, self.capacity
+                "{} {:.2}{} / {:.2}{}",
+                resource.name, self.amount, UNIT, self.capacity, UNIT,
             ));
         });
     }

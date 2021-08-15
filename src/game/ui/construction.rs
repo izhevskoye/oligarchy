@@ -14,6 +14,7 @@ use crate::game::{
         SelectedTool, Tool,
     },
     car::Car,
+    constants::CURRENCY,
     production::{DeliveryStation, ExportStation},
     storage::Storage,
     street::Street,
@@ -27,15 +28,20 @@ fn button(
     account: &Account,
 ) -> Response {
     let price = item.price(&resources);
-    let name = format!("{} ({})", name, price.to_formatted_string(&Locale::en));
 
-    let mut button = ui.small_button(name);
+    let button = ui.small_button(name);
+
+    let mut hover_text = format!(
+        "Cost: {} {}",
+        price.to_formatted_string(&Locale::en),
+        CURRENCY
+    );
 
     if price >= account.value {
-        button = button.on_hover_text("You cannot afford this");
+        hover_text += " - You cannot afford it"
     }
 
-    button
+    button.on_hover_text(hover_text)
 }
 
 pub struct Filter(String);
@@ -68,6 +74,7 @@ pub fn construction_ui(
 
     egui::Window::new("Construction")
         .anchor(Align2::RIGHT_TOP, [-10.0, 10.0])
+        .default_width(150.0)
         .show(egui_context.ctx(), |ui| {
             ui.horizontal(|ui| {
                 ui.label("Filter");
@@ -79,7 +86,7 @@ pub fn construction_ui(
 
             ui.separator();
 
-            egui::Grid::new("items").show(ui, |ui| {
+            ui.vertical_centered_justified(|ui| {
                 if ui.small_button("None").clicked() {
                     selected_tool.tool = Tool::None;
                 }
@@ -100,37 +107,39 @@ pub fn construction_ui(
                 if !building_names.is_empty() {
                     let group_title = "Building: General";
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
-                        if filter.match_name("Street")
-                            && button(ui, "Street", &Street, &resources, &account).clicked()
-                        {
-                            selected_tool.tool = Tool::Street;
-                        }
+                        ui.vertical_centered_justified(|ui| {
+                            if filter.match_name("Street")
+                                && button(ui, "Street", &Street, &resources, &account).clicked()
+                            {
+                                selected_tool.tool = Tool::Street;
+                            }
 
-                        if filter.match_name("Export Station")
-                            && button(
-                                ui,
-                                "Export Station",
-                                &ExportStation::default(),
-                                &resources,
-                                &account,
-                            )
-                            .clicked()
-                        {
-                            selected_tool.tool = Tool::ExportStation;
-                        }
+                            if filter.match_name("Export Station")
+                                && button(
+                                    ui,
+                                    "Export Station",
+                                    &ExportStation::default(),
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
+                            {
+                                selected_tool.tool = Tool::ExportStation;
+                            }
 
-                        if filter.match_name("Delivery Station")
-                            && button(
-                                ui,
-                                "Delivery Station",
-                                &DeliveryStation,
-                                &resources,
-                                &account,
-                            )
-                            .clicked()
-                        {
-                            selected_tool.tool = Tool::DeliveryStation;
-                        }
+                            if filter.match_name("Delivery Station")
+                                && button(
+                                    ui,
+                                    "Delivery Station",
+                                    &DeliveryStation,
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
+                            {
+                                selected_tool.tool = Tool::DeliveryStation;
+                            }
+                        });
                     });
 
                     if open_groups {
@@ -168,13 +177,15 @@ pub fn construction_ui(
                         let group_title = format!("Building: {}", group);
 
                         let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
-                            for (id, building) in buildings.iter() {
-                                if button(ui, &building.name, *building, &resources, &account)
-                                    .clicked()
-                                {
-                                    selected_tool.tool = Tool::Building(id.to_string());
+                            ui.vertical_centered_justified(|ui| {
+                                for (id, building) in buildings.iter() {
+                                    if button(ui, &building.name, *building, &resources, &account)
+                                        .clicked()
+                                    {
+                                        selected_tool.tool = Tool::Building(id.to_string());
+                                    }
                                 }
-                            }
+                            });
                         });
 
                         if open_groups {
@@ -216,24 +227,26 @@ pub fn construction_ui(
                         let group_title = format!("Storage: {}", group);
 
                         let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
-                            for (id, resource) in resource_list.iter() {
-                                let name = format!("{} Storage", resource.name);
+                            ui.vertical_centered_justified(|ui| {
+                                for (id, resource) in resource_list.iter() {
+                                    let name = format!("{} Storage", resource.name);
 
-                                if button(
-                                    ui,
-                                    &name,
-                                    &Storage {
-                                        resource: id.to_string(),
-                                        ..Default::default()
-                                    },
-                                    &resources,
-                                    &account,
-                                )
-                                .clicked()
-                                {
-                                    selected_tool.tool = Tool::Storage(id.to_string());
+                                    if button(
+                                        ui,
+                                        &name,
+                                        &Storage {
+                                            resource: id.to_string(),
+                                            ..Default::default()
+                                        },
+                                        &resources,
+                                        &account,
+                                    )
+                                    .clicked()
+                                    {
+                                        selected_tool.tool = Tool::Storage(id.to_string());
+                                    }
                                 }
-                            }
+                            });
                         });
 
                         if open_groups {
@@ -262,27 +275,29 @@ pub fn construction_ui(
                         let group_title = format!("Transport: {}", group);
 
                         let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
-                            for (id, resource) in resource_list.iter() {
-                                let name = format!("{} Truck", resource.name);
+                            ui.vertical_centered_justified(|ui| {
+                                for (id, resource) in resource_list.iter() {
+                                    let name = format!("{} Truck", resource.name);
 
-                                if button(
-                                    ui,
-                                    &name,
-                                    &(
-                                        Car::default(),
-                                        Storage {
-                                            resource: id.to_string(),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    &resources,
-                                    &account,
-                                )
-                                .clicked()
-                                {
-                                    selected_tool.tool = Tool::Car(id.to_string());
+                                    if button(
+                                        ui,
+                                        &name,
+                                        &(
+                                            Car::default(),
+                                            Storage {
+                                                resource: id.to_string(),
+                                                ..Default::default()
+                                            },
+                                        ),
+                                        &resources,
+                                        &account,
+                                    )
+                                    .clicked()
+                                    {
+                                        selected_tool.tool = Tool::Car(id.to_string());
+                                    }
                                 }
-                            }
+                            });
                         });
 
                         if open_groups {

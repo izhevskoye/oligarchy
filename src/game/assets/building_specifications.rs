@@ -41,7 +41,7 @@ impl PurchaseCost for BuildingSpecification {
 
 impl InfoUI for BuildingSpecification {
     fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
-        ui.heading(&self.name);
+        ui.label(&self.name);
     }
 }
 

@@ -77,6 +77,10 @@ impl Game {
             .init_resource::<StateName>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
+            .insert_resource(WindowDescriptor {
+                title: "Oligarchy".to_owned(),
+                ..Default::default()
+            })
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -142,7 +146,6 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(UILabel::UIEnd)
-                    .with_system(ui::account::account_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))

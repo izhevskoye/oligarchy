@@ -14,6 +14,8 @@ pub const GOAL_UPDATE_TICK_SPEED: f64 = PRODUCTION_TICK_SPEED;
 pub const Z_CAR: f32 = 1.0;
 pub const Z_IDLE_INDICATOR: f32 = 1.5;
 pub const Z_SELECTION_INDICATOR: f32 = 2.0;
+pub const CURRENCY: &str = "RUB";
+pub const UNIT: &str = "t";
 
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
