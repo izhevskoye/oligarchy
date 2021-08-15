@@ -6,6 +6,7 @@ use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 use crate::game::{
     account::PurchaseCost,
     assets::{resource_specifications::ResourceSpecifications, InfoUI},
+    constants::CURRENCY,
     production::Product,
 };
 
@@ -36,6 +37,27 @@ impl PurchaseCost for BuildingSpecification {
                 let resource = resources.get(r).unwrap();
                 acc + resource.cost * a
             })) as i64
+    }
+
+    fn price_description(&self, resources: &ResourceSpecifications) -> String {
+        let mut items = vec![];
+
+        if self.cost.base > f64::EPSILON {
+            items.push(format!("Labor worth {} {}", self.cost.base, CURRENCY));
+        }
+
+        for (resource, amount) in self.cost.resources.iter() {
+            let resource = resources.get(resource).unwrap();
+            items.push(format!(
+                "{} {} worth {} {}",
+                amount,
+                resource.name,
+                resource.cost * amount,
+                CURRENCY
+            ));
+        }
+
+        items.join("\n")
     }
 }
 

@@ -32,13 +32,14 @@ fn button(
     let button = ui.small_button(name);
 
     let mut hover_text = format!(
-        "Cost: {} {}",
+        "{}\n---\nTotal Cost: {} {}",
+        item.price_description(&resources),
         price.to_formatted_string(&Locale::en),
         CURRENCY
     );
 
     if price >= account.value {
-        hover_text += " - You cannot afford it"
+        hover_text += "\nYou cannot afford it"
     }
 
     button.on_hover_text(hover_text)
