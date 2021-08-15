@@ -27,9 +27,16 @@ pub enum SubMenuState {
     SaveGameMenu,
 }
 
+pub enum ConfirmDialog {
+    DeleteFile(String),
+    ExitGame,
+    ExitProgram,
+}
+
 pub struct MenuState {
     pub sub_menu_state: SubMenuState,
     pub save_game_path: String,
+    pub confirm_dialog: Option<ConfirmDialog>,
 }
 
 impl Default for MenuState {
@@ -37,6 +44,7 @@ impl Default for MenuState {
         Self {
             sub_menu_state: SubMenuState::None,
             save_game_path: generate_save_game_path(),
+            confirm_dialog: None,
         }
     }
 }
@@ -109,6 +117,46 @@ pub fn save_ui(
     mut state_name: ResMut<StateName>,
     mut files: Local<Option<HashMap<String, String>>>,
 ) {
+    if let Some(confirm_dialog) = &state.confirm_dialog {
+        let mut close_confirm = false;
+
+        egui::Window::new("Game")
+            .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
+            .default_width(150.0)
+            .show(egui_context.ctx(), |ui| {
+                ui.label("Are you sure?");
+
+                ui.horizontal(|ui| {
+                    if ui.small_button("No").clicked() {
+                        close_confirm = true;
+                    }
+                    if ui.small_button("Yes").clicked() {
+                        close_confirm = true;
+
+                        match confirm_dialog {
+                            ConfirmDialog::DeleteFile(file_name) => {
+                                let _ = remove_file(&file_name);
+                            }
+                            ConfirmDialog::ExitGame => {
+                                if let AppState::InGame = app_state.current() {
+                                    let _ = app_state.pop();
+                                }
+                            }
+                            ConfirmDialog::ExitProgram => {
+                                std::process::exit(0);
+                            }
+                        }
+                    }
+                });
+            });
+
+        if close_confirm {
+            state.confirm_dialog = None;
+        } else {
+            return;
+        }
+    }
+
     if SubMenuState::None == state.sub_menu_state {
         let (align, offset, width) = match app_state.current() {
             AppState::InGame => (Align2::RIGHT_BOTTOM, [-10.0, -10.0], 50.0),
@@ -130,7 +178,7 @@ pub fn save_ui(
                         }
 
                         if ui.button("Exit Game").clicked() {
-                            std::process::exit(0);
+                            state.confirm_dialog = Some(ConfirmDialog::ExitProgram);
                         }
                     }
 
@@ -140,9 +188,7 @@ pub fn save_ui(
                         }
 
                         if ui.button("Back to Menu").clicked() {
-                            if let AppState::InGame = app_state.current() {
-                                let _ = app_state.pop();
-                            }
+                            state.confirm_dialog = Some(ConfirmDialog::ExitGame);
                         }
                     }
                 });
@@ -233,7 +279,8 @@ pub fn save_ui(
                             }
 
                             if ui.button("Delete").clicked() {
-                                let _ = remove_file(&file_name);
+                                state.confirm_dialog =
+                                    Some(ConfirmDialog::DeleteFile(file_name.to_owned()));
                                 invalidate_files = true;
                             }
 
