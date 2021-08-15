@@ -89,129 +89,147 @@ pub fn program_ui(
                     }
                 }
 
-                egui::Window::new("Instruction").show(egui_context.ctx(), |ui| {
-                    ui.heading(format!("Current: {}", instruction.format(&resources)));
+                egui::Window::new("Instruction").default_width(100.0).show(
+                    egui_context.ctx(),
+                    |ui| {
+                        ui.heading(format!("Current: {}", instruction.format(&resources)));
 
-                    if ui.button("Idle").clicked() {
-                        car.instructions[selected_index] = CarInstructions::Nop;
-                        currently_selected.locked = false;
-                        edit_instruction.confirm_selection();
-                    }
-
-                    if ui.button("Unload").clicked() {
-                        if let Some(resource) = &edit_instruction.resource {
-                            car.instructions[selected_index] =
-                                CarInstructions::Unload(resource.clone());
-                            currently_selected.locked = false;
-                            edit_instruction.confirm_selection();
-                        }
-                    }
-
-                    if ui.button("Wait For Unload").clicked() {
-                        if let Some(resource) = &edit_instruction.resource {
-                            car.instructions[selected_index] =
-                                CarInstructions::WaitForUnload(resource.clone());
-                            currently_selected.locked = false;
-                            edit_instruction.confirm_selection();
-                        }
-                    }
-
-                    if ui.button("Load").clicked() {
-                        if let Some(resource) = &edit_instruction.resource {
-                            car.instructions[selected_index] =
-                                CarInstructions::Load(resource.clone());
-                            currently_selected.locked = false;
-                            edit_instruction.confirm_selection();
-                        }
-                    }
-
-                    if ui.button("Wait for Load").clicked() {
-                        if let Some(resource) = &edit_instruction.resource {
-                            car.instructions[selected_index] =
-                                CarInstructions::WaitForLoad(resource.clone());
-                            currently_selected.locked = false;
-                            edit_instruction.confirm_selection();
-                        }
-                    }
-
-                    if ui.button("Go to").clicked() {
-                        edit_instruction.select_mode = true;
-                        currently_selected.locked = true;
-                    }
-
-                    egui::CollapsingHeader::new("Load / Unload Resource Configuration").show(
-                        ui,
-                        |ui| {
-                            for (id, resource) in resources.iter() {
-                                ui.radio_value(
-                                    &mut edit_instruction.resource,
-                                    Some(id.to_owned()),
-                                    resource.name.clone(),
-                                );
+                        ui.vertical_centered_justified(|ui| {
+                            if ui.button("Idle").clicked() {
+                                car.instructions[selected_index] = CarInstructions::Nop;
+                                currently_selected.locked = false;
+                                edit_instruction.confirm_selection();
                             }
-                        },
-                    );
 
-                    if ui.button("Abort").clicked() {
-                        edit_instruction.confirm_selection();
-                        currently_selected.locked = false;
-                    }
-                });
+                            if ui.button("Unload").clicked() {
+                                if let Some(resource) = &edit_instruction.resource {
+                                    car.instructions[selected_index] =
+                                        CarInstructions::Unload(resource.clone());
+                                    currently_selected.locked = false;
+                                    edit_instruction.confirm_selection();
+                                }
+                            }
+
+                            if ui.button("Wait For Unload").clicked() {
+                                if let Some(resource) = &edit_instruction.resource {
+                                    car.instructions[selected_index] =
+                                        CarInstructions::WaitForUnload(resource.clone());
+                                    currently_selected.locked = false;
+                                    edit_instruction.confirm_selection();
+                                }
+                            }
+
+                            if ui.button("Load").clicked() {
+                                if let Some(resource) = &edit_instruction.resource {
+                                    car.instructions[selected_index] =
+                                        CarInstructions::Load(resource.clone());
+                                    currently_selected.locked = false;
+                                    edit_instruction.confirm_selection();
+                                }
+                            }
+
+                            if ui.button("Wait for Load").clicked() {
+                                if let Some(resource) = &edit_instruction.resource {
+                                    car.instructions[selected_index] =
+                                        CarInstructions::WaitForLoad(resource.clone());
+                                    currently_selected.locked = false;
+                                    edit_instruction.confirm_selection();
+                                }
+                            }
+
+                            if ui.button("Go to").clicked() {
+                                edit_instruction.select_mode = true;
+                                currently_selected.locked = true;
+                            }
+                        });
+
+                        egui::CollapsingHeader::new("Load / Unload Resource Configuration").show(
+                            ui,
+                            |ui| {
+                                egui::containers::ScrollArea::from_max_height(200.0).show(
+                                    ui,
+                                    |ui| {
+                                    ui.label("Please note this is more for debugging as cars cannot load anything other than what they are designed to load!");
+                                        for (id, resource) in resources.iter() {
+                                            ui.radio_value(
+                                                &mut edit_instruction.resource,
+                                                Some(id.to_owned()),
+                                                resource.name.clone(),
+                                            );
+                                        }
+                                    },
+                                );
+                            },
+                        );
+
+                        if ui.button("Abort").clicked() {
+                            edit_instruction.confirm_selection();
+                            currently_selected.locked = false;
+                        }
+                    },
+                );
             }
 
-            egui::Window::new("Instructions").show(egui_context.ctx(), |ui| {
-                ui.horizontal(|ui| {
-                    if car.active {
-                        if ui.button("Deactivate").clicked() {
-                            car.active = false;
-                        }
-                    } else if ui.button("Activate").clicked() {
-                        car.active = true;
-                    }
-                });
-
-                ui.horizontal(|ui| {
-                    if ui.button("Clone instructions").clicked() {
-                        edit_instruction.select_mode = !edit_instruction.select_mode;
-                        edit_instruction.index = None;
-                        currently_selected.locked = true;
-                    }
-                });
-
-                let instructions = car.instructions.clone();
-                for (index, instruction) in instructions.iter().enumerate() {
+            egui::Window::new("Instructions")
+                .default_width(100.0)
+                .show(egui_context.ctx(), |ui| {
                     ui.horizontal(|ui| {
-                        ui.label(instruction.format(&resources));
-                        if ui.button("Edit").clicked() {
-                            edit_instruction.select_mode = false;
-                            edit_instruction.index = Some(index);
-                            currently_selected.locked = false;
+                        if car.active {
+                            if ui.button("Deactivate").clicked() {
+                                car.active = false;
+                            }
+                        } else if ui.button("Activate").clicked() {
+                            car.active = true;
                         }
 
-                        if ui.button("Delete").clicked() {
-                            car.instructions.remove(index);
+                        if ui.button("Clone instructions").clicked() {
+                            edit_instruction.select_mode = !edit_instruction.select_mode;
                             edit_instruction.index = None;
-                            edit_instruction.select_mode = false;
-                            currently_selected.locked = false;
-
-                            if car.current_instruction > car.instructions.len() {
-                                car.current_instruction = 0;
-                            }
-
-                            if car.instructions.is_empty() {
-                                car.instructions.push(CarInstructions::Nop);
-                            }
+                            currently_selected.locked = true;
                         }
                     });
-                }
 
-                if ui.button("[Add new]").clicked() {
-                    car.instructions.push(CarInstructions::Nop);
-                    edit_instruction.index = Some(car.instructions.len() - 1);
-                    edit_instruction.select_mode = false;
-                    currently_selected.locked = false;
-                }
-            });
+                    ui.separator();
+
+                    let instructions = car.instructions.clone();
+                    egui::Grid::new("instructions").show(ui, |ui| {
+                        for (index, instruction) in instructions.iter().enumerate() {
+                            ui.label(instruction.format(&resources));
+                            if ui.button("Edit").clicked() {
+                                edit_instruction.select_mode = false;
+                                edit_instruction.index = Some(index);
+                                currently_selected.locked = false;
+                            }
+
+                            if ui.button("Delete").clicked() {
+                                car.instructions.remove(index);
+                                edit_instruction.index = None;
+                                edit_instruction.select_mode = false;
+                                currently_selected.locked = false;
+
+                                if car.current_instruction > car.instructions.len() {
+                                    car.current_instruction = 0;
+                                }
+
+                                if car.instructions.is_empty() {
+                                    car.instructions.push(CarInstructions::Nop);
+                                }
+                            }
+                            ui.end_row();
+                        }
+                    });
+
+                    ui.separator();
+
+                    ui.vertical_centered_justified(|ui| {
+                        if ui.button("[Add new]").clicked() {
+                            car.instructions.push(CarInstructions::Nop);
+                            edit_instruction.index = Some(car.instructions.len() - 1);
+                            edit_instruction.select_mode = false;
+                            currently_selected.locked = false;
+                        }
+                    });
+                });
         }
     }
 
