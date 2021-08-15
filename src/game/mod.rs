@@ -77,6 +77,10 @@ impl Game {
             .init_resource::<StateName>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
+            .insert_resource(WindowDescriptor {
+                title: "Oligarchy".to_owned(),
+                ..Default::default()
+            })
             .add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
