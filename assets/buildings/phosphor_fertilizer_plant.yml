@@ -10,7 +10,7 @@
   group: Chemical
   cost:
     resources:
-      steel.blooms: 15
-      steel.slabs: 20
-      steel.billets: 10
-    base: 700
+      steel.blooms: 25
+      steel.slabs: 10
+      steel.billets: 15
+    base: 350

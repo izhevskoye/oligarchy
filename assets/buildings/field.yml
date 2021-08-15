@@ -15,6 +15,13 @@
         - resource: fertilizer
           rate: 0.15
           modifier: 3.0
+
+    - resource: rye
+      rate: 0.75
+      enhancers:
+        - resource: fertilizer
+          rate: 0.15
+          modifier: 3.0
   group: Agriculture
   cost:
     base: 1500

@@ -71,3 +71,21 @@
   car_tile:
     horizontal: 252
     vertical: 220
+
+"rye":
+  name: Rye
+  storage_tile: 74
+  group: Agriculture
+  car_tile:
+    horizontal: 253
+    vertical: 221
+  cost: 5
+
+"vodka":
+  name: Vodka
+  storage_tile: 76
+  group: Agriculture
+  car_tile:
+    horizontal: 346
+    vertical: 378
+  cost: 27

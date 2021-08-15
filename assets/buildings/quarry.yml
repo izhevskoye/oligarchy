@@ -10,7 +10,7 @@
       steel.blooms: 25
       steel.slabs: 5
       steel.billets: 25
-    base: 5000
+    base: 4000
 
 "quarry.iron_ore":
   name: Iron Ore Quarry
@@ -24,7 +24,7 @@
       steel.blooms: 25
       steel.slabs: 5
       steel.billets: 25
-    base: 5000
+    base: 4000
 
 "quarry.limestone":
   name: Limestone Quarry
@@ -38,7 +38,7 @@
       steel.blooms: 25
       steel.slabs: 5
       steel.billets: 25
-    base: 5000
+    base: 3000
 
 "quarry.phosphor":
   name: Phosphor Quarry
@@ -52,7 +52,7 @@
       steel.blooms: 25
       steel.slabs: 5
       steel.billets: 25
-    base: 5000
+    base: 3500
 
 "quarry.sulfur":
   name: Sulfur Quarry
@@ -66,4 +66,4 @@
       steel.blooms: 25
       steel.slabs: 5
       steel.billets: 25
-    base: 5000
+    base: 4000

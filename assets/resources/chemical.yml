@@ -3,8 +3,8 @@
   storage_tile: 69
   group: Chemical
   car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 347
+    vertical: 379
   cost: 5
 
 "sulfur.acid":
@@ -12,8 +12,8 @@
   storage_tile: 70
   group: Chemical
   car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 348
+    vertical: 380
   cost: 14
 
 "phosphor":
@@ -21,8 +21,8 @@
   storage_tile: 72
   group: Chemical
   car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 346
+    vertical: 378
   cost: 5
 
 "phosphoric_acid":
@@ -30,8 +30,8 @@
   storage_tile: 71
   group: Chemical
   car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 349
+    vertical: 381
   cost: 20
 
 "phosphoric_fertilizer":
@@ -39,6 +39,6 @@
   storage_tile: 73
   group: Agriculture
   car_tile:
-    horizontal: 115
-    vertical: 116
+    horizontal: 346
+    vertical: 378
   cost: 28

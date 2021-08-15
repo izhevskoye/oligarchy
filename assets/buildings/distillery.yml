@@ -1,0 +1,22 @@
+"Distillery":
+  name: Distillery
+  tile: 75
+  products:
+    - resource: vodka
+      rate: 1
+      requisites:
+        - resource: rye
+          rate: 3
+
+    - resource: vodka
+      rate: 1
+      requisites:
+        - resource: wheat
+          rate: 4
+  group: Agriculture
+  cost:
+    resources:
+      steel.blooms: 10
+      steel.slabs: 12
+      steel.billets: 40
+    base: 600
