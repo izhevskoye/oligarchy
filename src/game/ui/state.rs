@@ -109,35 +109,45 @@ pub fn save_ui(
     mut state_name: ResMut<StateName>,
     mut files: Local<Option<HashMap<String, String>>>,
 ) {
-    egui::Window::new("Game")
-        .anchor(Align2::RIGHT_BOTTOM, [-10.0, -10.0])
-        .show(egui_context.ctx(), |ui| {
-            if let AppState::MainMenu = app_state.current() {
-                if ui.button("new").clicked() {
-                    state.sub_menu_state = SubMenuState::NewGameMenu;
-                }
+    if SubMenuState::None == state.sub_menu_state {
+        let (align, offset, width) = match app_state.current() {
+            AppState::InGame => (Align2::RIGHT_BOTTOM, [-10.0, -10.0], 50.0),
+            _ => (Align2::CENTER_CENTER, [0.0, 0.0], 100.0),
+        };
 
-                if ui.button("load").clicked() {
-                    state.sub_menu_state = SubMenuState::LoadGameMenu;
-                }
+        egui::Window::new("Game")
+            .anchor(align, offset)
+            .default_width(width)
+            .show(egui_context.ctx(), |ui| {
+                ui.vertical_centered_justified(|ui| {
+                    if let AppState::MainMenu = app_state.current() {
+                        if ui.button("New Game").clicked() {
+                            state.sub_menu_state = SubMenuState::NewGameMenu;
+                        }
 
-                if ui.button("exit").clicked() {
-                    std::process::exit(0);
-                }
-            }
+                        if ui.button("Load Game").clicked() {
+                            state.sub_menu_state = SubMenuState::LoadGameMenu;
+                        }
 
-            if let AppState::InGame = app_state.current() {
-                if ui.button("save").clicked() {
-                    state.sub_menu_state = SubMenuState::SaveGameMenu;
-                }
-
-                if ui.button("exit").clicked() {
-                    if let AppState::InGame = app_state.current() {
-                        let _ = app_state.pop();
+                        if ui.button("Exit Game").clicked() {
+                            std::process::exit(0);
+                        }
                     }
-                }
-            }
-        });
+
+                    if let AppState::InGame = app_state.current() {
+                        if ui.button("Save Game").clicked() {
+                            state.sub_menu_state = SubMenuState::SaveGameMenu;
+                        }
+
+                        if ui.button("Back to Menu").clicked() {
+                            if let AppState::InGame = app_state.current() {
+                                let _ = app_state.pop();
+                            }
+                        }
+                    }
+                });
+            });
+    }
 
     if SubMenuState::LoadGameMenu == state.sub_menu_state
         || SubMenuState::SaveGameMenu == state.sub_menu_state
@@ -181,24 +191,28 @@ pub fn save_ui(
                         ui.text_edit_singleline(&mut state_name.name);
                     });
 
-                    if ui.button("New Save").clicked() {
-                        let file_name = format!(
-                            "{}/{}.yml",
-                            state.save_game_path,
-                            Uuid::new_v4().to_string()
-                        );
+                    ui.separator();
 
-                        if !state_name.name.is_empty() {
-                            save_game.send(SaveGameEvent { file_name });
-                            state.sub_menu_state = SubMenuState::None;
-                            invalidate_files = true;
+                    ui.vertical_centered_justified(|ui| {
+                        if ui.button("New Save").clicked() {
+                            let file_name = format!(
+                                "{}/{}.yml",
+                                state.save_game_path,
+                                Uuid::new_v4().to_string()
+                            );
+
+                            if !state_name.name.is_empty() {
+                                save_game.send(SaveGameEvent { file_name });
+                                state.sub_menu_state = SubMenuState::None;
+                                invalidate_files = true;
+                            }
                         }
-                    }
+                    });
                 }
 
-                if let Some(list) = files.as_ref() {
-                    for (name, file_name) in list {
-                        ui.horizontal(|ui| {
+                egui::Grid::new("file list").show(ui, |ui| {
+                    if let Some(list) = files.as_ref() {
+                        for (name, file_name) in list {
                             ui.label(name);
 
                             if ui.button(&button_title).clicked() {
@@ -222,9 +236,13 @@ pub fn save_ui(
                                 let _ = remove_file(&file_name);
                                 invalidate_files = true;
                             }
-                        });
+
+                            ui.end_row();
+                        }
                     }
-                }
+                });
+
+                ui.separator();
 
                 if ui.button("Abort").clicked() {
                     state.sub_menu_state = SubMenuState::None;
@@ -238,44 +256,49 @@ pub fn save_ui(
 
     if SubMenuState::NewGameMenu == state.sub_menu_state {
         egui::Window::new("New Game")
+            .default_width(100.0)
             .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
             .show(egui_context.ctx(), |ui| {
-                if ui.button("small").clicked() {
-                    commands.insert_resource(MapSettings {
-                        width: 3,
-                        height: 3,
-                        size: MapSize::Small,
-                    });
+                ui.vertical_centered_justified(|ui| {
+                    if ui.button("Size: Small").clicked() {
+                        commands.insert_resource(MapSettings {
+                            width: 3,
+                            height: 3,
+                            size: MapSize::Small,
+                        });
 
-                    app_state.push(AppState::InGame).unwrap();
-                    state.sub_menu_state = SubMenuState::None;
-                }
+                        app_state.push(AppState::InGame).unwrap();
+                        state.sub_menu_state = SubMenuState::None;
+                    }
 
-                if ui.button("medium").clicked() {
-                    commands.insert_resource(MapSettings {
-                        width: 5,
-                        height: 5,
-                        size: MapSize::Medium,
-                    });
+                    if ui.button("Size: Medium").clicked() {
+                        commands.insert_resource(MapSettings {
+                            width: 5,
+                            height: 5,
+                            size: MapSize::Medium,
+                        });
 
-                    app_state.push(AppState::InGame).unwrap();
-                    state.sub_menu_state = SubMenuState::None;
-                }
+                        app_state.push(AppState::InGame).unwrap();
+                        state.sub_menu_state = SubMenuState::None;
+                    }
 
-                if ui.button("large").clicked() {
-                    commands.insert_resource(MapSettings {
-                        width: 8,
-                        height: 8,
-                        size: MapSize::Large,
-                    });
+                    if ui.button("Size Large").clicked() {
+                        commands.insert_resource(MapSettings {
+                            width: 8,
+                            height: 8,
+                            size: MapSize::Large,
+                        });
 
-                    app_state.push(AppState::InGame).unwrap();
-                    state.sub_menu_state = SubMenuState::None;
-                }
+                        app_state.push(AppState::InGame).unwrap();
+                        state.sub_menu_state = SubMenuState::None;
+                    }
 
-                if ui.button("Abort").clicked() {
-                    state.sub_menu_state = SubMenuState::None;
-                }
+                    ui.separator();
+
+                    if ui.button("Abort").clicked() {
+                        state.sub_menu_state = SubMenuState::None;
+                    }
+                });
             });
     }
 }
