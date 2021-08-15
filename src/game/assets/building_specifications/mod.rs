@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use bevy_egui::egui::Ui;
 use glob::glob;
 use serde::Deserialize;
@@ -12,7 +15,7 @@ use crate::game::{
 
 pub type BuildingSpecifications = HashMap<String, BuildingSpecification>;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecificationCost {
     #[serde(default)]
@@ -20,7 +23,7 @@ pub struct BuildingSpecificationCost {
     pub base: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct BuildingSpecification {
     pub name: String,
