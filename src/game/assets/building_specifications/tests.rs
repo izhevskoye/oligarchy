@@ -53,7 +53,7 @@ fn purchase_cost() {
 
     let mut parts = specification
         .price_description(&resources)
-        .split("\n")
+        .split('\n')
         .map(|s| s.to_owned())
         .collect::<Vec<String>>();
 
