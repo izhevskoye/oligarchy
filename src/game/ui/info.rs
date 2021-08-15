@@ -62,9 +62,9 @@ pub fn info_ui(
 
                     if queries.1.get(entity).is_ok() {
                         let label = if currently_selected.editing {
-                            "close edit"
+                            "Edit (Close)"
                         } else {
-                            "edit"
+                            "Edit"
                         };
                         if ui.button(label).clicked() {
                             currently_selected.editing = !currently_selected.editing;
@@ -72,11 +72,11 @@ pub fn info_ui(
                     }
 
                     let label = if currently_selected.renaming {
-                        "close rename"
+                        "Rename (Close)"
                     } else if queries.2.get(entity).is_err() {
-                        "give name"
+                        "Give Name"
                     } else {
-                        "rename"
+                        "Rename"
                     };
                     if ui.button(label).clicked() {
                         currently_selected.renaming = !currently_selected.renaming;

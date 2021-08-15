@@ -256,38 +256,42 @@ pub fn save_ui(
                     });
                 }
 
-                egui::Grid::new("file list").show(ui, |ui| {
-                    if let Some(list) = files.as_ref() {
-                        for (name, file_name) in list {
-                            ui.label(name);
+                if let Some(list) = files.as_ref() {
+                    if list.is_empty() {
+                        ui.label("No save games yet");
+                    } else {
+                        egui::Grid::new("file list").show(ui, |ui| {
+                            for (name, file_name) in list {
+                                ui.label(name);
 
-                            if ui.button(&button_title).clicked() {
-                                if SubMenuState::LoadGameMenu == state.sub_menu_state {
-                                    app_state.push(AppState::InGame).unwrap();
-                                    emit_load_game(&mut commands, &mut load_game, &file_name);
+                                if ui.button(&button_title).clicked() {
+                                    if SubMenuState::LoadGameMenu == state.sub_menu_state {
+                                        app_state.push(AppState::InGame).unwrap();
+                                        emit_load_game(&mut commands, &mut load_game, &file_name);
+                                    }
+                                    if SubMenuState::SaveGameMenu == state.sub_menu_state
+                                        && !state_name.name.is_empty()
+                                    {
+                                        save_game.send(SaveGameEvent {
+                                            file_name: file_name.to_owned(),
+                                        });
+                                        invalidate_files = true;
+                                    }
+
+                                    state.sub_menu_state = SubMenuState::None;
                                 }
-                                if SubMenuState::SaveGameMenu == state.sub_menu_state
-                                    && !state_name.name.is_empty()
-                                {
-                                    save_game.send(SaveGameEvent {
-                                        file_name: file_name.to_owned(),
-                                    });
+
+                                if ui.button("Delete").clicked() {
+                                    state.confirm_dialog =
+                                        Some(ConfirmDialog::DeleteFile(file_name.to_owned()));
                                     invalidate_files = true;
                                 }
 
-                                state.sub_menu_state = SubMenuState::None;
+                                ui.end_row();
                             }
-
-                            if ui.button("Delete").clicked() {
-                                state.confirm_dialog =
-                                    Some(ConfirmDialog::DeleteFile(file_name.to_owned()));
-                                invalidate_files = true;
-                            }
-
-                            ui.end_row();
-                        }
+                        });
                     }
-                });
+                }
 
                 ui.separator();
 

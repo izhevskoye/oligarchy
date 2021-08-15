@@ -6,6 +6,7 @@ use crate::game::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building,
     },
+    constants::UNIT,
     current_selection::CurrentlySelected,
     production::ProductionBuilding,
 };
@@ -43,24 +44,24 @@ pub fn edit_ui(
 
     if let Some(entity) = currently_selected.entity {
         if let Ok((mut production, building)) = building_query.get_mut(entity) {
-            egui::Window::new("ProductionBuilding").show(egui_context.ctx(), |ui| {
-                let building = buildings.get(&building.id).unwrap();
-                ui.heading(&building.name);
+            let building = buildings.get(&building.id).unwrap();
 
+            egui::Window::new(&building.name).show(egui_context.ctx(), |ui| {
                 for (product, active) in &mut production.products {
                     let resource = resources.get(&product.resource).unwrap();
 
                     ui.checkbox(
                         active,
-                        format!("Produce {} {}", product.rate, resource.name),
+                        format!("Produce {}{} {}", product.rate, UNIT, resource.name),
                     );
 
                     if !product.byproducts.is_empty() {
                         ui.label("It will also optionally produce:");
                         for byproduct in product.byproducts.iter() {
                             ui.label(format!(
-                                "{} {}",
+                                "{}{} {}",
                                 byproduct.rate,
+                                UNIT,
                                 resource_name(&byproduct.resource, &resources)
                             ));
                         }
@@ -70,8 +71,9 @@ pub fn edit_ui(
                         ui.label("This will consume:");
                         for requisite in product.requisites.iter() {
                             ui.label(format!(
-                                "{} {}",
+                                "{}{} {}",
                                 requisite.rate,
+                                UNIT,
                                 resource_name(&requisite.resource, &resources)
                             ));
                         }
@@ -81,8 +83,9 @@ pub fn edit_ui(
                         ui.label("If the following is provided, it increases output:");
                         for enhancer in product.enhancers.iter() {
                             ui.label(format!(
-                                "{} {} by {}x",
+                                "{}{} {} by {}x",
                                 enhancer.rate,
+                                UNIT,
                                 resource_name(&enhancer.resource, &resources),
                                 enhancer.modifier,
                             ));

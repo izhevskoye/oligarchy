@@ -142,7 +142,6 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(UILabel::UIEnd)
-                    .with_system(ui::account::account_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))

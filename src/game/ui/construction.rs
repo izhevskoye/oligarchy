@@ -14,6 +14,7 @@ use crate::game::{
         SelectedTool, Tool,
     },
     car::Car,
+    constants::CURRENCY,
     production::{DeliveryStation, ExportStation},
     storage::Storage,
     street::Street,
@@ -27,15 +28,20 @@ fn button(
     account: &Account,
 ) -> Response {
     let price = item.price(&resources);
-    let name = format!("{} ({})", name, price.to_formatted_string(&Locale::en));
 
-    let mut button = ui.small_button(name);
+    let button = ui.small_button(name);
+
+    let mut hover_text = format!(
+        "Cost: {} {}",
+        price.to_formatted_string(&Locale::en),
+        CURRENCY
+    );
 
     if price >= account.value {
-        button = button.on_hover_text("You cannot afford this");
+        hover_text += " - You cannot afford it"
     }
 
-    button
+    button.on_hover_text(hover_text)
 }
 
 pub struct Filter(String);
