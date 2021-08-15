@@ -72,6 +72,9 @@ pub fn construction_ui(
             ui.horizontal(|ui| {
                 ui.label("Filter");
                 ui.text_edit_singleline(&mut filter.0);
+                if ui.small_button("X").clicked() {
+                    filter.0 = "".to_owned();
+                }
             });
 
             ui.separator();
