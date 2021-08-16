@@ -4,6 +4,7 @@ mod assets;
 mod camera;
 mod car;
 mod constants;
+mod construction;
 mod current_selection;
 mod current_tool;
 mod goals;
@@ -231,7 +232,8 @@ impl Game {
                     .with_system(street::update_streets.system())
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::spawn_car.system())
-                    .with_system(car::update_car.system()),
+                    .with_system(car::update_car.system())
+                    .with_system(construction::construction.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)

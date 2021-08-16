@@ -8,20 +8,21 @@ use crate::game::{
         RequiresUpdate,
     },
     constants::MapTile,
+    construction::UnderConstruction,
     production::{DeliveryStation, ExportStation},
     setup::{GROUND_LAYER_ID, MAP_ID},
     storage::Storage,
 };
 
 pub fn building_update(
-    mut query: Query<(&mut Tile, &Building), With<RequiresUpdate>>,
+    mut query: Query<(&mut Tile, &Building, Option<&UnderConstruction>), With<RequiresUpdate>>,
     buildings: Res<BuildingSpecifications>,
 ) {
-    for (mut tile, building) in query.iter_mut() {
+    for (mut tile, building, construction) in query.iter_mut() {
         let building = buildings.get(&building.id).unwrap();
 
         tile.texture_index = building.tile;
-        tile.visible = true;
+        tile.visible = construction.is_none();
     }
 }
 
