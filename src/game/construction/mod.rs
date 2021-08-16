@@ -40,7 +40,9 @@ impl InfoUI for UnderConstruction {
     fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.label("Under construction.");
 
-        ui.label("Remaining:");
+        if self.labor > f64::EPSILON || self.resources_needed.len() > 0 {
+            ui.label("Remaining:");
+        }
 
         if self.labor > f64::EPSILON {
             ui.label(format!("Labor worth {} {}", self.labor, CURRENCY));
