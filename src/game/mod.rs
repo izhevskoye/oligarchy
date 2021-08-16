@@ -206,7 +206,8 @@ impl Game {
                             .system()
                             .label(IdleLabel::SpawnIdle),
                     )
-                    .with_system(account::maintenance_cost.system()),
+                    .with_system(account::maintenance_cost.system())
+                    .with_system(construction::construction.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
@@ -224,6 +225,7 @@ impl Game {
                 SystemSet::on_update(AppState::InGame)
                     .label(Label::Update)
                     .before(Label::UpdateEnd)
+                    .with_system(asset_tiles::construction_update.system())
                     .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::export_station_update.system())
@@ -232,8 +234,7 @@ impl Game {
                     .with_system(street::update_streets.system())
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::spawn_car.system())
-                    .with_system(car::update_car.system())
-                    .with_system(construction::construction.system()),
+                    .with_system(car::update_car.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)

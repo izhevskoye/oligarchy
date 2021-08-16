@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
+    account::{MaintenanceCost, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, ClickedTile, Occupied, Position,
         RequiresUpdate, SelectedTool, Tool,
     },
+    construction::UnderConstruction,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{Storage, StorageConsolidator},
 };
@@ -21,8 +22,6 @@ pub fn storage_placement(
     consolidator_query: Query<Entity, With<StorageConsolidator>>,
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
-    mut events: EventWriter<AccountTransaction>,
-    account: Res<Account>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -39,11 +38,6 @@ pub fn storage_placement(
                 };
 
                 let price = storage.price(&resources);
-                if account.value < price {
-                    return;
-                }
-
-                events.send(AccountTransaction { amount: -price });
 
                 commands
                     .entity(entity)
@@ -51,6 +45,7 @@ pub fn storage_placement(
                     .insert(RequiresUpdate)
                     .insert(Position { position: pos })
                     .insert(MaintenanceCost::new_from_cost(price))
+                    .insert(UnderConstruction::from_fixed_cost(price))
                     .insert(Occupied);
 
                 let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);

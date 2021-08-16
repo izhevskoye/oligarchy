@@ -54,6 +54,8 @@ pub enum MapTile {
     StreetEastEnd,
     StreetWestEnd,
     DeliveryStation = 77,
+    Construction = 80,
+    ConstructionStreet,
 }
 
 #[derive(FromPrimitive, ToPrimitive)]

@@ -12,22 +12,37 @@ use crate::game::{
     production::{DeliveryStation, ExportStation},
     setup::{GROUND_LAYER_ID, MAP_ID},
     storage::Storage,
+    street::Street,
 };
 
+pub fn construction_update(
+    mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,
+) {
+    for (mut tile, street) in query.iter_mut() {
+        tile.texture_index = if street.is_none() {
+            MapTile::Construction as u16
+        } else {
+            MapTile::ConstructionStreet as u16
+        };
+        tile.visible = true;
+    }
+}
+
 pub fn building_update(
-    mut query: Query<(&mut Tile, &Building, Option<&UnderConstruction>), With<RequiresUpdate>>,
+    mut query: Query<(&mut Tile, &Building), (With<RequiresUpdate>, Without<UnderConstruction>)>,
     buildings: Res<BuildingSpecifications>,
 ) {
-    for (mut tile, building, construction) in query.iter_mut() {
-        let building = buildings.get(&building.id).unwrap();
-
-        tile.texture_index = building.tile;
-        tile.visible = construction.is_none();
+    for (mut tile, building) in query.iter_mut() {
+        tile.texture_index = {
+            let building = buildings.get(&building.id).unwrap();
+            building.tile
+        };
+        tile.visible = true;
     }
 }
 
 pub fn storage_update(
-    mut query: Query<(&mut Tile, &Storage), With<RequiresUpdate>>,
+    mut query: Query<(&mut Tile, &Storage), (With<RequiresUpdate>, Without<UnderConstruction>)>,
     resources: Res<ResourceSpecifications>,
 ) {
     for (mut tile, storage) in query.iter_mut() {
@@ -41,7 +56,13 @@ pub fn storage_update(
 }
 
 pub fn export_station_update(
-    mut query: Query<&mut Tile, (With<ExportStation>, With<RequiresUpdate>)>,
+    mut query: Query<
+        &mut Tile,
+        (
+            With<ExportStation>,
+            (With<RequiresUpdate>, Without<UnderConstruction>),
+        ),
+    >,
 ) {
     for mut tile in query.iter_mut() {
         tile.texture_index = MapTile::ExportStation as u16;
@@ -50,7 +71,14 @@ pub fn export_station_update(
 }
 
 pub fn delivery_station_update(
-    mut query: Query<&mut Tile, (With<DeliveryStation>, With<RequiresUpdate>)>,
+    mut query: Query<
+        &mut Tile,
+        (
+            With<DeliveryStation>,
+            With<RequiresUpdate>,
+            Without<UnderConstruction>,
+        ),
+    >,
 ) {
     for mut tile in query.iter_mut() {
         tile.texture_index = MapTile::DeliveryStation as u16;
@@ -59,7 +87,14 @@ pub fn delivery_station_update(
 }
 
 pub fn ground_update(
-    query: Query<&Position, (With<Occupied>, With<RequiresUpdate>)>,
+    query: Query<
+        &Position,
+        (
+            With<Occupied>,
+            With<RequiresUpdate>,
+            Without<UnderConstruction>,
+        ),
+    >,
     mut tile_query: Query<&mut Tile>,
     mut map_query: MapQuery,
 ) {
