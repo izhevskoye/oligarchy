@@ -71,7 +71,7 @@ fn drains_money() {
 
     let construction = setup.world.get::<UnderConstruction>(entity).unwrap();
 
-    assert_eq!(construction.labor, 1000.0);
+    assert_eq!(construction.labor as i64, 1000);
 }
 
 #[test]
