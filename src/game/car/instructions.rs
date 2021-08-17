@@ -45,11 +45,11 @@ fn load(
             if fetch_from_storage(consolidator, storage_query, resource, AMOUNT) {
                 let mut storage = storage_query.get_mut(car_entity).unwrap();
                 storage.amount += AMOUNT;
-                return;
             } else if !wait_for_load {
                 car.current_instruction += 1;
-                return;
             }
+
+            return;
         }
     }
 
@@ -91,11 +91,11 @@ fn unload(
 
                 let mut storage = storage_query.get_mut(car_entity).unwrap();
                 storage.amount -= AMOUNT;
-                return;
             } else if !wait_for_unload {
                 car.current_instruction += 1;
-                return;
             }
+
+            return;
         }
     }
 
