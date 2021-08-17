@@ -202,6 +202,9 @@ pub fn construction_ui(
 
                 let mut groups = CollectingHashMap::new();
                 for (id, resource) in resources.iter() {
+                    if resource.virtual_resource {
+                        continue;
+                    }
                     groups.insert(resource.group.clone(), (id, resource));
                 }
 
