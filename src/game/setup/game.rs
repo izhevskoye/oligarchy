@@ -1,21 +1,18 @@
 use bevy::{prelude::*, render::camera::Camera};
 use bevy_ecs_tilemap::prelude::*;
 
-use super::{
+use crate::game::{
     assets::MapSettings,
     car::Car,
     constants::{MapTile, CHUNK_SIZE, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
 };
 
-pub const MAP_ID: u16 = 0;
-pub const GROUND_LAYER_ID: u16 = 0;
-pub const BUILDING_LAYER_ID: u16 = 1;
+use super::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID};
 
 pub fn teardown(
     mut commands: Commands,
     mut map_query: MapQuery,
     car_query: Query<Entity, With<Car>>,
-    camera_query: Query<Entity, With<Camera>>,
     sprite_query: Query<Entity, With<TextureAtlasSprite>>,
 ) {
     map_query.depsawn_map(&mut commands, MAP_ID);
@@ -27,19 +24,22 @@ pub fn teardown(
     for entity in car_query.iter() {
         commands.entity(entity).despawn_recursive();
     }
-
-    for entity in camera_query.iter() {
-        commands.entity(entity).despawn_recursive();
-    }
 }
 
-pub fn setup_map(
+pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut map_query: MapQuery,
     map_settings: Res<MapSettings>,
+    camera_query: Query<Entity, With<Camera>>,
 ) {
+    commands.insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)));
+
+    for entity in camera_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
     let mut camera = OrthographicCameraBundle::new_2d();
     camera.orthographic_projection.far = 1000.0 / 0.1;
 

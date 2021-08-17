@@ -123,6 +123,8 @@ pub fn save_ui(
         egui::Window::new("Game")
             .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
             .default_width(150.0)
+            .resizable(false)
+            .collapsible(false)
             .show(egui_context.ctx(), |ui| {
                 ui.label("Are you sure?");
 
@@ -158,14 +160,16 @@ pub fn save_ui(
     }
 
     if SubMenuState::None == state.sub_menu_state {
-        let (align, offset, width) = match app_state.current() {
-            AppState::InGame => (Align2::RIGHT_BOTTOM, [-10.0, -10.0], 50.0),
-            _ => (Align2::CENTER_CENTER, [0.0, 0.0], 100.0),
+        let (align, offset, width, collapsible) = match app_state.current() {
+            AppState::InGame => (Align2::RIGHT_BOTTOM, [-10.0, -10.0], 50.0, true),
+            _ => (Align2::CENTER_CENTER, [0.0, 0.0], 100.0, false),
         };
 
         egui::Window::new("Game")
             .anchor(align, offset)
             .default_width(width)
+            .resizable(false)
+            .collapsible(collapsible)
             .show(egui_context.ctx(), |ui| {
                 ui.vertical_centered_justified(|ui| {
                     if let AppState::MainMenu = app_state.current() {
@@ -230,6 +234,8 @@ pub fn save_ui(
 
         egui::Window::new(title)
             .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
+            .resizable(false)
+            .collapsible(false)
             .show(egui_context.ctx(), |ui| {
                 if SubMenuState::SaveGameMenu == state.sub_menu_state {
                     ui.horizontal(|ui| {
@@ -309,6 +315,8 @@ pub fn save_ui(
         egui::Window::new("New Game")
             .default_width(100.0)
             .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
+            .resizable(false)
+            .collapsible(false)
             .show(egui_context.ctx(), |ui| {
                 ui.vertical_centered_justified(|ui| {
                     if ui.button("Size: Small").clicked() {
