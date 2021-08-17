@@ -1,4 +1,6 @@
-use crate::game::assets::resource_specifications::load_specifications;
+use std::collections::HashMap;
+
+use crate::game::assets::resource_specifications::ResourceSpecification;
 
 use super::*;
 use bevy::{app::Events, prelude::*};
@@ -10,6 +12,7 @@ struct Setup {
 }
 
 const RESOURCE: &str = "coke";
+const RESOURCE_COST: f64 = 10.0;
 
 struct TestSetup {
     world: World,
@@ -48,58 +51,71 @@ impl TestSetup {
             sum += event.amount;
         }
 
-        assert_eq!(sum, amount);
+        assert!(
+            sum == amount,
+            "expected event sum {} but was {}",
+            amount,
+            sum
+        );
     }
-}
 
-fn setup_test(setup: Setup) -> TestSetup {
-    let mut world = World::default();
-    world.insert_resource(load_specifications());
-    world.insert_resource(Events::<AccountTransaction>::default());
+    fn new(setup: Setup) -> Self {
+        let mut world = World::default();
+        let mut resources = HashMap::new();
+        resources.insert(
+            RESOURCE.to_owned(),
+            ResourceSpecification {
+                cost: RESOURCE_COST,
+                ..Default::default()
+            },
+        );
+        world.insert_resource(resources);
+        world.insert_resource(Events::<AccountTransaction>::default());
 
-    let mut stage = SystemStage::parallel();
-    stage.add_system(export_station.system());
+        let mut stage = SystemStage::parallel();
+        stage.add_system(export_station.system());
 
-    let storage_id = world
-        .spawn()
-        .insert(Storage {
-            resource: RESOURCE.to_owned(),
-            amount: setup.amount_in_storage,
-            capacity: 10.0,
-        })
-        .id();
+        let storage_id = world
+            .spawn()
+            .insert(Storage {
+                resource: RESOURCE.to_owned(),
+                amount: setup.amount_in_storage,
+                capacity: 10.0,
+            })
+            .id();
 
-    let connected_storage = if setup.connected_storage {
-        vec![storage_id]
-    } else {
-        vec![]
-    };
+        let connected_storage = if setup.connected_storage {
+            vec![storage_id]
+        } else {
+            vec![]
+        };
 
-    let goods = if setup.good_set_to_export {
-        vec![RESOURCE.to_owned()]
-    } else {
-        vec![]
-    };
+        let goods = if setup.good_set_to_export {
+            vec![RESOURCE.to_owned()]
+        } else {
+            vec![]
+        };
 
-    let station_id = world
-        .spawn()
-        .insert(ExportStation { goods })
-        .insert(Statistics::default())
-        .insert(StorageConsolidator { connected_storage })
-        .id();
+        let station_id = world
+            .spawn()
+            .insert(ExportStation { goods })
+            .insert(Statistics::default())
+            .insert(StorageConsolidator { connected_storage })
+            .id();
 
-    stage.run(&mut world);
+        stage.run(&mut world);
 
-    TestSetup {
-        world,
-        station_id,
-        storage_id,
+        Self {
+            world,
+            station_id,
+            storage_id,
+        }
     }
 }
 
 #[test]
 fn no_connection_and_not_configured() {
-    let setup = setup_test(Setup {
+    let setup = TestSetup::new(Setup {
         amount_in_storage: 10.0,
         connected_storage: false,
         good_set_to_export: false,
@@ -112,7 +128,7 @@ fn no_connection_and_not_configured() {
 
 #[test]
 fn connection_but_not_configured() {
-    let setup = setup_test(Setup {
+    let setup = TestSetup::new(Setup {
         amount_in_storage: 10.0,
         connected_storage: true,
         good_set_to_export: false,
@@ -125,20 +141,33 @@ fn connection_but_not_configured() {
 
 #[test]
 fn connection_and_configured() {
-    let setup = setup_test(Setup {
-        amount_in_storage: 10.0,
+    let setup = TestSetup::new(Setup {
+        amount_in_storage: 1.0,
         connected_storage: true,
         good_set_to_export: true,
     });
 
-    setup.assert_storage_amount(9.0);
+    setup.assert_storage_amount(0.0);
     setup.assert_exported_statistic(1.0);
-    setup.assert_event_sum(10);
+    setup.assert_event_sum(RESOURCE_COST as i64);
+}
+
+#[test]
+fn maximum_export_amount() {
+    let setup = TestSetup::new(Setup {
+        amount_in_storage: 100.0,
+        connected_storage: true,
+        good_set_to_export: true,
+    });
+
+    setup.assert_storage_amount(90.0);
+    setup.assert_exported_statistic(10.0);
+    setup.assert_event_sum(10 * RESOURCE_COST as i64);
 }
 
 #[test]
 fn connection_and_configured_but_empty() {
-    let setup = setup_test(Setup {
+    let setup = TestSetup::new(Setup {
         amount_in_storage: 0.0,
         connected_storage: true,
         good_set_to_export: true,
