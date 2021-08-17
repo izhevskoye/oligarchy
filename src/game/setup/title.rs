@@ -1,5 +1,7 @@
 use bevy::{prelude::*, render::camera::Camera};
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 pub fn teardown(mut commands: Commands, query: Query<Entity, With<Text>>) {
     for entity in query.iter() {
         log::info!("remove ");
@@ -22,8 +24,9 @@ pub fn setup(
     let text_style = TextStyle {
         font,
         font_size: 70.0,
-        color: Color::rgb(0.811764706, 0.811764706, 0.356862745),
+        color: Color::rgb(0.812, 0.812, 0.357),
     };
+
     let text_alignment = TextAlignment {
         vertical: VerticalAlign::Center,
         horizontal: HorizontalAlign::Center,
@@ -32,6 +35,24 @@ pub fn setup(
     commands.spawn_bundle(Text2dBundle {
         text: Text::with_section("Oligarchy", text_style.clone(), text_alignment),
         transform: Transform::from_xyz(0.0, 150.0, 0.0),
+        ..Default::default()
+    });
+
+    let font = asset_server.load("fonts/SpaceGrotesk-Light.ttf");
+    let text_style = TextStyle {
+        font,
+        font_size: 14.0,
+        color: Color::rgb(0.812, 0.812, 0.357),
+    };
+
+    let text_alignment = TextAlignment {
+        vertical: VerticalAlign::Center,
+        horizontal: HorizontalAlign::Center,
+    };
+
+    commands.spawn_bundle(Text2dBundle {
+        text: Text::with_section(format!("v{}", VERSION), text_style.clone(), text_alignment),
+        transform: Transform::from_xyz(0.0, -150.0, 0.0),
         ..Default::default()
     });
 
