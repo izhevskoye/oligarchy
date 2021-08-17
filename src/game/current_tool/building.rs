@@ -2,12 +2,13 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
+    account::{MaintenanceCost, PurchaseCost},
     assets::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable, Occupied,
         Position, RequiresUpdate, SelectedTool, Tool,
     },
+    construction::UnderConstruction,
     production::ProductionBuilding,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
@@ -24,8 +25,6 @@ pub fn building_placement(
     clicked_tile: Res<ClickedTile>,
     buildings: Res<BuildingSpecifications>,
     resources: Res<ResourceSpecifications>,
-    mut events: EventWriter<AccountTransaction>,
-    account: Res<Account>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -39,11 +38,6 @@ pub fn building_placement(
                 let building = buildings.get(id).unwrap();
 
                 let price = building.price(&resources);
-                if account.value < price {
-                    return;
-                }
-
-                events.send(AccountTransaction { amount: -price });
 
                 commands
                     .entity(entity)
@@ -51,6 +45,7 @@ pub fn building_placement(
                     .insert(Position { position: pos })
                     .insert(MaintenanceCost::new_from_cost(price))
                     .insert(RequiresUpdate)
+                    .insert(UnderConstruction::from_building_specification(building))
                     .insert(Occupied);
 
                 if !building.products.is_empty() {

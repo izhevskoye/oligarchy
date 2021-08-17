@@ -6,6 +6,7 @@ use crate::game::{
     account::PurchaseCost,
     assets::{resource_specifications::ResourceSpecifications, Position, RequiresUpdate},
     constants::MapTile,
+    construction::UnderConstruction,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
@@ -106,7 +107,14 @@ fn eval_neighbor(entity: Option<Entity>, street_query: &Query<&Street>) -> bool 
 
 #[allow(clippy::type_complexity)]
 pub fn update_streets(
-    mut tile_query: Query<(&mut Tile, &Position), (With<Street>, With<RequiresUpdate>)>,
+    mut tile_query: Query<
+        (&mut Tile, &Position),
+        (
+            With<Street>,
+            With<RequiresUpdate>,
+            Without<UnderConstruction>,
+        ),
+    >,
     street_query: Query<&Street>,
     map_query: MapQuery,
 ) {

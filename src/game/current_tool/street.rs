@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
+    account::{MaintenanceCost, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile, Occupied,
         Position, RequiresUpdate, SelectedTool, Tool,
     },
+    construction::UnderConstruction,
     setup::BUILDING_LAYER_ID,
     street::Street,
 };
@@ -21,8 +22,6 @@ pub fn street_placement(
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
-    mut events: EventWriter<AccountTransaction>,
-    account: Res<Account>,
 ) {
     if selected_tool.tool != Tool::Street || clicked_tile.occupied_building {
         return;
@@ -32,17 +31,13 @@ pub fn street_placement(
         let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
         let price = Street::default().price(&resources);
-        if account.value < price {
-            return;
-        }
-
-        events.send(AccountTransaction { amount: -price });
 
         commands
             .entity(entity)
             .insert(Street)
             .insert(RequiresUpdate)
             .insert(MaintenanceCost::new_from_cost(price))
+            .insert(UnderConstruction::from_fixed_cost(price))
             .insert(Position { position: pos })
             .insert(CanDriveOver)
             .insert(Occupied);

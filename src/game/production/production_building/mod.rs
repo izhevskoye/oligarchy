@@ -6,21 +6,26 @@ use rand::{prelude::SliceRandom, thread_rng};
 
 use crate::game::{
     assets::resource_specifications::ResourceSpecifications,
+    construction::UnderConstruction,
     production::{Idle, ProductionBuilding},
     statistics::Statistics,
     storage::{distribute_to_storage, fetch_from_storage, has_in_storage, has_space_in_storage},
     storage::{Storage, StorageConsolidator},
 };
 
+#[allow(clippy::type_complexity)]
 pub fn production_building(
     mut commands: Commands,
-    mut building_query: Query<(
-        Entity,
-        &ProductionBuilding,
-        &StorageConsolidator,
-        &mut Statistics,
-        Option<&Idle>,
-    )>,
+    mut building_query: Query<
+        (
+            Entity,
+            &ProductionBuilding,
+            &StorageConsolidator,
+            &mut Statistics,
+            Option<&Idle>,
+        ),
+        Without<UnderConstruction>,
+    >,
     mut storage_query: Query<&mut Storage>,
     resources: Res<ResourceSpecifications>,
 ) {

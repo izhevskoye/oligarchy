@@ -75,40 +75,40 @@ impl TestSetup {
             amount
         );
     }
-}
 
-fn setup_test() -> TestSetup {
-    let mut world = World::default();
+    fn new() -> Self {
+        let mut world = World::default();
 
-    let mut resource_specifications = ResourceSpecifications::new();
-    resource_specifications.insert(COKE.to_owned(), ResourceSpecification::default());
-    resource_specifications.insert(COAL.to_owned(), ResourceSpecification::default());
-    resource_specifications.insert(SLUG.to_owned(), ResourceSpecification::default());
-    resource_specifications.insert(
-        ENHANCER_REPLACEMENT.to_owned(),
-        ResourceSpecification::default(),
-    );
-    let mut substitute = HashMap::new();
-    substitute.insert(ENHANCER_REPLACEMENT.to_owned(), 1.0);
-    resource_specifications.insert(
-        ENHANCER.to_owned(),
-        ResourceSpecification {
-            substitute,
-            ..Default::default()
-        },
-    );
+        let mut resource_specifications = ResourceSpecifications::new();
+        resource_specifications.insert(COKE.to_owned(), ResourceSpecification::default());
+        resource_specifications.insert(COAL.to_owned(), ResourceSpecification::default());
+        resource_specifications.insert(SLUG.to_owned(), ResourceSpecification::default());
+        resource_specifications.insert(
+            ENHANCER_REPLACEMENT.to_owned(),
+            ResourceSpecification::default(),
+        );
+        let mut substitute = HashMap::new();
+        substitute.insert(ENHANCER_REPLACEMENT.to_owned(), 1.0);
+        resource_specifications.insert(
+            ENHANCER.to_owned(),
+            ResourceSpecification {
+                substitute,
+                ..Default::default()
+            },
+        );
 
-    world.insert_resource(resource_specifications);
+        world.insert_resource(resource_specifications);
 
-    let mut stage = SystemStage::parallel();
-    stage.add_system(production_building.system());
+        let mut stage = SystemStage::parallel();
+        stage.add_system(production_building.system());
 
-    TestSetup { world, stage }
+        Self { world, stage }
+    }
 }
 
 #[test]
 fn produces_resource() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 10.0);
@@ -185,7 +185,7 @@ fn produces_resource() {
 
 #[test]
 fn produces_byproducts() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 10.0);
@@ -248,7 +248,7 @@ fn produces_byproducts() {
 
 #[test]
 fn increases_production_with_enhancers() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 10.0);
@@ -325,7 +325,7 @@ fn increases_production_with_enhancers() {
 
 #[test]
 fn increases_production_with_enhancer_substitute() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 10.0);
@@ -382,7 +382,7 @@ fn increases_production_with_enhancer_substitute() {
 
 #[test]
 fn no_production_is_marked_idle() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 10.0);
@@ -429,7 +429,7 @@ fn no_production_is_marked_idle() {
 
 #[test]
 fn random_production() {
-    let mut setup = setup_test();
+    let mut setup = TestSetup::new();
 
     let coke_storage_id = setup.add_storage(COKE, 0.0);
     let coal_storage_id = setup.add_storage(COAL, 0.0);
@@ -470,4 +470,36 @@ fn random_production() {
         ((setup.get_storage_amount(coke_storage_id) - 1.0).abs() < f64::EPSILON)
             ^ ((setup.get_storage_amount(coal_storage_id) - 1.0).abs() < f64::EPSILON)
     );
+}
+
+#[test]
+fn ignores_under_construction() {
+    let mut setup = TestSetup::new();
+
+    let coal_storage_id = setup.add_storage(COAL, 0.0);
+
+    let building_id = setup
+        .world
+        .spawn()
+        .insert(Statistics::default())
+        .insert(ProductionBuilding {
+            products: vec![(
+                Product {
+                    resource: COAL.to_owned(),
+                    rate: 1.0,
+                    ..Default::default()
+                },
+                true,
+            )],
+        })
+        .insert(StorageConsolidator {
+            connected_storage: vec![coal_storage_id],
+        })
+        .insert(UnderConstruction::from_fixed_cost(0))
+        .id();
+
+    setup.stage.run(&mut setup.world);
+
+    setup.assert_storage_amount(coal_storage_id, 0.0);
+    setup.assert_production_statistic(COAL, building_id, 0.0);
 }

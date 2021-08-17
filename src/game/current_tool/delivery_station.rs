@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
+    account::{MaintenanceCost, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile, Occupied,
         Position, RequiresUpdate, SelectedTool, Tool,
     },
+    construction::UnderConstruction,
     production::DeliveryStation,
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
@@ -21,8 +22,6 @@ pub fn delivery_station_placement(
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
-    mut events: EventWriter<AccountTransaction>,
-    account: Res<Account>,
 ) {
     if clicked_tile.dragging {
         return;
@@ -33,17 +32,13 @@ pub fn delivery_station_placement(
             let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
             let price = DeliveryStation::default().price(&resources);
-            if account.value < price {
-                return;
-            }
-
-            events.send(AccountTransaction { amount: -price });
 
             commands
                 .entity(entity)
                 .insert(DeliveryStation)
                 .insert(StorageConsolidator::default())
                 .insert(MaintenanceCost::new_from_cost(price))
+                .insert(UnderConstruction::from_fixed_cost(price))
                 .insert(RequiresUpdate)
                 .insert(Position { position: pos })
                 .insert(CanDriveOver)
