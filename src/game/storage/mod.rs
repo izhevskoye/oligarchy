@@ -98,28 +98,32 @@ pub fn distribute_to_storage(
     log::error!("Expected some storage to accept resource");
 }
 
+pub fn amount_in_storage(
+    consolidator: &StorageConsolidator,
+    storage_query: &mut Query<&mut Storage>,
+    resource: &str,
+) -> f64 {
+    let mut amount = 0.0;
+
+    for storage in consolidator.connected_storage.iter() {
+        if let Ok(storage) = storage_query.get_mut(*storage) {
+            if storage.resource == resource {
+                amount += storage.amount
+            }
+        }
+    }
+
+    amount
+}
+
 pub fn has_in_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
     resource: &str,
     amount: f64,
 ) -> bool {
-    assert!(amount > 0.0);
-    let mut amount_needed = amount;
-
-    for storage in consolidator.connected_storage.iter() {
-        if let Ok(storage) = storage_query.get_mut(*storage) {
-            if storage.resource == resource && storage.amount > 0.0 {
-                amount_needed -= storage.amount
-            }
-        }
-
-        if amount_needed <= 0.0 {
-            return true;
-        }
-    }
-
-    false
+    assert!(amount >= 0.0);
+    amount_in_storage(consolidator, storage_query, resource) >= amount
 }
 
 pub fn has_space_in_storage(
