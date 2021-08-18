@@ -9,16 +9,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::{
     account::Account,
-    assets::{MapSettings, Name},
+    assets::{MapSettings, Name, StateName},
     car::Car,
+    construction::UnderConstruction,
     goals::Goal,
     production::{DeliveryStation, ExportStation},
     statistics::Statistics,
     storage::Storage,
     street::Street,
 };
-
-use super::assets::StateName;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -54,6 +53,7 @@ pub struct GameEntity {
     pub entity: GameEntityType,
     pub name: Option<Name>,
     pub statistics: Option<Statistics>,
+    pub under_construction: Option<UnderConstruction>,
 }
 
 #[derive(Default, Serialize, Deserialize)]

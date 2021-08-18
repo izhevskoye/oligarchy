@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests;
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::game::{
@@ -14,7 +15,7 @@ use crate::game::{
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct UnderConstruction {
     resources_needed: HashMap<String, f64>,
     labor: f64,
