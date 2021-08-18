@@ -1,14 +1,20 @@
+mod eval_neighbor;
+
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::game::{
     account::PurchaseCost,
-    assets::{resource_specifications::ResourceSpecifications, Position, RequiresUpdate},
+    assets::{
+        resource_specifications::ResourceSpecifications, MapSettings, Position, RequiresUpdate,
+    },
     constants::MapTile,
     construction::UnderConstruction,
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
+
+use eval_neighbor::EvalNeighbor;
 
 #[derive(Clone, Serialize, Deserialize, Default)]
 #[serde(deny_unknown_fields)]
@@ -95,16 +101,6 @@ impl From<NeighborStructure> for u16 {
     }
 }
 
-fn eval_neighbor(entity: Option<Entity>, street_query: &Query<&Street>) -> bool {
-    if let Some(entity) = entity {
-        if street_query.get(entity).is_ok() {
-            return true;
-        }
-    }
-
-    false
-}
-
 #[allow(clippy::type_complexity)]
 pub fn update_streets(
     mut tile_query: Query<
@@ -115,18 +111,24 @@ pub fn update_streets(
             Without<UnderConstruction>,
         ),
     >,
-    street_query: Query<&Street>,
+    street_query: Query<(), With<Street>>,
     map_query: MapQuery,
+    map_settings: Res<MapSettings>,
 ) {
     for (mut tile, position) in tile_query.iter_mut() {
         let mut ns = NeighborStructure::default();
         let pos = UVec2::new(position.position.x, position.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
         // N, S, W, E, NW, NE, SW, SE.
-        ns.north = eval_neighbor(neighbors[0].1, &street_query);
-        ns.south = eval_neighbor(neighbors[1].1, &street_query);
-        ns.west = eval_neighbor(neighbors[2].1, &street_query);
-        ns.east = eval_neighbor(neighbors[3].1, &street_query);
+        let en = EvalNeighbor {
+            map_settings: &map_settings,
+            street_query: &street_query,
+        };
+
+        ns.north = en.eval_neighbor(neighbors[0]);
+        ns.south = en.eval_neighbor(neighbors[1]);
+        ns.west = en.eval_neighbor(neighbors[2]);
+        ns.east = en.eval_neighbor(neighbors[3]);
 
         tile.texture_index = ns.clone().into();
         tile.visible = true;
