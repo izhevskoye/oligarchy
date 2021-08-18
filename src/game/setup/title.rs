@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::camera::Camera};
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn teardown(mut commands: Commands, query: Query<Entity, With<Text>>) {
     for entity in query.iter() {
@@ -41,7 +41,7 @@ pub fn setup(
     let font = asset_server.load("fonts/SpaceGrotesk-Light.ttf");
     let text_style = TextStyle {
         font,
-        font_size: 14.0,
+        font_size: 20.0,
         color: Color::rgb(0.812, 0.812, 0.357),
     };
 
