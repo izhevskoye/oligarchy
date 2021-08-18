@@ -15,14 +15,12 @@ impl<'a> EvalNeighbor<'a> {
             if self.street_query.get(entity).is_ok() {
                 return true;
             }
-        } else {
-            if pos.x == -1
-                || pos.y == -1
-                || pos.x == (self.map_settings.width * CHUNK_SIZE - 1) as i32
-                || pos.y == (self.map_settings.height * CHUNK_SIZE - 1) as i32
-            {
-                return true;
-            }
+        } else if pos.x == -1
+            || pos.y == -1
+            || pos.x == (self.map_settings.width * CHUNK_SIZE - 1) as i32
+            || pos.y == (self.map_settings.height * CHUNK_SIZE - 1) as i32
+        {
+            return true;
         }
 
         false
