@@ -7,6 +7,7 @@ use crate::game::{
     account::Account,
     assets::{Building, MapSettings, Name, Position, StateName},
     car::Car,
+    construction::UnderConstruction,
     goals::GoalManager,
     production::{DeliveryStation, ExportStation, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -25,6 +26,7 @@ pub fn save_game(
         Query<&Name>,
         Query<(Entity, &Car, &Position)>,
         Query<&Statistics>,
+        Query<&UnderConstruction>,
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&DeliveryStation>,
@@ -42,6 +44,7 @@ pub fn save_game(
         name_query,
         car_query,
         statistics_query,
+        under_construction_query,
         storage_query,
         export_station_query,
         delivery_station_query,
@@ -73,6 +76,7 @@ pub fn save_game(
                 pos,
                 name: name.clone(),
                 statistics: None,
+                under_construction: None,
                 entity: GameEntityType::Vehicle(Vehicle {
                     car: car.clone(),
                     storage: storage.clone(),
@@ -99,6 +103,13 @@ pub fn save_game(
                         None
                     };
 
+                    let under_construction =
+                        if let Ok(under_construction) = under_construction_query.get(entity) {
+                            Some(under_construction.clone())
+                        } else {
+                            None
+                        };
+
                     if let Ok((building, production_building)) = building_query.get(entity) {
                         let active_products = if let Some(pb) = production_building {
                             pb.products.iter().map(|(_, active)| *active).collect()
@@ -116,6 +127,7 @@ pub fn save_game(
                                 },
                             )),
                             statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
                         });
                     }
 
@@ -127,6 +139,7 @@ pub fn save_game(
                                 building.clone(),
                             )),
                             statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
                         });
                     }
 
@@ -138,6 +151,7 @@ pub fn save_game(
                                 building.clone(),
                             )),
                             statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
                         });
                     }
 
@@ -149,6 +163,7 @@ pub fn save_game(
                                 building.clone(),
                             )),
                             statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
                         });
                     }
 
@@ -160,6 +175,7 @@ pub fn save_game(
                                 building.clone(),
                             )),
                             statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
                         });
                     }
                 }

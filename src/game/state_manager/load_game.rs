@@ -127,6 +127,10 @@ fn insert_building(
                 commands.entity(entity).insert(statistics.clone());
             }
 
+            if let Some(under_construction) = &game_entity.under_construction {
+                commands.entity(entity).insert(under_construction.clone());
+            }
+
             match building {
                 BuildingEntity::Building(c) => {
                     let building = buildings.get(&c.id).unwrap();
