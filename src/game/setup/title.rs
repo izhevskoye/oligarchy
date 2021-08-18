@@ -33,7 +33,7 @@ pub fn setup(
     };
 
     commands.spawn_bundle(Text2dBundle {
-        text: Text::with_section("Oligarchy", text_style.clone(), text_alignment),
+        text: Text::with_section("Oligarchy", text_style, text_alignment),
         transform: Transform::from_xyz(0.0, 150.0, 0.0),
         ..Default::default()
     });
@@ -51,7 +51,7 @@ pub fn setup(
     };
 
     commands.spawn_bundle(Text2dBundle {
-        text: Text::with_section(format!("v{}", VERSION), text_style.clone(), text_alignment),
+        text: Text::with_section(format!("v{}", VERSION), text_style, text_alignment),
         transform: Transform::from_xyz(0.0, -150.0, 0.0),
         ..Default::default()
     });
