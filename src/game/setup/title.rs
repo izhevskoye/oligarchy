@@ -56,9 +56,5 @@ pub fn setup(
         ..Default::default()
     });
 
-    commands.insert_resource(ClearColor(Color::rgb(
-        0.584313725,
-        0.231372549,
-        0.270588235,
-    )))
+    commands.insert_resource(ClearColor(Color::rgb(0.584, 0.231, 0.271)))
 }
