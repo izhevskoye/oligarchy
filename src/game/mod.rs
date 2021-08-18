@@ -92,9 +92,20 @@ impl Game {
             .add_event::<RemovedBuildingEvent>()
             .add_event::<AccountTransaction>()
             .add_startup_system(assets::integrity::integrity_check.system())
+            .add_startup_system(setup::setup.system())
             //
             // MENU
             //
+            .add_system_set(
+                SystemSet::on_enter(AppState::MainMenu).with_system(setup::title::setup.system()),
+            )
+            .add_system_set(
+                SystemSet::on_resume(AppState::MainMenu).with_system(setup::title::setup.system()),
+            )
+            .add_system_set(
+                SystemSet::on_pause(AppState::MainMenu)
+                    .with_system(setup::title::teardown.system()),
+            )
             .add_system_set(
                 SystemSet::new()
                     .with_system(ui::state::save_ui.system())
@@ -105,7 +116,7 @@ impl Game {
             //
             .add_system_set(
                 SystemSet::on_enter(AppState::InGame)
-                    .with_system(setup::setup_map.system())
+                    .with_system(setup::game::setup.system())
                     .with_system(account::reset_account.system())
                     .with_system(goals::generate_goals.system()),
             )
@@ -115,7 +126,7 @@ impl Game {
                     .with_system(goals::update_goals.system()),
             )
             .add_system_set(
-                SystemSet::on_exit(AppState::InGame).with_system(setup::teardown.system()),
+                SystemSet::on_exit(AppState::InGame).with_system(setup::game::teardown.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
