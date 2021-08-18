@@ -2,6 +2,7 @@ pub mod building;
 pub mod bulldoze;
 pub mod car;
 pub mod delivery_station;
+pub mod depot;
 pub mod export_station;
 pub mod storage;
 pub mod street;

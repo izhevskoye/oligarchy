@@ -13,7 +13,7 @@ use crate::game::{
     car::Car,
     construction::UnderConstruction,
     goals::Goal,
-    production::{DeliveryStation, ExportStation},
+    production::{DeliveryStation, Depot, ExportStation},
     statistics::Statistics,
     storage::Storage,
     street::Street,
@@ -31,6 +31,7 @@ pub enum BuildingEntity {
     Storage(Storage),
     ExportStation(ExportStation),
     DeliveryStation(DeliveryStation),
+    Depot(Depot),
     Street(Street),
     Building(SerializedBuilding),
 }

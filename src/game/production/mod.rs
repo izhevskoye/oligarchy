@@ -80,6 +80,27 @@ impl InfoUI for ExportStation {
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
+pub struct Depot {
+    pub deliveries: Vec<UVec2>,
+    pub pickups: Vec<UVec2>,
+}
+
+impl PurchaseCost for Depot {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
+        1200
+    }
+}
+
+impl InfoUI for Depot {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            ui.label("Depot");
+        });
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct DeliveryStation;
 
 impl PurchaseCost for DeliveryStation {

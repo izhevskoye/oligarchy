@@ -185,6 +185,7 @@ impl Game {
                     .after(Label::CurrentSelection)
                     .before(Label::Update)
                     .with_system(current_tool::street::street_placement.system())
+                    .with_system(current_tool::depot::depot_placement.system())
                     .with_system(current_tool::storage::storage_placement.system())
                     .with_system(current_tool::export_station::export_station_placement.system())
                     .with_system(
@@ -238,6 +239,7 @@ impl Game {
                     .before(Label::UpdateEnd)
                     .with_system(asset_tiles::construction_update.system())
                     .with_system(asset_tiles::building_update.system())
+                    .with_system(asset_tiles::depot_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::export_station_update.system())
                     .with_system(asset_tiles::delivery_station_update.system())

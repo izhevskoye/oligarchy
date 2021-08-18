@@ -30,6 +30,7 @@ pub fn save_game(
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&DeliveryStation>,
+        Query<&Depot>,
         Query<&Street>,
         Query<(&Building, Option<&ProductionBuilding>)>,
     ),
@@ -48,6 +49,7 @@ pub fn save_game(
         storage_query,
         export_station_query,
         delivery_station_query,
+        depot_query,
         street_query,
         building_query,
     ) = queries;
@@ -162,6 +164,16 @@ pub fn save_game(
                             entity: GameEntityType::Building(BuildingEntity::DeliveryStation(
                                 building.clone(),
                             )),
+                            statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
+                        });
+                    }
+
+                    if let Ok(depot) = depot_query.get(entity) {
+                        state.entities.push(GameEntity {
+                            pos,
+                            name: name.clone(),
+                            entity: GameEntityType::Building(BuildingEntity::Depot(depot.clone())),
                             statistics: statistics.clone(),
                             under_construction: under_construction.clone(),
                         });

@@ -172,6 +172,13 @@ fn insert_building(
                         .insert(c.clone())
                         .insert(MaintenanceCost::new_from_cost(c.price(resources)));
                 }
+                BuildingEntity::Depot(c) => {
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(Editable)
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)));
+                }
                 BuildingEntity::DeliveryStation(c) => {
                     commands
                         .entity(entity)
