@@ -30,11 +30,10 @@ struct UuidCollection {
 
 impl UuidCollection {
     fn get(&mut self, entity: Entity) -> String {
-        if !self.uuids.contains_key(&entity) {
-            self.uuids.insert(entity, Uuid::new_v4().to_string());
-        }
-
-        self.uuids.get(&entity).unwrap().to_owned()
+        self.uuids
+            .entry(entity)
+            .or_insert_with(|| Uuid::new_v4().to_string())
+            .to_owned()
     }
 }
 
