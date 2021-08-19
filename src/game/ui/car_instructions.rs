@@ -73,8 +73,11 @@ pub fn program_ui(
                                 }
                             });
 
-                    // TODO: reset index!
-                    if let Some(controller) = controller {
+                    if let Some(mut controller) = controller {
+                        if let CarController::UserControlled(controller) = &mut controller {
+                            controller.current_instruction = 0;
+                        }
+
                         if let Ok((mut car, _storage, _position)) = car_query.get_mut(entity) {
                             car.controller = controller;
                         }

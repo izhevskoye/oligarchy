@@ -2,6 +2,8 @@ pub mod export_station;
 pub mod idle;
 pub mod production_building;
 
+use std::collections::HashSet;
+
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 use serde::{Deserialize, Serialize};
@@ -81,8 +83,8 @@ impl InfoUI for ExportStation {
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Depot {
-    pub deliveries: Vec<UVec2>,
-    pub pickups: Vec<UVec2>,
+    pub deliveries: HashSet<UVec2>,
+    pub pickups: HashSet<UVec2>,
 }
 
 impl PurchaseCost for Depot {

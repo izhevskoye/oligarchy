@@ -42,6 +42,10 @@ impl Storage {
     pub fn is_empty(&self) -> bool {
         self.amount == 0.0
     }
+
+    pub fn percentage(&self) -> f64 {
+        self.amount / self.capacity
+    }
 }
 
 impl PurchaseCost for Storage {

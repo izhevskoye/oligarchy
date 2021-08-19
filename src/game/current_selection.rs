@@ -29,7 +29,6 @@ pub fn current_selection(
 
     if clicked_tile.occupied_vehicle {
         if let Some(pos) = clicked_tile.vehicle_pos {
-            // TODO: improve
             for (entity, position) in car_query.iter() {
                 if position.position == pos {
                     currently_selected.entity = Some(entity);

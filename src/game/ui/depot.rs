@@ -1,11 +1,13 @@
 use bevy::prelude::*;
+use bevy_ecs_tilemap::MapQuery;
 use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
     assets::{ClickedTile, Position},
     car::{Car, CarController, DepotController},
     current_selection::CurrentlySelected,
-    production::Depot,
+    production::{DeliveryStation, Depot},
+    setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -22,13 +24,16 @@ impl Default for EditMode {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
     mut depot_query: Query<(Entity, &mut Depot)>,
+    delivery_query: Query<(), With<DeliveryStation>>,
     mut car_query: Query<(&mut Car, &Position)>,
     mut currently_selected: ResMut<CurrentlySelected>,
     clicked_tile: Res<ClickedTile>,
     mut edit_mode: Local<EditMode>,
+    map_query: MapQuery,
 ) {
     if !currently_selected.editing {
         return;
@@ -42,18 +47,20 @@ pub fn edit_ui(
         if let Ok((entity, mut depot)) = depot_query.get_mut(entity) {
             if clicked_tile.occupied_building {
                 if let Some(pos) = clicked_tile.pos {
-                    // TODO: only select delivery
+                    if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+                        if delivery_query.get(entity).is_ok() {
+                            if EditMode::AddDelivery == *edit_mode {
+                                currently_selected.locked = false;
+                                *edit_mode = EditMode::None;
+                                depot.deliveries.insert(pos);
+                            }
 
-                    if EditMode::AddDelivery == *edit_mode {
-                        currently_selected.locked = false;
-                        *edit_mode = EditMode::None;
-                        depot.deliveries.push(pos);
-                    }
-
-                    if EditMode::AddPickup == *edit_mode {
-                        currently_selected.locked = false;
-                        *edit_mode = EditMode::None;
-                        depot.pickups.push(pos);
+                            if EditMode::AddPickup == *edit_mode {
+                                currently_selected.locked = false;
+                                *edit_mode = EditMode::None;
+                                depot.pickups.insert(pos);
+                            }
+                        }
                     }
                 }
             }
@@ -77,8 +84,6 @@ pub fn edit_ui(
             }
 
             egui::Window::new("Depot").show(egui_context.ctx(), |ui| {
-                ui.heading("Depot");
-
                 if EditMode::None != *edit_mode && ui.button("Abort selection").clicked() {
                     *edit_mode = EditMode::None;
                     currently_selected.locked = false;
@@ -90,36 +95,36 @@ pub fn edit_ui(
                 }
 
                 egui::CollapsingHeader::new("Deliveries").show(ui, |ui| {
-                    for (index, point) in depot.deliveries.clone().iter().enumerate() {
-                        ui.horizontal(|ui| {
-                            ui.label(format!("{}", point));
-
-                            if ui.button("Delete").clicked() {
-                                depot.deliveries.remove(index);
-                            }
-                        });
-                    }
-
                     if ui.button("Add").clicked() {
                         *edit_mode = EditMode::AddDelivery;
                         currently_selected.locked = true;
                     }
-                });
 
-                egui::CollapsingHeader::new("Pickups").show(ui, |ui| {
-                    for (index, point) in depot.pickups.clone().iter().enumerate() {
+                    for point in depot.deliveries.clone().iter() {
                         ui.horizontal(|ui| {
                             ui.label(format!("{}", point));
 
                             if ui.button("Delete").clicked() {
-                                depot.pickups.remove(index);
+                                depot.deliveries.remove(point);
                             }
                         });
                     }
+                });
 
+                egui::CollapsingHeader::new("Pickups").show(ui, |ui| {
                     if ui.button("Add").clicked() {
                         *edit_mode = EditMode::AddPickup;
                         currently_selected.locked = true;
+                    }
+
+                    for point in depot.pickups.clone().iter() {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("{}", point));
+
+                            if ui.button("Delete").clicked() {
+                                depot.pickups.remove(point);
+                            }
+                        });
                     }
                 });
             });
