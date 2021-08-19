@@ -3,7 +3,7 @@ use bevy_egui::{egui, EguiContext};
 
 use crate::game::{
     assets::{ClickedTile, Position},
-    car::{Car, CarInstructions},
+    car::{Car, CarController, DepotController},
     current_selection::CurrentlySelected,
     production::Depot,
 };
@@ -42,6 +42,8 @@ pub fn edit_ui(
         if let Ok((entity, mut depot)) = depot_query.get_mut(entity) {
             if clicked_tile.occupied_building {
                 if let Some(pos) = clicked_tile.pos {
+                    // TODO: only select delivery
+
                     if EditMode::AddDelivery == *edit_mode {
                         currently_selected.locked = false;
                         *edit_mode = EditMode::None;
@@ -67,7 +69,8 @@ pub fn edit_ui(
                                 continue;
                             }
 
-                            car.instructions = vec![CarInstructions::DepotControlled(entity)];
+                            car.controller =
+                                CarController::DepotControlled(DepotController { depot: entity });
                         }
                     }
                 }
@@ -76,11 +79,9 @@ pub fn edit_ui(
             egui::Window::new("Depot").show(egui_context.ctx(), |ui| {
                 ui.heading("Depot");
 
-                if EditMode::None != *edit_mode {
-                    if ui.button("Abort selection").clicked() {
-                        *edit_mode = EditMode::None;
-                        currently_selected.locked = false;
-                    }
+                if EditMode::None != *edit_mode && ui.button("Abort selection").clicked() {
+                    *edit_mode = EditMode::None;
+                    currently_selected.locked = false;
                 }
 
                 if ui.button("Add car").clicked() {
@@ -89,8 +90,14 @@ pub fn edit_ui(
                 }
 
                 egui::CollapsingHeader::new("Deliveries").show(ui, |ui| {
-                    for point in &depot.deliveries {
-                        ui.label(format!("- {}", point));
+                    for (index, point) in depot.deliveries.clone().iter().enumerate() {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("{}", point));
+
+                            if ui.button("Delete").clicked() {
+                                depot.deliveries.remove(index);
+                            }
+                        });
                     }
 
                     if ui.button("Add").clicked() {
@@ -100,8 +107,14 @@ pub fn edit_ui(
                 });
 
                 egui::CollapsingHeader::new("Pickups").show(ui, |ui| {
-                    for point in &depot.pickups {
-                        ui.label(format!("- {}", point));
+                    for (index, point) in depot.pickups.clone().iter().enumerate() {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("{}", point));
+
+                            if ui.button("Delete").clicked() {
+                                depot.pickups.remove(index);
+                            }
+                        });
                     }
 
                     if ui.button("Add").clicked() {

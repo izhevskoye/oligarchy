@@ -61,8 +61,6 @@ pub enum CarInstructions {
     WaitForUnload(String),
     Load(String),
     Unload(String),
-    // TODO: serialized how?!
-    DepotControlled(Entity),
 }
 
 impl CarInstructions {
@@ -82,26 +80,49 @@ impl CarInstructions {
             CarInstructions::Unload(resource) => {
                 format!("Unload {:?}", resources.get(resource).unwrap().name)
             }
-            CarInstructions::DepotControlled(_depot) => "Controlled by Depot".to_owned(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct Car {
+    pub direction: Direction,
+    pub controller: CarController,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct DepotController {
+    pub depot: Entity,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserController {
+    pub instructions: Vec<CarInstructions>,
+    pub current_instruction: usize,
+    pub active: bool,
+}
+
+impl Default for UserController {
+    fn default() -> Self {
+        Self {
+            instructions: vec![CarInstructions::Nop],
+            current_instruction: 0,
+            active: false,
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Car {
-    pub direction: Direction,
-    pub instructions: Vec<CarInstructions>,
-    pub current_instruction: usize,
-    pub active: bool,
+pub enum CarController {
+    DepotControlled(DepotController),
+    UserControlled(UserController),
 }
 
 impl Default for Car {
     fn default() -> Self {
         Self {
             direction: Direction::North,
-            instructions: vec![CarInstructions::Nop],
-            current_instruction: 0,
-            active: false,
+            controller: CarController::UserControlled(UserController::default()),
         }
     }
 }
