@@ -14,7 +14,6 @@ pub fn remove_update(
     for (entity, position, tile) in query.iter() {
         commands.entity(entity).remove::<RequiresUpdate>();
 
-        // TODO: is it always a building?
         if tile.is_some() {
             map_query.notify_chunk_for_tile(position.position, MAP_ID, BUILDING_LAYER_ID);
         }

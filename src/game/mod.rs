@@ -25,6 +25,9 @@ use bevy_egui::EguiPlugin;
 use self::{
     account::{Account, AccountTransaction},
     assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool, StateName},
+    car::instructions::{
+        CarGoToInstructionEvent, CarLoadInstructionEvent, CarUnloadInstructionEvent,
+    },
     constants::{
         CAR_DRIVE_TICK_SPEED, CAR_INSTRUCTION_TICK_SPEED, GOAL_UPDATE_TICK_SPEED,
         PRODUCTION_TICK_SPEED,
@@ -54,6 +57,11 @@ pub enum IdleLabel {
 pub enum UILabel {
     InfoUI,
     UIEnd,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub enum CarLabel {
+    Instruction,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -91,6 +99,9 @@ impl Game {
             .add_event::<SaveGameEvent>()
             .add_event::<RemovedBuildingEvent>()
             .add_event::<AccountTransaction>()
+            .add_event::<CarLoadInstructionEvent>()
+            .add_event::<CarUnloadInstructionEvent>()
+            .add_event::<CarGoToInstructionEvent>()
             .add_startup_system(assets::integrity::integrity_check.system())
             .add_startup_system(setup::setup.system())
             //
@@ -161,6 +172,7 @@ impl Game {
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
+                    .with_system(ui::depot::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui
                             .system()
@@ -185,6 +197,7 @@ impl Game {
                     .after(Label::CurrentSelection)
                     .before(Label::Update)
                     .with_system(current_tool::street::street_placement.system())
+                    .with_system(current_tool::depot::depot_placement.system())
                     .with_system(current_tool::storage::storage_placement.system())
                     .with_system(current_tool::export_station::export_station_placement.system())
                     .with_system(
@@ -230,7 +243,26 @@ impl Game {
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
                     .with_run_criteria(FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED))
-                    .with_system(car::instructions::car_instruction.system()),
+                    .with_system(
+                        car::instructions::car_instruction
+                            .system()
+                            .label(CarLabel::Instruction),
+                    )
+                    .with_system(
+                        car::instructions::load
+                            .system()
+                            .after(CarLabel::Instruction),
+                    )
+                    .with_system(
+                        car::instructions::unload
+                            .system()
+                            .after(CarLabel::Instruction),
+                    )
+                    .with_system(
+                        car::instructions::goto
+                            .system()
+                            .after(CarLabel::Instruction),
+                    ),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
@@ -238,6 +270,7 @@ impl Game {
                     .before(Label::UpdateEnd)
                     .with_system(asset_tiles::construction_update.system())
                     .with_system(asset_tiles::building_update.system())
+                    .with_system(asset_tiles::depot_update.system())
                     .with_system(asset_tiles::storage_update.system())
                     .with_system(asset_tiles::export_station_update.system())
                     .with_system(asset_tiles::delivery_station_update.system())

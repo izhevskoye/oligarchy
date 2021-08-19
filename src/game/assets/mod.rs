@@ -72,6 +72,7 @@ pub enum Tool {
     Storage(String),
     ExportStation,
     DeliveryStation,
+    Depot,
     Car(String),
     Building(String),
 }

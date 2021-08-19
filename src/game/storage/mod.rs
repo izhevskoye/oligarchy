@@ -34,6 +34,20 @@ impl Default for Storage {
     }
 }
 
+impl Storage {
+    pub fn is_full(&self) -> bool {
+        self.amount >= self.capacity
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.amount == 0.0
+    }
+
+    pub fn percentage(&self) -> f64 {
+        self.amount / self.capacity
+    }
+}
+
 impl PurchaseCost for Storage {
     fn price(&self, resources: &ResourceSpecifications) -> i64 {
         let resource = resources

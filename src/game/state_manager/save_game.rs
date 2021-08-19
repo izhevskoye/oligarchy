@@ -1,15 +1,16 @@
-use std::{fs::File, io::prelude::*, path::Path};
+use std::{collections::HashMap, fs::File, io::prelude::*, path::Path};
 
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use uuid::Uuid;
 
 use crate::game::{
     account::Account,
     assets::{Building, MapSettings, Name, Position, StateName},
-    car::Car,
+    car::{Car, CarController},
     construction::UnderConstruction,
     goals::GoalManager,
-    production::{DeliveryStation, ExportStation, ProductionBuilding},
+    production::{DeliveryStation, Depot, ExportStation, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
@@ -19,6 +20,22 @@ use crate::game::{
     storage::Storage,
     street::Street,
 };
+
+use super::VehicleController;
+
+#[derive(Default)]
+struct UuidCollection {
+    uuids: HashMap<Entity, String>,
+}
+
+impl UuidCollection {
+    fn get(&mut self, entity: Entity) -> String {
+        self.uuids
+            .entry(entity)
+            .or_insert_with(|| Uuid::new_v4().to_string())
+            .to_owned()
+    }
+}
 
 #[allow(clippy::type_complexity)]
 pub fn save_game(
@@ -30,6 +47,7 @@ pub fn save_game(
         Query<&Storage>,
         Query<&ExportStation>,
         Query<&DeliveryStation>,
+        Query<&Depot>,
         Query<&Street>,
         Query<(&Building, Option<&ProductionBuilding>)>,
     ),
@@ -48,6 +66,7 @@ pub fn save_game(
         storage_query,
         export_station_query,
         delivery_station_query,
+        depot_query,
         street_query,
         building_query,
     ) = queries;
@@ -61,28 +80,7 @@ pub fn save_game(
             ..Default::default()
         };
 
-        for (entity, car, position) in car_query.iter() {
-            let pos = position.position;
-
-            let name = if let Ok(name) = name_query.get(entity) {
-                Some(name.clone())
-            } else {
-                None
-            };
-
-            let storage = storage_query.get(entity).unwrap();
-
-            state.entities.push(GameEntity {
-                pos,
-                name: name.clone(),
-                statistics: None,
-                under_construction: None,
-                entity: GameEntityType::Vehicle(Vehicle {
-                    car: car.clone(),
-                    storage: storage.clone(),
-                }),
-            });
-        }
+        let mut uuids = UuidCollection::default();
 
         let (_, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
         let size = layer.get_layer_size_in_tiles();
@@ -118,6 +116,7 @@ pub fn save_game(
                         };
 
                         state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::Building(
@@ -133,6 +132,7 @@ pub fn save_game(
 
                     if let Ok(building) = storage_query.get(entity) {
                         state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::Storage(
@@ -145,6 +145,7 @@ pub fn save_game(
 
                     if let Ok(building) = export_station_query.get(entity) {
                         state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::ExportStation(
@@ -157,6 +158,7 @@ pub fn save_game(
 
                     if let Ok(building) = delivery_station_query.get(entity) {
                         state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::DeliveryStation(
@@ -167,8 +169,20 @@ pub fn save_game(
                         });
                     }
 
+                    if let Ok(depot) = depot_query.get(entity) {
+                        state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
+                            pos,
+                            name: name.clone(),
+                            entity: GameEntityType::Building(BuildingEntity::Depot(depot.clone())),
+                            statistics: statistics.clone(),
+                            under_construction: under_construction.clone(),
+                        });
+                    }
+
                     if let Ok(building) = street_query.get(entity) {
                         state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
                             entity: GameEntityType::Building(BuildingEntity::Street(
@@ -180,6 +194,40 @@ pub fn save_game(
                     }
                 }
             }
+        }
+
+        for (entity, car, position) in car_query.iter() {
+            let pos = position.position;
+
+            let name = if let Ok(name) = name_query.get(entity) {
+                Some(name.clone())
+            } else {
+                None
+            };
+
+            let storage = storage_query.get(entity).unwrap();
+
+            let controller = match &car.controller {
+                CarController::UserControlled(controller) => {
+                    VehicleController::UserControlled(controller.clone())
+                }
+                CarController::DepotControlled(depot) => {
+                    VehicleController::DepotControlled(uuids.get(depot.depot))
+                }
+            };
+
+            state.entities.push(GameEntity {
+                uuid: uuids.get(entity),
+                pos,
+                name: name.clone(),
+                statistics: None,
+                under_construction: None,
+                entity: GameEntityType::Vehicle(Vehicle {
+                    direction: car.direction,
+                    controller,
+                    storage: storage.clone(),
+                }),
+            });
         }
 
         let path = Path::new(&event.file_name);

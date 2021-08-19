@@ -15,7 +15,7 @@ use crate::game::{
     },
     car::Car,
     constants::CURRENCY,
-    production::{DeliveryStation, ExportStation},
+    production::{DeliveryStation, Depot, ExportStation},
     storage::Storage,
     street::Street,
 };
@@ -100,7 +100,7 @@ pub fn construction_ui(
 
             egui::containers::ScrollArea::from_max_height(max_height).show(ui, |ui| {
                 let building_names: Vec<&str> =
-                    vec!["Street", "Export Station", "Delivery Station"]
+                    vec!["Street", "Export Station", "Delivery Station", "Depot"]
                         .into_iter()
                         .filter(|item| filter.match_name(item))
                         .collect();
@@ -126,6 +126,13 @@ pub fn construction_ui(
                                 .clicked()
                             {
                                 selected_tool.tool = Tool::ExportStation;
+                            }
+
+                            if filter.match_name("Depot")
+                                && button(ui, "Depot", &Depot::default(), &resources, &account)
+                                    .clicked()
+                            {
+                                selected_tool.tool = Tool::Depot;
                             }
 
                             if filter.match_name("Delivery Station")

@@ -84,21 +84,45 @@ impl CarInstructions {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Car {
     pub direction: Direction,
+    pub controller: CarController,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct DepotController {
+    pub depot: Entity,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserController {
     pub instructions: Vec<CarInstructions>,
     pub current_instruction: usize,
     pub active: bool,
+}
+
+impl Default for UserController {
+    fn default() -> Self {
+        Self {
+            instructions: vec![CarInstructions::Nop],
+            current_instruction: 0,
+            active: false,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub enum CarController {
+    DepotControlled(DepotController),
+    UserControlled(UserController),
 }
 
 impl Default for Car {
     fn default() -> Self {
         Self {
             direction: Direction::North,
-            instructions: vec![CarInstructions::Nop],
-            current_instruction: 0,
-            active: false,
+            controller: CarController::UserControlled(UserController::default()),
         }
     }
 }

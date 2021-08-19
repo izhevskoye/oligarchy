@@ -15,6 +15,8 @@ use crate::game::{
     street::Street,
 };
 
+use super::production::Depot;
+
 #[allow(clippy::type_complexity)]
 pub fn construction_update(
     mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,
@@ -39,6 +41,23 @@ pub fn building_update(
             let building = buildings.get(&building.id).unwrap();
             building.tile
         };
+        tile.visible = true;
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn depot_update(
+    mut query: Query<
+        &mut Tile,
+        (
+            With<Depot>,
+            With<RequiresUpdate>,
+            Without<UnderConstruction>,
+        ),
+    >,
+) {
+    for mut tile in query.iter_mut() {
+        tile.texture_index = MapTile::Depot as u16;
         tile.visible = true;
     }
 }

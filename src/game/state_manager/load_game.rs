@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
@@ -8,6 +10,7 @@ use crate::game::{
         resource_specifications::ResourceSpecifications, Building, CanDriveOver, Editable,
         Occupied, Position, RequiresUpdate, StateName,
     },
+    car::{Car, CarController, DepotController},
     goals::GoalManager,
     production::{Product, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
@@ -16,6 +19,8 @@ use crate::game::{
     },
     storage::StorageConsolidator,
 };
+
+use super::VehicleController;
 
 #[allow(clippy::too_many_arguments)]
 pub fn load_game(
@@ -50,13 +55,15 @@ fn load_state(
     buildings: &BuildingSpecifications,
     resources: &ResourceSpecifications,
 ) {
+    let mut uuids = HashMap::new();
+
     for game_entity in &state.entities {
         match &game_entity.entity {
             GameEntityType::Vehicle(vehicle) => {
-                insert_car(commands, vehicle, game_entity, resources);
+                insert_car(commands, vehicle, game_entity, resources, &uuids);
             }
             GameEntityType::Building(building) => {
-                insert_building(
+                let entity = insert_building(
                     commands,
                     building,
                     game_entity,
@@ -64,6 +71,11 @@ fn load_state(
                     buildings,
                     resources,
                 );
+
+                if let Some(entity) = entity {
+                    let uuid = game_entity.uuid.to_owned();
+                    uuids.insert(uuid, entity);
+                }
             }
         }
     }
@@ -74,8 +86,25 @@ fn insert_car(
     vehicle: &Vehicle,
     game_entity: &GameEntity,
     resources: &ResourceSpecifications,
+    uuids: &HashMap<String, Entity>,
 ) {
-    let price = (vehicle.car.clone(), vehicle.storage.clone()).price(resources);
+    let controller = match &vehicle.controller {
+        VehicleController::UserControlled(controller) => {
+            CarController::UserControlled(controller.clone())
+        }
+        VehicleController::DepotControlled(depot_uuid) => {
+            CarController::DepotControlled(DepotController {
+                depot: *uuids.get(depot_uuid).unwrap(),
+            })
+        }
+    };
+
+    let car = Car {
+        direction: vehicle.direction,
+        controller,
+    };
+
+    let price = (car.clone(), vehicle.storage.clone()).price(resources);
 
     let entity = commands
         .spawn()
@@ -83,7 +112,7 @@ fn insert_car(
         .insert(Position {
             position: game_entity.pos,
         })
-        .insert(vehicle.car.clone())
+        .insert(car)
         .insert(vehicle.storage.clone())
         .insert(Editable)
         .insert(MaintenanceCost::new_from_cost(price))
@@ -101,7 +130,7 @@ fn insert_building(
     map_query: &mut MapQuery,
     buildings: &BuildingSpecifications,
     resources: &ResourceSpecifications,
-) {
+) -> Option<Entity> {
     let tile = Tile {
         visible: false,
         ..Default::default()
@@ -172,6 +201,13 @@ fn insert_building(
                         .insert(c.clone())
                         .insert(MaintenanceCost::new_from_cost(c.price(resources)));
                 }
+                BuildingEntity::Depot(c) => {
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(Editable)
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)));
+                }
                 BuildingEntity::DeliveryStation(c) => {
                     commands
                         .entity(entity)
@@ -189,6 +225,10 @@ fn insert_building(
                         .insert(StorageConsolidator::default());
                 }
             }
+
+            return Some(entity);
         }
     }
+
+    None
 }

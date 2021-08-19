@@ -9,11 +9,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::{
     account::Account,
-    assets::{MapSettings, Name, StateName},
-    car::Car,
+    assets::{Direction, MapSettings, Name, StateName},
+    car::UserController,
     construction::UnderConstruction,
     goals::Goal,
-    production::{DeliveryStation, ExportStation},
+    production::{DeliveryStation, Depot, ExportStation},
     statistics::Statistics,
     storage::Storage,
     street::Street,
@@ -31,13 +31,21 @@ pub enum BuildingEntity {
     Storage(Storage),
     ExportStation(ExportStation),
     DeliveryStation(DeliveryStation),
+    Depot(Depot),
     Street(Street),
     Building(SerializedBuilding),
 }
 
 #[derive(Serialize, Deserialize)]
+pub enum VehicleController {
+    UserControlled(UserController),
+    DepotControlled(String),
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct Vehicle {
-    car: Car,
+    direction: Direction,
+    controller: VehicleController,
     storage: Storage,
 }
 
@@ -49,6 +57,7 @@ pub enum GameEntityType {
 
 #[derive(Serialize, Deserialize)]
 pub struct GameEntity {
+    pub uuid: String,
     pub pos: UVec2,
     pub entity: GameEntityType,
     pub name: Option<Name>,

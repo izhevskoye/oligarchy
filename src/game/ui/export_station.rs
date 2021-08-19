@@ -19,9 +19,7 @@ pub fn edit_ui(
 
     if let Some(entity) = currently_selected.entity {
         if let Ok(mut export) = export_query.get_mut(entity) {
-            egui::Window::new("ExportStation").show(egui_context.ctx(), |ui| {
-                ui.heading("Export Station");
-
+            egui::Window::new("Export Station").show(egui_context.ctx(), |ui| {
                 let mut groups = CollectingHashMap::new();
                 for (id, resource) in resources.iter() {
                     if resource.cost > f64::EPSILON && !resource.virtual_resource {

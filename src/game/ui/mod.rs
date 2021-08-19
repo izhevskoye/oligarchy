@@ -1,5 +1,6 @@
 pub mod car_instructions;
 pub mod construction;
+pub mod depot;
 pub mod export_station;
 pub mod goals;
 pub mod info;

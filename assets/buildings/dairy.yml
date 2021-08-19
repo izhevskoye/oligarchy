@@ -3,22 +3,22 @@
   tile: 52
   products:
     - resource: butter
-      rate: 0.5
+      rate: 1.0
       requisites:
         - resource: milk
-          rate: 2.0
+          rate: 4.0
 
     - resource: sour_cream
-      rate: 0.5
+      rate: 1.0
       requisites:
         - resource: milk
-          rate: 1.5
+          rate: 3.0
 
     - resource: cheese
-      rate: 0.5
+      rate: 1.0
       requisites:
         - resource: milk
-          rate: 2.0
+          rate: 4.0
   group: Dairy
   cost:
     resources:
