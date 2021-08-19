@@ -161,6 +161,7 @@ impl Game {
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
+                    .with_system(ui::depot::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui
                             .system()

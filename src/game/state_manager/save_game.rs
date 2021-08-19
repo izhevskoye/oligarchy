@@ -9,7 +9,7 @@ use crate::game::{
     car::Car,
     construction::UnderConstruction,
     goals::GoalManager,
-    production::{DeliveryStation, ExportStation, ProductionBuilding},
+    production::{DeliveryStation, Depot, ExportStation, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,

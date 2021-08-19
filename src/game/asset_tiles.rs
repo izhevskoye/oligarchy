@@ -55,7 +55,6 @@ pub fn depot_update(
             Without<UnderConstruction>,
         ),
     >,
-    buildings: Res<BuildingSpecifications>,
 ) {
     for mut tile in query.iter_mut() {
         tile.texture_index = MapTile::Depot as u16;

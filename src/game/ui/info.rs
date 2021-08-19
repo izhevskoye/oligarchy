@@ -9,7 +9,7 @@ use crate::game::{
     car::Car,
     construction::UnderConstruction,
     current_selection::CurrentlySelected,
-    production::ExportStation,
+    production::{Depot, ExportStation},
     storage::Storage,
 };
 
@@ -33,6 +33,7 @@ pub fn info_ui(
         Query<&Car>,
         Query<&Storage>,
         Query<&ExportStation>,
+        Query<&Depot>,
         Query<&UnderConstruction>,
     ),
     mut currently_selected: ResMut<CurrentlySelected>,
@@ -52,6 +53,7 @@ pub fn info_ui(
         query_resolve(&mut items, queries.4.get(entity));
         query_resolve(&mut items, queries.5.get(entity));
         query_resolve(&mut items, queries.6.get(entity));
+        query_resolve(&mut items, queries.7.get(entity));
 
         if !items.is_empty() {
             egui::SidePanel::left("side_panel")
