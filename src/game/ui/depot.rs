@@ -1,12 +1,18 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContext};
 
-use crate::game::{assets::ClickedTile, current_selection::CurrentlySelected, production::Depot};
+use crate::game::{
+    assets::{ClickedTile, Position},
+    car::{Car, CarInstructions},
+    current_selection::CurrentlySelected,
+    production::Depot,
+};
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum EditMode {
     AddPickup,
     AddDelivery,
+    AddCar,
     None,
 }
 
@@ -18,7 +24,8 @@ impl Default for EditMode {
 
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
-    mut depot_query: Query<&mut Depot>,
+    mut depot_query: Query<(Entity, &mut Depot)>,
+    mut car_query: Query<(&mut Car, &Position)>,
     mut currently_selected: ResMut<CurrentlySelected>,
     clicked_tile: Res<ClickedTile>,
     mut edit_mode: Local<EditMode>,
@@ -32,23 +39,54 @@ pub fn edit_ui(
     }
 
     if let Some(entity) = currently_selected.entity {
-        if let Ok(mut depot) = depot_query.get_mut(entity) {
-            if let Some(pos) = clicked_tile.pos {
-                if EditMode::AddDelivery == *edit_mode {
-                    currently_selected.locked = false;
-                    *edit_mode = EditMode::None;
-                    depot.deliveries.push(pos);
-                }
+        if let Ok((entity, mut depot)) = depot_query.get_mut(entity) {
+            if clicked_tile.occupied_building {
+                if let Some(pos) = clicked_tile.pos {
+                    if EditMode::AddDelivery == *edit_mode {
+                        currently_selected.locked = false;
+                        *edit_mode = EditMode::None;
+                        depot.deliveries.push(pos);
+                    }
 
-                if EditMode::AddPickup == *edit_mode {
-                    currently_selected.locked = false;
-                    *edit_mode = EditMode::None;
-                    depot.pickups.push(pos);
+                    if EditMode::AddPickup == *edit_mode {
+                        currently_selected.locked = false;
+                        *edit_mode = EditMode::None;
+                        depot.pickups.push(pos);
+                    }
+                }
+            }
+
+            if clicked_tile.occupied_vehicle {
+                if let Some(pos) = clicked_tile.vehicle_pos {
+                    if EditMode::AddCar == *edit_mode {
+                        currently_selected.locked = false;
+                        *edit_mode = EditMode::None;
+
+                        for (mut car, position) in car_query.iter_mut() {
+                            if position.position != pos {
+                                continue;
+                            }
+
+                            car.instructions = vec![CarInstructions::DepotControlled(entity)];
+                        }
+                    }
                 }
             }
 
             egui::Window::new("Depot").show(egui_context.ctx(), |ui| {
                 ui.heading("Depot");
+
+                if EditMode::None != *edit_mode {
+                    if ui.button("Abort selection").clicked() {
+                        *edit_mode = EditMode::None;
+                        currently_selected.locked = false;
+                    }
+                }
+
+                if ui.button("Add car").clicked() {
+                    *edit_mode = EditMode::AddCar;
+                    currently_selected.locked = true;
+                }
 
                 egui::CollapsingHeader::new("Deliveries").show(ui, |ui| {
                     for point in &depot.deliveries {

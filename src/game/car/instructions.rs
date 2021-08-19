@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
     assets::Position,
-    production::DeliveryStation,
+    production::{DeliveryStation, Depot},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{distribute_to_storage, fetch_from_storage, has_space_in_storage},
     storage::{Storage, StorageConsolidator},
@@ -26,7 +26,7 @@ fn load(
 ) {
     let full = {
         match storage_query.get_mut(car_entity) {
-            Ok(storage) => storage.amount >= storage.capacity,
+            Ok(storage) => storage.is_full(),
             _ => {
                 log::warn!("Car has no storage but should wait for loading");
                 car.current_instruction += 1;
@@ -70,7 +70,7 @@ fn unload(
 ) {
     let empty = {
         match storage_query.get_mut(car_entity) {
-            Ok(storage) => storage.amount == 0.0,
+            Ok(storage) => storage.is_empty(),
             _ => {
                 log::warn!("Car has no storage but should wait for unloading");
                 car.current_instruction += 1;
@@ -107,6 +107,7 @@ fn unload(
 pub fn car_instruction(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car, &Position), (Without<Destination>, Without<Waypoints>)>,
+    depot_query: Query<&Depot>,
     mut storage_query: Query<&mut Storage>,
     consolidator_query: Query<&StorageConsolidator, With<DeliveryStation>>,
     map_query: MapQuery,
@@ -120,8 +121,34 @@ pub fn car_instruction(
             car.current_instruction = 0;
         }
 
-        match car.instructions[car.current_instruction].clone() {
+        let mut current_instruction = car.instructions[car.current_instruction].clone();
+
+        if let CarInstructions::DepotControlled(depot_entity) = current_instruction {
+            if let Ok(depot) = depot_query.get(depot_entity) {
+                let storage = storage_query.get_mut(car_entity).unwrap();
+
+                let car_pos = position.position / 2;
+                if depot.pickups.contains(&car_pos) && !storage.is_full() {
+                    current_instruction = CarInstructions::WaitForLoad(storage.resource.clone());
+                } else if depot.deliveries.contains(&car_pos) && !storage.is_empty() {
+                    current_instruction = CarInstructions::WaitForUnload(storage.resource.clone());
+                } else if storage.is_empty() {
+                    // go to pickup
+                    let place = depot.pickups.get(0).unwrap();
+                    current_instruction = CarInstructions::GoTo(*place);
+                } else if !storage.is_empty() {
+                    // go to delivery
+                    let place = depot.deliveries.get(0).unwrap();
+                    current_instruction = CarInstructions::GoTo(*place);
+                }
+            } else {
+                log::error!("Car assigned to a depot which is not found");
+            }
+        }
+
+        match current_instruction {
             CarInstructions::Nop => {}
+            CarInstructions::DepotControlled(_) => {}
             CarInstructions::GoTo(destination) => {
                 let car_pos = position.position / 2;
                 if car_pos == destination {

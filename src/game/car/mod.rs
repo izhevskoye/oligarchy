@@ -61,6 +61,8 @@ pub enum CarInstructions {
     WaitForUnload(String),
     Load(String),
     Unload(String),
+    // TODO: serialized how?!
+    DepotControlled(Entity),
 }
 
 impl CarInstructions {
@@ -80,6 +82,7 @@ impl CarInstructions {
             CarInstructions::Unload(resource) => {
                 format!("Unload {:?}", resources.get(resource).unwrap().name)
             }
+            CarInstructions::DepotControlled(_depot) => "Controlled by Depot".to_owned(),
         }
     }
 }
