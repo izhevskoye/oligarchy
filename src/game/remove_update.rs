@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 
 use super::{
     assets::{Position, RequiresUpdate},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
 pub fn remove_update(
@@ -16,6 +16,7 @@ pub fn remove_update(
 
         if tile.is_some() {
             map_query.notify_chunk_for_tile(position.position, MAP_ID, BUILDING_LAYER_ID);
+            map_query.notify_chunk_for_tile(position.position, MAP_ID, GROUND_LAYER_ID);
         }
     }
 }

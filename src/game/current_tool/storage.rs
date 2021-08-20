@@ -8,11 +8,10 @@ use crate::game::{
         RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{Storage, StorageConsolidator},
 };
-
-use super::get_entity;
 
 #[allow(clippy::too_many_arguments)]
 pub fn storage_placement(

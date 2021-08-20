@@ -1,18 +1,24 @@
 use bevy::prelude::*;
 
-use crate::game::{assets::MapSettings, constants::CHUNK_SIZE, street::Street};
+use crate::game::{assets::MapSettings, constants::CHUNK_SIZE};
 
-pub struct EvalNeighbor<'a> {
+pub struct EvalNeighbor<'a, T: 'static>
+where
+    T: Sync + Send + 'a,
+{
     pub map_settings: &'a MapSettings,
-    pub street_query: &'a Query<'a, (), With<Street>>,
+    pub query: &'a Query<'a, (), With<T>>,
 }
 
-impl<'a> EvalNeighbor<'a> {
+impl<'a, T> EvalNeighbor<'a, T>
+where
+    T: Sync + Send + 'a,
+{
     pub fn eval_neighbor(&self, neighbor: (IVec2, Option<Entity>)) -> bool {
         let (pos, entity) = neighbor;
 
         if let Some(entity) = entity {
-            if self.street_query.get(entity).is_ok() {
+            if self.query.get(entity).is_ok() {
                 return true;
             }
         } else if pos.x == -1

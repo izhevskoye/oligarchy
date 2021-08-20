@@ -1,6 +1,8 @@
 use crate::game::{
     assets::{MapSettings, MapSize, StateName},
-    state_manager::{helper::generate_save_game_path, GameState, LoadGameEvent, SaveGameEvent},
+    state_manager::{
+        helper::generate_save_game_path, GameState, LoadGameEvent, NewGameEvent, SaveGameEvent,
+    },
     AppState,
 };
 use bevy::prelude::*;
@@ -111,6 +113,7 @@ pub fn save_ui(
     mut commands: Commands,
     egui_context: ResMut<EguiContext>,
     mut app_state: ResMut<State<AppState>>,
+    mut new_game: EventWriter<NewGameEvent>,
     mut load_game: EventWriter<LoadGameEvent>,
     mut save_game: EventWriter<SaveGameEvent>,
     mut state: Local<MenuState>,
@@ -329,6 +332,7 @@ pub fn save_ui(
                             size: MapSize::Small,
                         });
 
+                        new_game.send(NewGameEvent);
                         app_state.push(AppState::InGame).unwrap();
                         state.sub_menu_state = SubMenuState::None;
                     }
@@ -340,6 +344,7 @@ pub fn save_ui(
                             size: MapSize::Medium,
                         });
 
+                        new_game.send(NewGameEvent);
                         app_state.push(AppState::InGame).unwrap();
                         state.sub_menu_state = SubMenuState::None;
                     }
@@ -351,6 +356,7 @@ pub fn save_ui(
                             size: MapSize::Large,
                         });
 
+                        new_game.send(NewGameEvent);
                         app_state.push(AppState::InGame).unwrap();
                         state.sub_menu_state = SubMenuState::None;
                     }

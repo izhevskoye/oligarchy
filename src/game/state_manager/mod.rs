@@ -74,6 +74,8 @@ pub struct GameState {
     pub account: Account,
 }
 
+pub struct NewGameEvent;
+
 pub struct LoadGameEvent {
     pub state: GameState,
 }

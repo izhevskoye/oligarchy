@@ -8,11 +8,10 @@ use crate::game::{
         RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity,
     production::Depot,
     setup::BUILDING_LAYER_ID,
 };
-
-use super::get_entity;
 
 pub fn depot_placement(
     mut commands: Commands,

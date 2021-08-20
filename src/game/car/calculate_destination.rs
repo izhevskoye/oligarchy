@@ -78,13 +78,18 @@ pub fn calculate_destination(
         }
 
         if !changes.is_empty() {
-            // safe unwrap due because it is always created above
-            log::info!("Updating pathfinding cache: {:?}", changes);
-            let pathfinding = pathfinding.as_mut().unwrap();
-            pathfinding.tiles_changed(
-                &changes,
-                cost_fn(&map_query, &street_query, &occupied_query),
-            );
+            if changes.len() > 10 {
+                log::warn!("Too many updates, discarding pathfinding cache!");
+                *pathfinding = None;
+            } else {
+                // safe unwrap due because it is always created above
+                log::info!("Updating pathfinding cache: {:?}", changes);
+                let pathfinding = pathfinding.as_mut().unwrap();
+                pathfinding.tiles_changed(
+                    &changes,
+                    cost_fn(&map_query, &street_query, &occupied_query),
+                );
+            }
             updated = true;
         }
     }

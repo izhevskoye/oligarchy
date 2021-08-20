@@ -8,12 +8,11 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity,
     production::DeliveryStation,
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
 };
-
-use super::get_entity;
 
 #[allow(clippy::too_many_arguments)]
 pub fn delivery_station_placement(

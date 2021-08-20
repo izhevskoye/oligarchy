@@ -8,13 +8,12 @@ use crate::game::{
         RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity,
     production::ExportStation,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
     storage::StorageConsolidator,
 };
-
-use super::get_entity;
 
 pub fn export_station_placement(
     mut commands: Commands,

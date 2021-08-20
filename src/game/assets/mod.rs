@@ -43,6 +43,7 @@ impl Default for MapSettings {
     }
 }
 
+#[derive(Debug)]
 pub struct Position {
     pub position: UVec2,
 }

@@ -9,13 +9,12 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity,
     production::ProductionBuilding,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
     storage::StorageConsolidator,
 };
-
-use super::get_entity;
 
 #[allow(clippy::too_many_arguments)]
 pub fn building_placement(
