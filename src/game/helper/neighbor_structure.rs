@@ -1,13 +1,12 @@
 use crate::game::{
     assets::{MapSettings, Position, RequiresUpdate},
     constants::{MapTile, VariantOffsets},
+    helper::eval_neighbor::EvalNeighbor,
     setup::MAP_ID,
 };
 
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-
-use super::EvalNeighbor;
 
 pub struct LayerIndex(u16);
 

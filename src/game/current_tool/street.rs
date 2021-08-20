@@ -8,7 +8,7 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
-    helper::get_entity,
+    helper::get_entity::get_entity,
     setup::BUILDING_LAYER_ID,
     street::Street,
 };
@@ -24,7 +24,10 @@ pub fn street_placement(
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
 ) {
-    if selected_tool.tool != Tool::Street || clicked_tile.occupied_building {
+    if selected_tool.tool != Tool::Street
+        || clicked_tile.occupied_building
+        || !clicked_tile.can_build
+    {
         return;
     }
 

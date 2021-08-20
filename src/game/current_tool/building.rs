@@ -9,7 +9,7 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
-    helper::get_entity,
+    helper::get_entity::get_entity,
     production::ProductionBuilding,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
@@ -30,7 +30,7 @@ pub fn building_placement(
     }
 
     if let Tool::Building(id) = &selected_tool.tool {
-        if !clicked_tile.occupied_building {
+        if !clicked_tile.occupied_building && clicked_tile.can_build {
             if let Some(pos) = clicked_tile.pos {
                 let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 

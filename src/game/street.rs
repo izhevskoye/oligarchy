@@ -9,7 +9,10 @@ use crate::game::{
     },
     constants::MapTile,
     construction::UnderConstruction,
-    helper::{EvalNeighbor, LayerIndex, NeighborStructure},
+    helper::{
+        eval_neighbor::EvalNeighbor,
+        neighbor_structure::{LayerIndex, NeighborStructure},
+    },
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 

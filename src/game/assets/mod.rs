@@ -95,6 +95,7 @@ pub struct ClickedTile {
     pub vehicle_pos: Option<UVec2>,
     pub occupied_building: bool,
     pub occupied_vehicle: bool,
+    pub can_build: bool,
 }
 
 pub struct Occupied;
