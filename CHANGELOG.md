@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.5
+
+### Added
+
+- Automatic depots which supply resources between delivery stations
+- Buildings which are placed are slowly build over time, not immediately
+- Proper menu
+- Confirmation dialog when deleting files
+- Vodka production
+
+### Changed
+
+- Buildings can have multiple productions active and will randomly produce a possible activated production each tick
+- Exports stations export 10 items per tick instead of one
+- Adjusted prices and production rates for different buildings
+- Animal based buildings produce manure which can be used as fertilizer for fields
+- Phosphor fertilizer production
+- Allow corn to be implicitly also used as animal feed
+- Allow zooming when a construction option is selected
+
 ## 0.1.4
 
 ### Added
