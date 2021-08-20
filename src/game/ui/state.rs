@@ -267,6 +267,9 @@ pub fn save_ui(
                         ui.label("No save games yet");
                     } else {
                         egui::Grid::new("file list").show(ui, |ui| {
+                            let mut list = list.iter().collect::<Vec<(&String, &String)>>();
+                            list.sort_by(|a, b| a.0.to_lowercase().cmp(&b.0.to_lowercase()));
+
                             for (name, file_name) in list {
                                 ui.label(name);
 
