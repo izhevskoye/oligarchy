@@ -256,6 +256,13 @@ fn insert_building(
                         .insert(CanDriveOver)
                         .insert(StorageConsolidator::default());
                 }
+                BuildingEntity::StorageManagement(c) => {
+                    commands
+                        .entity(entity)
+                        .insert(c.clone())
+                        .insert(MaintenanceCost::new_from_cost(c.price(resources)))
+                        .insert(StorageConsolidator::default());
+                }
                 BuildingEntity::ExportStation(c) => {
                     commands
                         .entity(entity)

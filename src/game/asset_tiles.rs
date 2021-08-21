@@ -15,7 +15,7 @@ use crate::game::{
     street::Street,
 };
 
-use super::production::Depot;
+use super::production::{Depot, StorageManagement};
 
 #[allow(clippy::type_complexity)]
 pub fn construction_update(
@@ -106,6 +106,23 @@ pub fn delivery_station_update(
 ) {
     for mut tile in query.iter_mut() {
         tile.texture_index = MapTile::DeliveryStation as u16;
+        tile.visible = true;
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn storage_management_update(
+    mut query: Query<
+        &mut Tile,
+        (
+            With<StorageManagement>,
+            With<RequiresUpdate>,
+            Without<UnderConstruction>,
+        ),
+    >,
+) {
+    for mut tile in query.iter_mut() {
+        tile.texture_index = MapTile::StorageManagement as u16;
         tile.visible = true;
     }
 }

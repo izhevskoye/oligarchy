@@ -25,3 +25,4 @@ num-format = "0.4"
 directories-next = "2.0"
 uuid = { version = "0.8", features = ["v4"] }
 noise = "0.7"
+combinations = "0.1"
