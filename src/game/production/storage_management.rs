@@ -65,7 +65,7 @@ pub fn storage_management(
 
         unequal_distributions.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
 
-        if unequal_distributions.len() >= 1 {
+        if !unequal_distributions.is_empty() {
             let (diff, lesser, larger) = unequal_distributions[0];
             let diff = (diff / 2.0).min(MAX_AMOUNT);
 
