@@ -111,4 +111,8 @@ pub fn movement(
     }
 
     transform.translation += time.delta_seconds() * direction * 500.;
+
+    // fix scan lines in render when position is not rounded
+    transform.translation = transform.translation.as_i32().as_f32();
+    transform.scale = (transform.scale * 20.0).as_i32().as_f32() / 20.0;
 }

@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
-use noise::{NoiseFn, Perlin};
+use noise::{NoiseFn, Perlin, Seedable};
+use rand::{thread_rng, Rng};
 
 use crate::game::{
     assets::{MapSettings, Position, RequiresUpdate},
     constants::{MapTile, CHUNK_SIZE},
     helper::{get_entity::get_entity, neighbor_structure::LayerIndex},
-    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID},
+    setup::GROUND_LAYER_ID,
     state_manager::NewGameEvent,
 };
 
@@ -50,7 +51,10 @@ pub fn generate_tiles(
     mut events: EventReader<NewGameEvent>,
 ) {
     for _ in events.iter() {
+        let mut random = thread_rng();
         let perlin = Perlin::new();
+        let seed = random.gen();
+        let perlin = perlin.set_seed(seed);
 
         for x in 0..map_settings.width * CHUNK_SIZE - 1 {
             for y in 0..map_settings.height * CHUNK_SIZE - 1 {

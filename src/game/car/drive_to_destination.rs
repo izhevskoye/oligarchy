@@ -7,13 +7,15 @@ use rand::{thread_rng, Rng};
 use crate::game::{
     assets::{CanDriveOver, Direction, Occupied, Position, RequiresUpdate},
     car::{Car, Waypoints},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    ground_tiles::BlockedForBuilding,
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
 pub fn drive_to_destination(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car, &mut Position)>,
-    blocked_query: Query<(), (With<Occupied>, Without<CanDriveOver>)>,
+    occupied_query: Query<(), (With<Occupied>, Without<CanDriveOver>)>,
+    blocked_query: Query<(), With<BlockedForBuilding>>,
     mut waypoint_query: Query<&mut Waypoints>,
     map_query: MapQuery,
 ) {
@@ -75,19 +77,32 @@ pub fn drive_to_destination(
 
         let contains_car = car_positions.contains(&new_car_position);
 
+        let blocked_tile =
+            match map_query.get_tile_entity(new_car_position / 2, MAP_ID, GROUND_LAYER_ID) {
+                Ok(entity) => blocked_query.get(entity).is_ok(),
+                Err(_) => false,
+            };
+
         let contains_building =
             match map_query.get_tile_entity(new_car_position / 2, MAP_ID, BUILDING_LAYER_ID) {
-                Ok(entity) => blocked_query.get(entity).is_ok(),
+                Ok(entity) => occupied_query.get(entity).is_ok(),
                 Err(_) => false,
             };
 
         let already_on_building = match map_query.get_tile_entity(c_pos, MAP_ID, BUILDING_LAYER_ID)
         {
+            Ok(entity) => occupied_query.get(entity).is_ok(),
+            Err(_) => false,
+        };
+
+        let already_blocked = match map_query.get_tile_entity(c_pos, MAP_ID, GROUND_LAYER_ID) {
             Ok(entity) => blocked_query.get(entity).is_ok(),
             Err(_) => false,
         };
 
-        let can_drive_to_new_pos = (already_on_building || !contains_building) && !contains_car;
+        let can_drive_to_new_pos =
+            (already_on_building || already_blocked || (!contains_building && !blocked_tile))
+                && !contains_car;
 
         if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
