@@ -53,6 +53,8 @@ pub struct Vehicle {
 pub enum GameEntityType {
     Building(BuildingEntity),
     Vehicle(Vehicle),
+    Water,
+    Forrest,
 }
 
 #[derive(Serialize, Deserialize)]

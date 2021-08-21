@@ -10,8 +10,9 @@ use crate::game::{
     car::{Car, CarController},
     construction::UnderConstruction,
     goals::GoalManager,
+    ground_tiles::{Forrest, Water},
     production::{DeliveryStation, Depot, ExportStation, ProductionBuilding},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
         Vehicle,
@@ -49,6 +50,8 @@ pub fn save_game(
         Query<&DeliveryStation>,
         Query<&Depot>,
         Query<&Street>,
+        Query<(), With<Water>>,
+        Query<(), With<Forrest>>,
         Query<(&Building, Option<&ProductionBuilding>)>,
     ),
     map_query: MapQuery,
@@ -68,6 +71,8 @@ pub fn save_game(
         delivery_station_query,
         depot_query,
         street_query,
+        water_query,
+        forrest_query,
         building_query,
     ) = queries;
 
@@ -87,6 +92,30 @@ pub fn save_game(
         for y in 0..size.y {
             for x in 0..size.x {
                 let pos = UVec2::new(x, y);
+
+                if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, GROUND_LAYER_ID) {
+                    if water_query.get(entity).is_ok() {
+                        state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
+                            pos,
+                            name: None,
+                            entity: GameEntityType::Water,
+                            statistics: None,
+                            under_construction: None,
+                        });
+                    }
+
+                    if forrest_query.get(entity).is_ok() {
+                        state.entities.push(GameEntity {
+                            uuid: uuids.get(entity),
+                            pos,
+                            name: None,
+                            entity: GameEntityType::Forrest,
+                            statistics: None,
+                            under_construction: None,
+                        });
+                    }
+                }
 
                 if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
                     let name = if let Ok(name) = name_query.get(entity) {

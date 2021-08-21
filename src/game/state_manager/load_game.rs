@@ -12,8 +12,9 @@ use crate::game::{
     },
     car::{Car, CarController, DepotController},
     goals::GoalManager,
+    ground_tiles::{BlockedForBuilding, Forrest, Water},
     production::{Product, ProductionBuilding},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
     },
@@ -77,6 +78,45 @@ fn load_state(
                     uuids.insert(uuid, entity);
                 }
             }
+            GameEntityType::Water => {
+                if let Some(entity) = insert_ground_tile(commands, &game_entity, map_query) {
+                    commands.entity(entity).insert(Water);
+                }
+            }
+            GameEntityType::Forrest => {
+                if let Some(entity) = insert_ground_tile(commands, &game_entity, map_query) {
+                    commands.entity(entity).insert(Forrest);
+                }
+            }
+        }
+    }
+}
+
+fn insert_ground_tile(
+    commands: &mut Commands,
+    game_entity: &GameEntity,
+    map_query: &mut MapQuery,
+) -> Option<Entity> {
+    let tile = Tile {
+        visible: false,
+        ..Default::default()
+    };
+
+    match map_query.set_tile(commands, game_entity.pos, tile, MAP_ID, GROUND_LAYER_ID) {
+        Err(why) => {
+            log::error!("Failed to set tile: {:?}", why);
+            None
+        }
+        Ok(entity) => {
+            commands
+                .entity(entity)
+                .insert(RequiresUpdate)
+                .insert(BlockedForBuilding)
+                .insert(Position {
+                    position: game_entity.pos,
+                });
+
+            Some(entity)
         }
     }
 }

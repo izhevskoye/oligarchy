@@ -162,9 +162,15 @@ impl Game {
                     .with_system(
                         state_manager::load_game::load_game
                             .system()
-                            .after(Label::Menu),
+                            .after(Label::Menu)
+                            .before(Label::Update),
                     )
-                    .with_system(ground_tiles::generate_tiles.system().after(Label::Menu))
+                    .with_system(
+                        ground_tiles::generate_tiles
+                            .system()
+                            .after(Label::Menu)
+                            .before(Label::Update),
+                    )
                     .with_system(
                         state_manager::save_game::save_game
                             .system()
