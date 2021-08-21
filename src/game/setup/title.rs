@@ -4,7 +4,6 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn teardown(mut commands: Commands, query: Query<Entity, With<Text>>) {
     for entity in query.iter() {
-        log::info!("remove ");
         commands.entity(entity).despawn_recursive();
     }
 }

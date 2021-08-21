@@ -8,12 +8,11 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity::get_entity,
     production::DeliveryStation,
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
 };
-
-use super::get_entity;
 
 #[allow(clippy::too_many_arguments)]
 pub fn delivery_station_placement(
@@ -27,7 +26,10 @@ pub fn delivery_station_placement(
         return;
     }
 
-    if Tool::DeliveryStation == selected_tool.tool && !clicked_tile.occupied_building {
+    if Tool::DeliveryStation == selected_tool.tool
+        && !clicked_tile.occupied_building
+        && clicked_tile.can_build
+    {
         if let Some(pos) = clicked_tile.pos {
             let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 

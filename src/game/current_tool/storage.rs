@@ -8,11 +8,10 @@ use crate::game::{
         RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity::get_entity,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     storage::{Storage, StorageConsolidator},
 };
-
-use super::get_entity;
 
 #[allow(clippy::too_many_arguments)]
 pub fn storage_placement(
@@ -28,7 +27,7 @@ pub fn storage_placement(
     }
 
     if let Tool::Storage(resource) = &selected_tool.tool {
-        if !clicked_tile.occupied_building {
+        if !clicked_tile.occupied_building && clicked_tile.can_build {
             if let Some(pos) = clicked_tile.pos {
                 let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 

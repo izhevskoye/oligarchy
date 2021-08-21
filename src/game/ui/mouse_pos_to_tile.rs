@@ -6,7 +6,8 @@ use crate::game::{
     assets::{ClickedTile, MapSettings, Occupied, Position},
     car::Car,
     constants::{CHUNK_SIZE, TILE_SIZE},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    ground_tiles::BlockedForBuilding,
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
 fn eval_pos(map_settings: &Res<MapSettings>, x: f32, y: f32, modifier: i32) -> Option<UVec2> {
@@ -35,11 +36,12 @@ pub fn mouse_pos_to_tile(
         Query<&Transform, With<Camera>>,
         Query<&Occupied>,
         Query<&Position, With<Car>>,
+        Query<&BlockedForBuilding>,
     ),
     map_query: MapQuery,
     map_settings: Res<MapSettings>,
 ) {
-    let (transform, occupied_query, car_query) = queries;
+    let (transform, occupied_query, car_query, blocked_query) = queries;
 
     clicked_tile.pos = None;
     clicked_tile.occupied_building = false;
@@ -71,6 +73,13 @@ pub fn mouse_pos_to_tile(
                     occupied_query.get(entity).is_ok()
                 } else {
                     false
+                };
+
+            clicked_tile.can_build =
+                if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, GROUND_LAYER_ID) {
+                    blocked_query.get(entity).is_err()
+                } else {
+                    true
                 };
         }
 

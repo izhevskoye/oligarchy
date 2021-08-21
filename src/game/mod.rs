@@ -8,6 +8,8 @@ mod construction;
 mod current_selection;
 mod current_tool;
 mod goals;
+mod ground_tiles;
+mod helper;
 mod production;
 mod remove_update;
 mod setup;
@@ -34,7 +36,9 @@ use self::{
     },
     current_selection::CurrentlySelected,
     goals::GoalManager,
-    state_manager::{LoadGameEvent, SaveGameEvent},
+    ground_tiles::{Forrest, Water},
+    state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
+    street::Street,
 };
 
 #[derive(Default)]
@@ -95,6 +99,7 @@ impl Game {
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_plugin(TilemapPlugin)
             .add_state(AppState::MainMenu)
+            .add_event::<NewGameEvent>()
             .add_event::<LoadGameEvent>()
             .add_event::<SaveGameEvent>()
             .add_event::<RemovedBuildingEvent>()
@@ -159,6 +164,7 @@ impl Game {
                             .system()
                             .after(Label::Menu),
                     )
+                    .with_system(ground_tiles::generate_tiles.system().after(Label::Menu))
                     .with_system(
                         state_manager::save_game::save_game
                             .system()
@@ -276,6 +282,9 @@ impl Game {
                     .with_system(asset_tiles::delivery_station_update.system())
                     .with_system(asset_tiles::ground_update.system())
                     .with_system(street::update_streets.system())
+                    .with_system(helper::neighbor_structure::update_tile::<Water>.system())
+                    .with_system(helper::neighbor_structure::update_tile::<Forrest>.system())
+                    .with_system(helper::neighbor_structure::update_tile::<Street>.system())
                     .with_system(storage::update_consolidators.system())
                     .with_system(car::spawn_car.system())
                     .with_system(car::update_car.system()),

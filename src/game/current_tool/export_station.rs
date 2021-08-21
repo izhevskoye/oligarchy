@@ -8,13 +8,12 @@ use crate::game::{
         RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity::get_entity,
     production::ExportStation,
     setup::BUILDING_LAYER_ID,
     statistics::Statistics,
     storage::StorageConsolidator,
 };
-
-use super::get_entity;
 
 pub fn export_station_placement(
     mut commands: Commands,
@@ -27,7 +26,10 @@ pub fn export_station_placement(
         return;
     }
 
-    if Tool::ExportStation == selected_tool.tool && !clicked_tile.occupied_building {
+    if Tool::ExportStation == selected_tool.tool
+        && !clicked_tile.occupied_building
+        && clicked_tile.can_build
+    {
         if let Some(pos) = clicked_tile.pos {
             let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 

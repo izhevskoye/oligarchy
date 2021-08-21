@@ -8,11 +8,12 @@ use crate::game::{
         Position, RequiresUpdate, SelectedTool, Tool,
     },
     construction::UnderConstruction,
+    helper::get_entity::get_entity,
     setup::BUILDING_LAYER_ID,
     street::Street,
 };
 
-use super::{get_entity, update_neighbor_streets};
+use super::update_neighbor_streets;
 
 #[allow(clippy::too_many_arguments)]
 pub fn street_placement(
@@ -23,7 +24,10 @@ pub fn street_placement(
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
 ) {
-    if selected_tool.tool != Tool::Street || clicked_tile.occupied_building {
+    if selected_tool.tool != Tool::Street
+        || clicked_tile.occupied_building
+        || !clicked_tile.can_build
+    {
         return;
     }
 
