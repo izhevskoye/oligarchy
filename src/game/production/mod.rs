@@ -1,6 +1,7 @@
 pub mod export_station;
 pub mod idle;
 pub mod production_building;
+pub mod storage_management;
 
 use std::collections::HashSet;
 
@@ -108,5 +109,23 @@ pub struct DeliveryStation;
 impl PurchaseCost for DeliveryStation {
     fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         250
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct StorageManagement;
+
+impl PurchaseCost for StorageManagement {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
+        1200
+    }
+}
+
+impl InfoUI for StorageManagement {
+    fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
+        ui.horizontal(|ui| {
+            ui.label("Storage Management");
+        });
     }
 }

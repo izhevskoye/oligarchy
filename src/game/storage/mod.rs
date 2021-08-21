@@ -16,7 +16,7 @@ use super::{
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Storage {
     pub resource: String,

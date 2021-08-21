@@ -19,7 +19,8 @@ pub const UNIT: &str = "t";
 
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]
 pub enum MapTile {
-    Ground = 2,
+    StorageManagement = 1,
+    Ground,
     Storage,
     ExportStation = 10,
     GroundFactory = 32,

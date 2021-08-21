@@ -15,7 +15,7 @@ use crate::game::{
     },
     car::Car,
     constants::CURRENCY,
-    production::{DeliveryStation, Depot, ExportStation},
+    production::{DeliveryStation, Depot, ExportStation, StorageManagement},
     storage::Storage,
     street::Street,
 };
@@ -99,11 +99,16 @@ pub fn construction_ui(
             ui.separator();
 
             egui::containers::ScrollArea::from_max_height(max_height).show(ui, |ui| {
-                let building_names: Vec<&str> =
-                    vec!["Street", "Export Station", "Delivery Station", "Depot"]
-                        .into_iter()
-                        .filter(|item| filter.match_name(item))
-                        .collect();
+                let building_names: Vec<&str> = vec![
+                    "Street",
+                    "Export Station",
+                    "Delivery Station",
+                    "Depot",
+                    "Storage Management",
+                ]
+                .into_iter()
+                .filter(|item| filter.match_name(item))
+                .collect();
 
                 if !building_names.is_empty() {
                     let group_title = "Building: General";
@@ -146,6 +151,19 @@ pub fn construction_ui(
                                 .clicked()
                             {
                                 selected_tool.tool = Tool::DeliveryStation;
+                            }
+
+                            if filter.match_name("Storage Management")
+                                && button(
+                                    ui,
+                                    "Storage Management",
+                                    &StorageManagement,
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
+                            {
+                                selected_tool.tool = Tool::StorageManagement;
                             }
                         });
                     });

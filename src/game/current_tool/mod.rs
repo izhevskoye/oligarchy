@@ -5,6 +5,7 @@ pub mod delivery_station;
 pub mod depot;
 pub mod export_station;
 pub mod storage;
+pub mod storage_management;
 pub mod street;
 
 use bevy::prelude::*;
