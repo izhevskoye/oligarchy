@@ -2,7 +2,7 @@
   name: Coal Quarry
   tile: 5
   products:
-    - resource: coal
+    - resource: coal.ore
       rate: 1
   group: Metallurgy
   cost:

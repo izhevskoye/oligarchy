@@ -1,0 +1,17 @@
+"coal_processing_plant":
+  name: Coal Processing Plant
+  tile: 112
+  products:
+    - resource: coal
+      rate: 1.0
+      requisites:
+        - resource: coal.ore
+          rate: 2.0
+
+  group: Metallurgy
+  cost:
+    resources:
+      steel.blooms: 20
+      steel.slabs: 30
+      steel.billets: 10
+    base: 1000
