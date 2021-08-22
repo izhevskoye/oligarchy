@@ -2,7 +2,7 @@ use bevy::{prelude::*, render::camera::Camera};
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::MapSettings,
+    assets::{ClickedTile, MapSettings, SelectedTool},
     car::Car,
     constants::{MapTile, CHUNK_SIZE, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
 };
@@ -35,6 +35,10 @@ pub fn setup(
     camera_query: Query<Entity, With<Camera>>,
 ) {
     commands.insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)));
+
+    // reset tools
+    commands.insert_resource(SelectedTool::default());
+    commands.insert_resource(ClickedTile::default());
 
     for entity in camera_query.iter() {
         commands.entity(entity).despawn_recursive();
