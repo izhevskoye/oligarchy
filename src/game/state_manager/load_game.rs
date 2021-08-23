@@ -18,6 +18,7 @@ use crate::game::{
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, LoadGameEvent, Vehicle,
     },
+    statistics::StatisticTracker,
     storage::StorageConsolidator,
 };
 
@@ -32,12 +33,14 @@ pub fn load_game(
     mut goals: ResMut<GoalManager>,
     mut account: ResMut<Account>,
     mut state_name: ResMut<StateName>,
+    mut deleted_export_statistics: ResMut<StatisticTracker>,
     resources: Res<ResourceSpecifications>,
 ) {
     for event in load_game.iter() {
         goals.goals = event.state.goals.clone();
         *account = event.state.account.clone();
         *state_name = event.state.state_name.clone();
+        *deleted_export_statistics = event.state.deleted_export_statistics.clone();
 
         load_state(
             &mut commands,

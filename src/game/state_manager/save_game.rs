@@ -17,7 +17,7 @@ use crate::game::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
         Vehicle,
     },
-    statistics::Statistics,
+    statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
 };
@@ -61,6 +61,7 @@ pub fn save_game(
     goals: Res<GoalManager>,
     account: Res<Account>,
     state_name: Res<StateName>,
+    deleted_export_statistics: Res<StatisticTracker>,
 ) {
     let (
         name_query,
@@ -84,6 +85,7 @@ pub fn save_game(
             goals: goals.goals.clone(),
             account: account.clone(),
             state_name: state_name.clone(),
+            deleted_export_statistics: deleted_export_statistics.clone(),
             ..Default::default()
         };
 

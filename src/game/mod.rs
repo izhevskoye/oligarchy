@@ -38,6 +38,7 @@ use self::{
     goals::GoalManager,
     ground_tiles::{Forrest, Water},
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
+    statistics::StatisticTracker,
     street::Street,
 };
 
@@ -88,6 +89,7 @@ impl Game {
             .init_resource::<GoalManager>()
             .init_resource::<Account>()
             .init_resource::<StateName>()
+            .init_resource::<StatisticTracker>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .insert_resource(WindowDescriptor {

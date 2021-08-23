@@ -14,7 +14,7 @@ use crate::game::{
     construction::UnderConstruction,
     goals::Goal,
     production::{DeliveryStation, Depot, ExportStation, StorageManagement},
-    statistics::Statistics,
+    statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
 };
@@ -71,6 +71,8 @@ pub struct GameEntity {
 #[derive(Default, Serialize, Deserialize)]
 pub struct GameState {
     pub state_name: StateName,
+    #[serde(default)]
+    pub deleted_export_statistics: StatisticTracker,
     pub settings: MapSettings,
     pub entities: Vec<GameEntity>,
     pub goals: HashMap<String, Goal>,

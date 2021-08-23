@@ -7,6 +7,7 @@ use crate::game::{
     constants::MapTile,
     production::Idle,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
+    statistics::{StatisticTracker, Statistics},
     street::Street,
 };
 
@@ -19,8 +20,10 @@ pub fn bulldoze(
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
     street_query: Query<&Street>,
+    statistics_query: Query<&Statistics>,
     car_query: Query<(Entity, &Position), With<Car>>,
     idle_query: Query<&Idle>,
+    mut deleted_export_statistics: ResMut<StatisticTracker>,
     mut tile_query: Query<&mut Tile>,
     mut removed_events: EventWriter<RemovedBuildingEvent>,
 ) {
@@ -44,6 +47,10 @@ pub fn bulldoze(
                         if let Some(entity) = idle.entity {
                             commands.entity(entity).despawn_recursive();
                         }
+                    }
+
+                    if let Ok(statistics) = statistics_query.get(entity) {
+                        deleted_export_statistics.merge(&statistics.export);
                     }
                 }
 
