@@ -4,7 +4,7 @@ use crate::game::{assets::MapSettings, constants::CHUNK_SIZE};
 
 pub struct EvalNeighbor<'a, T: 'static>
 where
-    T: Sync + Send + 'a,
+    T: Sync + Send,
 {
     pub map_settings: &'a MapSettings,
     pub query: &'a Query<'a, (), With<T>>,

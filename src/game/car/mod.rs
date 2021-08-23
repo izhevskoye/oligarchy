@@ -214,7 +214,6 @@ pub fn spawn_car(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn update_car(
     time: Res<Time>,
     mut car_query: Query<(

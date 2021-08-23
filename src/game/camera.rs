@@ -11,7 +11,6 @@ const MAX_ZOOM_OUT: f32 = 0.1;
 const MAX_ZOOM_IN: f32 = 1.5;
 
 // A simple camera system for moving and zooming the camera.
-#[allow(clippy::too_many_arguments)]
 pub fn movement(
     time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,

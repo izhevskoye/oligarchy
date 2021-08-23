@@ -17,7 +17,6 @@ use crate::game::{
 
 use super::production::{Depot, StorageManagement};
 
-#[allow(clippy::type_complexity)]
 pub fn construction_update(
     mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,
 ) {
@@ -31,7 +30,6 @@ pub fn construction_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn building_update(
     mut query: Query<(&mut Tile, &Building), (With<RequiresUpdate>, Without<UnderConstruction>)>,
     buildings: Res<BuildingSpecifications>,
@@ -45,7 +43,6 @@ pub fn building_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn depot_update(
     mut query: Query<
         &mut Tile,
@@ -62,7 +59,6 @@ pub fn depot_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn storage_update(
     mut query: Query<(&mut Tile, &Storage), (With<RequiresUpdate>, Without<UnderConstruction>)>,
     resources: Res<ResourceSpecifications>,
@@ -77,7 +73,6 @@ pub fn storage_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn export_station_update(
     mut query: Query<
         &mut Tile,
@@ -93,7 +88,6 @@ pub fn export_station_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn delivery_station_update(
     mut query: Query<
         &mut Tile,
@@ -110,7 +104,6 @@ pub fn delivery_station_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn storage_management_update(
     mut query: Query<
         &mut Tile,
@@ -127,7 +120,6 @@ pub fn storage_management_update(
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn ground_update(
     query: Query<
         &Position,

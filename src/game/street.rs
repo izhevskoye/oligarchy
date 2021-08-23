@@ -38,7 +38,6 @@ impl PurchaseCost for Street {
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn update_streets(
     mut tile_query: Query<
         (&mut Tile, &Position),

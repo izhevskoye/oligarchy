@@ -8,9 +8,10 @@ use std::collections::HashMap;
 
 use bevy::prelude::*;
 
-use crate::game::statistics::Statistics;
-
-use super::assets::{MapSettings, MapSize};
+use crate::game::{
+    assets::{MapSettings, MapSize},
+    statistics::{StatisticTracker, Statistics},
+};
 
 #[derive(Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -81,14 +82,18 @@ pub fn generate_goals(mut manager: ResMut<GoalManager>, map_settings: Res<MapSet
     }
 }
 
-pub fn update_goals(query: Query<&Statistics>, mut manager: ResMut<GoalManager>) {
+pub fn update_goals(
+    query: Query<&Statistics>,
+    mut manager: ResMut<GoalManager>,
+    deleted_export_statistics: Res<StatisticTracker>,
+) {
     if manager.goals.is_empty() {
         return;
     }
 
     let mut remove = vec![];
     for (resource, goal) in manager.goals.iter_mut() {
-        goal.current = 0.0;
+        goal.current = deleted_export_statistics.get(resource);
 
         for statistic in query.iter() {
             goal.current += statistic.export.get(resource);

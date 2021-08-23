@@ -108,7 +108,6 @@ pub fn get_state_name(file_name: &str) -> Option<String> {
     }
 }
 
-#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn save_ui(
     mut commands: Commands,
     egui_context: ResMut<EguiContext>,

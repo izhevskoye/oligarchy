@@ -26,7 +26,6 @@ fn eval_pos(map_settings: &Res<MapSettings>, x: f32, y: f32, modifier: i32) -> O
     Some(UVec2::new(x as u32, y as u32))
 }
 
-#[allow(clippy::type_complexity)]
 pub fn mouse_pos_to_tile(
     egui_context: ResMut<EguiContext>,
     windows: Res<Windows>,

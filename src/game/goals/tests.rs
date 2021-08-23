@@ -35,6 +35,7 @@ fn remove_goals_when_completed() {
     );
 
     world.insert_resource(goal_manager);
+    world.insert_resource(StatisticTracker::default());
     world.insert_resource(MapSettings::default());
 
     stage.run(&mut world);

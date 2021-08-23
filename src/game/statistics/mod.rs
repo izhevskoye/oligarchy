@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -9,6 +12,14 @@ pub struct StatisticTracker {
 }
 
 impl StatisticTracker {
+    pub fn merge(&mut self, other: &StatisticTracker) {
+        for (resource, amount) in other.data.iter() {
+            let value = amount + self.data.get(resource).unwrap_or(&0.0);
+
+            self.data.insert(resource.to_owned(), value);
+        }
+    }
+
     pub fn track(&mut self, resource: &str, amount: f64) {
         self.data.insert(
             resource.to_owned(),
