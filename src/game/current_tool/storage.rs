@@ -13,7 +13,6 @@ use crate::game::{
     storage::{Storage, StorageConsolidator},
 };
 
-#[allow(clippy::too_many_arguments)]
 pub fn storage_placement(
     mut commands: Commands,
     mut map_query: MapQuery,

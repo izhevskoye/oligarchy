@@ -43,7 +43,6 @@ impl From<Water> for LayerIndex {
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn generate_tiles(
     mut commands: Commands,
     mut map_query: MapQuery,

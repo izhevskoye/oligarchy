@@ -38,7 +38,6 @@ impl UuidCollection {
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn save_game(
     queries: (
         Query<&Name>,

@@ -24,7 +24,6 @@ use crate::game::{
 
 use super::VehicleController;
 
-#[allow(clippy::too_many_arguments)]
 pub fn load_game(
     mut commands: Commands,
     mut map_query: MapQuery,

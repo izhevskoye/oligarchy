@@ -13,7 +13,6 @@ use crate::game::{
     storage::{Storage, StorageConsolidator},
 };
 
-#[allow(clippy::type_complexity)]
 pub fn production_building(
     mut commands: Commands,
     mut building_query: Query<

@@ -22,7 +22,6 @@ where
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn info_ui(
     buildings: Res<BuildingSpecifications>,
     egui_context: ResMut<EguiContext>,

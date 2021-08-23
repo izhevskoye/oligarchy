@@ -14,7 +14,6 @@ use super::{Car, CarController, CarInstructions, Destination, Waypoints};
 
 const AMOUNT: f64 = 4.0;
 
-#[allow(clippy::too_many_arguments)]
 pub fn load(
     mut car_query: Query<(&mut Car, &Position)>,
     mut storage_query: Query<&mut Storage>,
@@ -63,7 +62,6 @@ pub fn load(
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn unload(
     mut car_query: Query<(&mut Car, &Position)>,
     mut storage_query: Query<&mut Storage>,
@@ -119,7 +117,6 @@ pub fn unload(
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn goto(
     mut commands: Commands,
     mut car_query: Query<(&mut Car, &Position)>,
@@ -163,7 +160,6 @@ pub struct WaitTime {
 const MAX_TICKS: i64 = 10;
 const PERCENTAGE_TO_FILL: f64 = 0.4;
 
-#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn car_instruction(
     mut commands: Commands,
     mut car_query: Query<

@@ -90,7 +90,6 @@ impl From<NeighborStructure> for u16 {
     }
 }
 
-#[allow(clippy::type_complexity)]
 pub fn update_tile<T: 'static + Send + Sync + Default>(
     mut tile_query: Query<(&mut Tile, &Position), (With<T>, With<RequiresUpdate>)>,
     query: Query<(), With<T>>,

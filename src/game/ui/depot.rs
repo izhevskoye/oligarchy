@@ -24,7 +24,6 @@ impl Default for EditMode {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
     mut depot_query: Query<(Entity, &mut Depot)>,

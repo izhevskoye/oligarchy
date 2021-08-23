@@ -15,7 +15,6 @@ use crate::game::{
 
 use super::update_neighbor_streets;
 
-#[allow(clippy::too_many_arguments)]
 pub fn street_placement(
     mut commands: Commands,
     street_query: Query<&Street>,

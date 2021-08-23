@@ -21,8 +21,8 @@ fn merge_statistics_tracker() {
 
     a.merge(&b);
 
-    assert!((a.data.get("b").unwrap() - 10.0) < f64::EPSILON);
-    assert!((a.data.get("a").unwrap() - 20.0) < f64::EPSILON);
+    assert!((a.data.get("b").unwrap() - 10.0).abs() < f64::EPSILON);
+    assert!((a.data.get("a").unwrap() - 20.0).abs() < f64::EPSILON);
 }
 
 #[test]
@@ -30,7 +30,7 @@ fn tracker() {
     let mut tracker = StatisticTracker::default();
     assert!(tracker.get("a") < f64::EPSILON);
     tracker.track("a", 10.0);
-    assert!((tracker.get("a") - 10.0) < f64::EPSILON);
+    assert!((tracker.get("a") - 10.0).abs() < f64::EPSILON);
     tracker.track("a", 2.0);
-    assert!((tracker.get("a") - 12.0) < f64::EPSILON);
+    assert!((tracker.get("a") - 12.0).abs() < f64::EPSILON);
 }
