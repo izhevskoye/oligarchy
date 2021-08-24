@@ -9,13 +9,13 @@ use crate::game::{
     },
     constants::MapTile,
     construction::UnderConstruction,
-    production::{DeliveryStation, ImportExportStation},
+    production::{
+        DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
+    },
     setup::{GROUND_LAYER_ID, MAP_ID},
     storage::Storage,
     street::Street,
 };
-
-use super::production::{Depot, StorageManagement};
 
 pub fn construction_update(
     mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,
@@ -75,15 +75,15 @@ pub fn storage_update(
 
 pub fn import_export_station_update(
     mut query: Query<
-        &mut Tile,
-        (
-            With<ImportExportStation>,
-            (With<RequiresUpdate>, Without<UnderConstruction>),
-        ),
+        (&mut Tile, &ImportExportStation),
+        (With<RequiresUpdate>, Without<UnderConstruction>),
     >,
 ) {
-    for mut tile in query.iter_mut() {
-        tile.texture_index = MapTile::ExportStation as u16;
+    for (mut tile, station) in query.iter_mut() {
+        tile.texture_index = match station.direction {
+            ImportExportDirection::Export => MapTile::ExportStation,
+            ImportExportDirection::Import => MapTile::ImportStation,
+        } as u16;
         tile.visible = true;
     }
 }

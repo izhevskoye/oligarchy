@@ -5,6 +5,7 @@ use collecting_hashmap::CollectingHashMap;
 use crate::game::{
     assets::resource_specifications::ResourceSpecifications,
     current_selection::CurrentlySelected,
+    goals::GoalManager,
     production::{ImportExportDirection, ImportExportStation},
 };
 
@@ -13,10 +14,13 @@ pub fn edit_ui(
     mut query: Query<&mut ImportExportStation>,
     currently_selected: Res<CurrentlySelected>,
     resources: Res<ResourceSpecifications>,
+    goals: Res<GoalManager>,
 ) {
     if !currently_selected.editing {
         return;
     }
+
+    let not_allowed_imports: Vec<&String> = goals.goals.keys().collect();
 
     if let Some(entity) = currently_selected.entity {
         if let Ok(mut station) = query.get_mut(entity) {
@@ -27,6 +31,12 @@ pub fn edit_ui(
             .show(egui_context.ctx(), |ui| {
                 let mut groups = CollectingHashMap::new();
                 for (id, resource) in resources.iter() {
+                    if station.direction == ImportExportDirection::Import
+                        && not_allowed_imports.contains(&id)
+                    {
+                        continue;
+                    }
+
                     if resource.cost > f64::EPSILON && !resource.virtual_resource {
                         groups.insert(resource.group.clone(), (id, resource));
                     }

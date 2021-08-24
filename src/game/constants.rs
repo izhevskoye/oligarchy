@@ -34,6 +34,7 @@ pub enum MapTile {
     Construction = 80,
     ConstructionStreet,
     Depot,
+    ImportStation = 88,
     WaterTilesOffset = 96,
     ForrestTilesOffset = 144,
 }
