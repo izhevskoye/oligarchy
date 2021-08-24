@@ -4,7 +4,8 @@ use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
     assets::{CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate},
-    setup::{BUILDING_LAYER_ID, MAP_ID},
+    ground_tiles::BlockedForBuilding,
+    setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     street::Street,
 };
 
@@ -18,22 +19,28 @@ fn cost_fn<'a, 'b: 'a>(
     map_query: &'b MapQuery,
     street_query: &'a Query<(), With<Street>>,
     occupied_query: &'a Query<(), (With<Occupied>, Without<CanDriveOver>)>,
+    blocked_query: &'a Query<(), With<BlockedForBuilding>>,
 ) -> impl 'a + Fn((usize, usize)) -> isize {
-    move |(x, y)| match map_query.get_tile_entity(
-        UVec2::new(x as u32, y as u32),
-        MAP_ID,
-        BUILDING_LAYER_ID,
-    ) {
-        Ok(entity) => {
-            if street_query.get(entity).is_ok() {
-                STREET_COST
-            } else if occupied_query.get(entity).is_ok() {
-                BUILDING_COST
-            } else {
-                GRASS_COST
+    move |(x, y)| {
+        let pos = UVec2::new(x as u32, y as u32);
+        if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, GROUND_LAYER_ID) {
+            if blocked_query.get(entity).is_ok() {
+                return BUILDING_COST;
             }
         }
-        Err(_) => GRASS_COST,
+
+        match map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {
+            Ok(entity) => {
+                if street_query.get(entity).is_ok() {
+                    STREET_COST
+                } else if occupied_query.get(entity).is_ok() {
+                    BUILDING_COST
+                } else {
+                    GRASS_COST
+                }
+            }
+            Err(_) => GRASS_COST,
+        }
     }
 }
 
@@ -42,6 +49,7 @@ pub fn calculate_destination(
     mut car_query: Query<(Entity, &Destination, &Position), With<Car>>,
     street_query: Query<(), With<Street>>,
     occupied_query: Query<(), (With<Occupied>, Without<CanDriveOver>)>,
+    blocked_query: Query<(), With<BlockedForBuilding>>,
     update_query: Query<&Position, (With<Tile>, With<RequiresUpdate>)>,
     map_query: MapQuery,
     mut pathfinding: Local<Option<PathCache<ManhattanNeighborhood>>>,
@@ -55,7 +63,7 @@ pub fn calculate_destination(
 
         let cache = PathCache::new(
             (size.x as usize, size.y as usize),
-            cost_fn(&map_query, &street_query, &occupied_query),
+            cost_fn(&map_query, &street_query, &occupied_query, &blocked_query),
             ManhattanNeighborhood::new(size.x as usize, size.y as usize),
             PathCacheConfig {
                 chunk_size: 2,
@@ -86,7 +94,7 @@ pub fn calculate_destination(
                 let pathfinding = pathfinding.as_mut().unwrap();
                 pathfinding.tiles_changed(
                     &changes,
-                    cost_fn(&map_query, &street_query, &occupied_query),
+                    cost_fn(&map_query, &street_query, &occupied_query, &blocked_query),
                 );
             }
             updated = true;
@@ -111,7 +119,7 @@ pub fn calculate_destination(
                 destination.destination.x as usize,
                 destination.destination.y as usize,
             ),
-            cost_fn(&map_query, &street_query, &occupied_query),
+            cost_fn(&map_query, &street_query, &occupied_query, &blocked_query),
         );
 
         if let Some(path) = path {

@@ -7,6 +7,7 @@ use rand::{thread_rng, Rng};
 use crate::game::{
     assets::{CanDriveOver, Direction, Occupied, Position, RequiresUpdate},
     car::{Car, Waypoints},
+    construction::UnderConstruction,
     ground_tiles::BlockedForBuilding,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
@@ -15,6 +16,7 @@ pub fn drive_to_destination(
     mut commands: Commands,
     mut car_query: Query<(Entity, &mut Car, &mut Position)>,
     occupied_query: Query<(), (With<Occupied>, Without<CanDriveOver>)>,
+    construction_query: Query<(), With<UnderConstruction>>,
     blocked_query: Query<(), With<BlockedForBuilding>>,
     mut waypoint_query: Query<&mut Waypoints>,
     map_query: MapQuery,
@@ -100,9 +102,16 @@ pub fn drive_to_destination(
             Err(_) => false,
         };
 
-        let can_drive_to_new_pos =
-            (already_on_building || already_blocked || (!contains_building && !blocked_tile))
-                && !contains_car;
+        let contains_construction =
+            match map_query.get_tile_entity(new_car_position / 2, MAP_ID, BUILDING_LAYER_ID) {
+                Ok(entity) => construction_query.get(entity).is_ok(),
+                Err(_) => false,
+            };
+
+        let can_drive_to_new_pos = (already_on_building
+            || already_blocked
+            || (!contains_building && !blocked_tile && !contains_construction))
+            && !contains_car;
 
         if !can_drive_to_new_pos && direction != Direction::None {
             log::warn!("Car is blocked");
