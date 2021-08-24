@@ -4,6 +4,7 @@ mod tests;
 use bevy::prelude::*;
 
 const MAX_AMOUNT: f64 = 10.0;
+const IMPORT_SURCHARGE: f64 = 1.2;
 
 use crate::game::{
     account::AccountTransaction,
@@ -59,7 +60,7 @@ pub fn import_export_station(
                     log::info!("Importing {} {:?}", amount, resource.name);
 
                     events.send(AccountTransaction {
-                        amount: (amount * -resource.cost) as i64,
+                        amount: (IMPORT_SURCHARGE * amount * -resource.cost) as i64,
                     });
 
                     break;

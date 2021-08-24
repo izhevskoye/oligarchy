@@ -315,7 +315,7 @@ mod import {
 
         setup.assert_storage_amount(10.0);
         setup.assert_imported_statistic(1.0);
-        setup.assert_event_sum(-RESOURCE_COST as i64);
+        setup.assert_event_sum((IMPORT_SURCHARGE * -RESOURCE_COST) as i64);
     }
 
     #[test]
@@ -330,7 +330,7 @@ mod import {
 
         setup.assert_storage_amount(10.0);
         setup.assert_imported_statistic(10.0);
-        setup.assert_event_sum(10 * -RESOURCE_COST as i64);
+        setup.assert_event_sum((IMPORT_SURCHARGE * 10.0 * -RESOURCE_COST) as i64);
     }
 
     #[test]
