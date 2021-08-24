@@ -269,7 +269,7 @@ pub fn car_instruction(
                 let skip = match &user_controller.instructions[user_controller.current_instruction]
                 {
                     CarInstructions::Nop => true,
-                    CarInstructions::GoTo(destination) => position.position == *destination,
+                    CarInstructions::GoTo(destination) => position.position / 2 == *destination,
                     CarInstructions::Load(_resource) => {
                         if let Some(current_position_storage) = current_position_storage {
                             storage.is_full() || current_position_storage.is_empty()
