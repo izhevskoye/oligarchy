@@ -2,9 +2,10 @@ use bevy::{prelude::*, render::camera::Camera};
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, MapSettings, SelectedTool},
+    assets::{ClickedTile, MapSettings},
     car::Car,
     constants::{MapTile, CHUNK_SIZE, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
+    current_tool::SelectedTool,
 };
 
 use super::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID};

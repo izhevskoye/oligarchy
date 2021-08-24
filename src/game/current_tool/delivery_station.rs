@@ -5,7 +5,7 @@ use crate::game::{
     account::{MaintenanceCost, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, CanDriveOver, ClickedTile, Occupied,
-        Position, RequiresUpdate, SelectedTool, Tool,
+        Position, RequiresUpdate,
     },
     construction::UnderConstruction,
     helper::get_entity::get_entity,
@@ -13,6 +13,8 @@ use crate::game::{
     setup::BUILDING_LAYER_ID,
     storage::StorageConsolidator,
 };
+
+use super::{SelectedTool, Tool};
 
 pub fn delivery_station_placement(
     mut commands: Commands,

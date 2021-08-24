@@ -2,14 +2,13 @@ use bevy::prelude::*;
 
 use crate::game::{
     account::{Account, AccountTransaction, MaintenanceCost, PurchaseCost},
-    assets::{
-        resource_specifications::ResourceSpecifications, ClickedTile, Editable, Position,
-        SelectedTool, Tool,
-    },
+    assets::{resource_specifications::ResourceSpecifications, ClickedTile, Editable, Position},
     car::Car,
     constants::CAR_STORAGE_SIZE,
     storage::Storage,
 };
+
+use super::{SelectedTool, Tool};
 
 pub fn car_placement(
     mut commands: Commands,

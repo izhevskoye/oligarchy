@@ -9,7 +9,7 @@ use crate::game::{
     },
     constants::MapTile,
     construction::UnderConstruction,
-    production::{DeliveryStation, ExportStation},
+    production::{DeliveryStation, ImportExportStation},
     setup::{GROUND_LAYER_ID, MAP_ID},
     storage::Storage,
     street::Street,
@@ -73,11 +73,11 @@ pub fn storage_update(
     }
 }
 
-pub fn export_station_update(
+pub fn import_export_station_update(
     mut query: Query<
         &mut Tile,
         (
-            With<ExportStation>,
+            With<ImportExportStation>,
             (With<RequiresUpdate>, Without<UnderConstruction>),
         ),
     >,

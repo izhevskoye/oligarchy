@@ -140,13 +140,11 @@ pub fn has_in_storage(
     amount_in_storage(consolidator, storage_query, resource) >= amount
 }
 
-pub fn has_space_in_storage(
+pub fn space_in_storage(
     consolidator: &StorageConsolidator,
     storage_query: &mut Query<&mut Storage>,
     resource: &str,
-    amount: f64,
-) -> bool {
-    assert!(amount > 0.0);
+) -> f64 {
     let mut amount_found = 0.0;
     for storage in consolidator.connected_storage.iter() {
         if let Ok(storage) = storage_query.get_mut(*storage) {
@@ -155,13 +153,20 @@ pub fn has_space_in_storage(
                 amount_found += space_left;
             }
         }
-
-        if amount_found >= amount {
-            return true;
-        }
     }
 
-    false
+    amount_found
+}
+
+pub fn has_space_in_storage(
+    consolidator: &StorageConsolidator,
+    storage_query: &mut Query<&mut Storage>,
+    resource: &str,
+    amount: f64,
+) -> bool {
+    assert!(amount > 0.0);
+
+    space_in_storage(consolidator, storage_query, resource) >= amount
 }
 
 pub fn fetch_from_storage(

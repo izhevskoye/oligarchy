@@ -3,13 +3,14 @@ use bevy_egui::{egui, EguiContext};
 use collecting_hashmap::CollectingHashMap;
 
 use crate::game::{
-    assets::resource_specifications::ResourceSpecifications, current_selection::CurrentlySelected,
-    production::ExportStation,
+    assets::resource_specifications::ResourceSpecifications,
+    current_selection::CurrentlySelected,
+    production::{ImportExportDirection, ImportExportStation},
 };
 
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
-    mut export_query: Query<&mut ExportStation>,
+    mut query: Query<&mut ImportExportStation>,
     currently_selected: Res<CurrentlySelected>,
     resources: Res<ResourceSpecifications>,
 ) {
@@ -18,8 +19,12 @@ pub fn edit_ui(
     }
 
     if let Some(entity) = currently_selected.entity {
-        if let Ok(mut export) = export_query.get_mut(entity) {
-            egui::Window::new("Export Station").show(egui_context.ctx(), |ui| {
+        if let Ok(mut station) = query.get_mut(entity) {
+            egui::Window::new(match station.direction {
+                ImportExportDirection::Export => "Export Station",
+                ImportExportDirection::Import => "Import Station",
+            })
+            .show(egui_context.ctx(), |ui| {
                 let mut groups = CollectingHashMap::new();
                 for (id, resource) in resources.iter() {
                     if resource.cost > f64::EPSILON && !resource.virtual_resource {
@@ -36,7 +41,7 @@ pub fn edit_ui(
 
                     let count = resources
                         .iter()
-                        .filter(|(id, _resource)| export.goods.contains(id))
+                        .filter(|(id, _resource)| station.goods.contains(id))
                         .count();
 
                     egui::CollapsingHeader::new(format!("{} ({})", group, count))
@@ -47,7 +52,7 @@ pub fn edit_ui(
                                     .button(format!(
                                         "{}: {}",
                                         resource.name,
-                                        if export.goods.contains(id) {
+                                        if station.goods.contains(id) {
                                             "Yes"
                                         } else {
                                             "No"
@@ -55,15 +60,15 @@ pub fn edit_ui(
                                     ))
                                     .clicked()
                                 {
-                                    if export.goods.contains(&id) {
-                                        export.goods = export
+                                    if station.goods.contains(&id) {
+                                        station.goods = station
                                             .goods
                                             .iter()
                                             .cloned()
                                             .filter(|r| r != *id)
                                             .collect();
                                     } else {
-                                        export.goods.push(id.to_string());
+                                        station.goods.push(id.to_string());
                                     }
                                 }
                             }

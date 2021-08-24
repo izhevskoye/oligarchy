@@ -26,7 +26,7 @@ use bevy_egui::EguiPlugin;
 
 use self::{
     account::{Account, AccountTransaction},
-    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, SelectedTool, StateName},
+    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, StateName},
     car::instructions::{
         CarGoToInstructionEvent, CarLoadInstructionEvent, CarUnloadInstructionEvent,
     },
@@ -35,6 +35,7 @@ use self::{
         PRODUCTION_TICK_SPEED,
     },
     current_selection::CurrentlySelected,
+    current_tool::SelectedTool,
     goals::GoalManager,
     ground_tiles::{Forrest, Water},
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
@@ -185,7 +186,11 @@ impl Game {
                     .before(UILabel::UIEnd)
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
-                    .with_system(ui::export_station::edit_ui.system().after(UILabel::InfoUI))
+                    .with_system(
+                        ui::import_export_station::edit_ui
+                            .system()
+                            .after(UILabel::InfoUI),
+                    )
                     .with_system(ui::depot::edit_ui.system().after(UILabel::InfoUI))
                     .with_system(
                         ui::production_building::edit_ui
@@ -213,7 +218,10 @@ impl Game {
                     .with_system(current_tool::street::street_placement.system())
                     .with_system(current_tool::depot::depot_placement.system())
                     .with_system(current_tool::storage::storage_placement.system())
-                    .with_system(current_tool::export_station::export_station_placement.system())
+                    .with_system(
+                        current_tool::import_export_station::import_export_station_placement
+                            .system(),
+                    )
                     .with_system(
                         current_tool::storage_management::storage_management_placement.system(),
                     )
@@ -236,7 +244,7 @@ impl Game {
                 SystemSet::on_update(AppState::InGame)
                     .before(Label::Update)
                     .with_run_criteria(FixedTimestep::step(PRODUCTION_TICK_SPEED))
-                    .with_system(production::export_station::export_station.system())
+                    .with_system(production::import_export_station::import_export_station.system())
                     .with_system(production::storage_management::storage_management.system())
                     .with_system(
                         production::production_building::production_building
@@ -290,7 +298,7 @@ impl Game {
                     .with_system(asset_tiles::building_update.system())
                     .with_system(asset_tiles::depot_update.system())
                     .with_system(asset_tiles::storage_update.system())
-                    .with_system(asset_tiles::export_station_update.system())
+                    .with_system(asset_tiles::import_export_station_update.system())
                     .with_system(asset_tiles::delivery_station_update.system())
                     .with_system(asset_tiles::storage_management_update.system())
                     .with_system(asset_tiles::ground_update.system())

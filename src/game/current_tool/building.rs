@@ -6,7 +6,7 @@ use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building, ClickedTile, Editable, Occupied,
-        Position, RequiresUpdate, SelectedTool, Tool,
+        Position, RequiresUpdate,
     },
     construction::UnderConstruction,
     helper::get_entity::get_entity,
@@ -15,6 +15,8 @@ use crate::game::{
     statistics::Statistics,
     storage::StorageConsolidator,
 };
+
+use super::{SelectedTool, Tool};
 
 pub fn building_placement(
     mut commands: Commands,

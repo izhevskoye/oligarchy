@@ -11,11 +11,13 @@ use crate::game::{
     assets::{
         building_specifications::{BuildingSpecification, BuildingSpecifications},
         resource_specifications::{ResourceSpecification, ResourceSpecifications},
-        SelectedTool, Tool,
     },
     car::Car,
     constants::CURRENCY,
-    production::{DeliveryStation, Depot, ExportStation, StorageManagement},
+    current_tool::{SelectedTool, Tool},
+    production::{
+        DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
+    },
     storage::Storage,
     street::Street,
 };
@@ -102,6 +104,7 @@ pub fn construction_ui(
                 let building_names: Vec<&str> = vec![
                     "Street",
                     "Export Station",
+                    "Import Station",
                     "Delivery Station",
                     "Depot",
                     "Storage Management",
@@ -124,13 +127,28 @@ pub fn construction_ui(
                                 && button(
                                     ui,
                                     "Export Station",
-                                    &ExportStation::default(),
+                                    &ImportExportStation::default(),
                                     &resources,
                                     &account,
                                 )
                                 .clicked()
                             {
-                                selected_tool.tool = Tool::ExportStation;
+                                selected_tool.tool =
+                                    Tool::ImportExportStation(ImportExportDirection::Export);
+                            }
+
+                            if filter.match_name("Import Station")
+                                && button(
+                                    ui,
+                                    "Import Station",
+                                    &ImportExportStation::default(),
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
+                            {
+                                selected_tool.tool =
+                                    Tool::ImportExportStation(ImportExportDirection::Import);
                             }
 
                             if filter.match_name("Depot")
