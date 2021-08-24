@@ -5,7 +5,7 @@ use bevy::{
 };
 use bevy_egui::EguiContext;
 
-use crate::game::assets::{SelectedTool, Tool};
+use super::current_tool::{SelectedTool, Tool};
 
 const MAX_ZOOM_OUT: f32 = 0.1;
 const MAX_ZOOM_IN: f32 = 1.5;

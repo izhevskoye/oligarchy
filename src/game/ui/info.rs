@@ -9,7 +9,7 @@ use crate::game::{
     car::Car,
     construction::UnderConstruction,
     current_selection::CurrentlySelected,
-    production::{Depot, ExportStation},
+    production::{Depot, ImportExportStation},
     storage::Storage,
 };
 
@@ -31,7 +31,7 @@ pub fn info_ui(
         Query<&Name>,
         Query<&Car>,
         Query<&Storage>,
-        Query<&ExportStation>,
+        Query<&ImportExportStation>,
         Query<&Depot>,
         Query<&UnderConstruction>,
     ),

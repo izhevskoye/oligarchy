@@ -13,7 +13,7 @@ use crate::game::{
     car::UserController,
     construction::UnderConstruction,
     goals::Goal,
-    production::{DeliveryStation, Depot, ExportStation, StorageManagement},
+    production::{DeliveryStation, Depot, ImportExportStation, StorageManagement},
     statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
@@ -29,7 +29,7 @@ pub struct SerializedBuilding {
 #[derive(Serialize, Deserialize)]
 pub enum BuildingEntity {
     Storage(Storage),
-    ExportStation(ExportStation),
+    ImportExportStation(ImportExportStation),
     DeliveryStation(DeliveryStation),
     StorageManagement(StorageManagement),
     Depot(Depot),

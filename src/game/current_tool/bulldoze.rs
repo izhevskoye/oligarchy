@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{ClickedTile, Position, RemovedBuildingEvent, SelectedTool, Tool},
+    assets::{ClickedTile, Position, RemovedBuildingEvent},
     car::Car,
     constants::MapTile,
     production::Idle,
@@ -11,7 +11,7 @@ use crate::game::{
     street::Street,
 };
 
-use super::update_neighbor_streets;
+use super::{update_neighbor_streets, SelectedTool, Tool};
 
 pub fn bulldoze(
     mut commands: Commands,

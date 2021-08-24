@@ -1,5 +1,5 @@
-pub mod export_station;
 pub mod idle;
+pub mod import_export_station;
 pub mod production_building;
 pub mod storage_management;
 
@@ -53,22 +53,38 @@ pub struct Product {
     pub enhancers: Vec<ProductEnhancer>,
 }
 
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq, Eq, Debug)]
+pub enum ImportExportDirection {
+    Import,
+    Export,
+}
+
+impl Default for ImportExportDirection {
+    fn default() -> Self {
+        ImportExportDirection::Export
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(deny_unknown_fields)]
-pub struct ExportStation {
+pub struct ImportExportStation {
+    pub direction: ImportExportDirection,
     pub goods: Vec<String>,
 }
 
-impl PurchaseCost for ExportStation {
+impl PurchaseCost for ImportExportStation {
     fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         1200
     }
 }
 
-impl InfoUI for ExportStation {
+impl InfoUI for ImportExportStation {
     fn ui(&self, ui: &mut Ui, resources: &ResourceSpecifications) {
         ui.horizontal(|ui| {
-            ui.label("Export Station for:");
+            ui.label(match self.direction {
+                ImportExportDirection::Export => "Export Station for:",
+                ImportExportDirection::Import => "Import Station for:",
+            });
         });
 
         for resource in self.goods.iter() {

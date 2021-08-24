@@ -65,30 +65,6 @@ pub enum Direction {
     None,
 }
 
-#[derive(PartialEq, Eq, Debug)]
-pub enum Tool {
-    None,
-    Bulldoze,
-    Street,
-    Storage(String),
-    ExportStation,
-    DeliveryStation,
-    StorageManagement,
-    Depot,
-    Car(String),
-    Building(String),
-}
-
-pub struct SelectedTool {
-    pub tool: Tool,
-}
-
-impl Default for SelectedTool {
-    fn default() -> Self {
-        Self { tool: Tool::None }
-    }
-}
-
 #[derive(Default)]
 pub struct ClickedTile {
     pub dragging: bool,

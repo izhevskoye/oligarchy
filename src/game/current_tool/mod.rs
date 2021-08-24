@@ -3,7 +3,7 @@ pub mod bulldoze;
 pub mod car;
 pub mod delivery_station;
 pub mod depot;
-pub mod export_station;
+pub mod import_export_station;
 pub mod storage;
 pub mod storage_management;
 pub mod street;
@@ -13,9 +13,34 @@ use bevy_ecs_tilemap::prelude::*;
 
 use super::{
     assets::RequiresUpdate,
+    production::ImportExportDirection,
     setup::{BUILDING_LAYER_ID, MAP_ID},
     street::Street,
 };
+
+#[derive(PartialEq, Eq, Debug)]
+pub enum Tool {
+    None,
+    Bulldoze,
+    Street,
+    Storage(String),
+    ImportExportStation(ImportExportDirection),
+    DeliveryStation,
+    StorageManagement,
+    Depot,
+    Car(String),
+    Building(String),
+}
+
+pub struct SelectedTool {
+    pub tool: Tool,
+}
+
+impl Default for SelectedTool {
+    fn default() -> Self {
+        Self { tool: Tool::None }
+    }
+}
 
 fn update_neighbor_streets(
     commands: &mut Commands,

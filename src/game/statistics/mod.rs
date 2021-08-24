@@ -38,4 +38,5 @@ pub struct Statistics {
     pub production: StatisticTracker,
     pub consumption: StatisticTracker,
     pub export: StatisticTracker,
+    pub import: StatisticTracker,
 }

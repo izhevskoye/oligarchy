@@ -11,7 +11,9 @@ use crate::game::{
     construction::UnderConstruction,
     goals::GoalManager,
     ground_tiles::{Forrest, Water},
-    production::{DeliveryStation, Depot, ExportStation, ProductionBuilding, StorageManagement},
+    production::{
+        DeliveryStation, Depot, ImportExportStation, ProductionBuilding, StorageManagement,
+    },
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     state_manager::{
         BuildingEntity, GameEntity, GameEntityType, GameState, SaveGameEvent, SerializedBuilding,
@@ -45,7 +47,7 @@ pub fn save_game(
         Query<&Statistics>,
         Query<&UnderConstruction>,
         Query<&Storage>,
-        Query<&ExportStation>,
+        Query<&ImportExportStation>,
         Query<&DeliveryStation>,
         Query<&StorageManagement>,
         Query<&Depot>,
@@ -68,7 +70,7 @@ pub fn save_game(
         statistics_query,
         under_construction_query,
         storage_query,
-        export_station_query,
+        import_export_station_query,
         delivery_station_query,
         storage_management_query,
         depot_query,
@@ -175,12 +177,12 @@ pub fn save_game(
                         });
                     }
 
-                    if let Ok(building) = export_station_query.get(entity) {
+                    if let Ok(building) = import_export_station_query.get(entity) {
                         state.entities.push(GameEntity {
                             uuid: uuids.get(entity),
                             pos,
                             name: name.clone(),
-                            entity: GameEntityType::Building(BuildingEntity::ExportStation(
+                            entity: GameEntityType::Building(BuildingEntity::ImportExportStation(
                                 building.clone(),
                             )),
                             statistics: statistics.clone(),

@@ -265,7 +265,7 @@ fn insert_building(
                         .insert(MaintenanceCost::new_from_cost(c.price(resources)))
                         .insert(StorageConsolidator::default());
                 }
-                BuildingEntity::ExportStation(c) => {
+                BuildingEntity::ImportExportStation(c) => {
                     commands
                         .entity(entity)
                         .insert(c.clone())

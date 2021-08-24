@@ -5,13 +5,15 @@ use crate::game::{
     account::{MaintenanceCost, PurchaseCost},
     assets::{
         resource_specifications::ResourceSpecifications, ClickedTile, Editable, Occupied, Position,
-        RequiresUpdate, SelectedTool, Tool,
+        RequiresUpdate,
     },
     construction::UnderConstruction,
     helper::get_entity::get_entity,
     production::Depot,
     setup::BUILDING_LAYER_ID,
 };
+
+use super::{SelectedTool, Tool};
 
 pub fn depot_placement(
     mut commands: Commands,
