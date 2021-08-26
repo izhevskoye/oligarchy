@@ -1,0 +1,18 @@
+"winery":
+  name: Winery
+  tile: 103
+  products:
+    - resource: wine
+      rate: 1
+      cost: 30
+      requisites:
+        - resource: grapes
+          rate: 6
+
+  group: Alcohol
+  cost:
+    resources:
+      steel.blooms: 4
+      steel.slabs: 10
+      steel.billets: 4
+    base: 3000

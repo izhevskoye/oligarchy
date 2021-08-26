@@ -6,7 +6,7 @@ use crate::game::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, Building,
     },
-    constants::UNIT,
+    constants::{CURRENCY, UNIT},
     current_selection::CurrentlySelected,
     production::ProductionBuilding,
 };
@@ -77,6 +77,10 @@ pub fn edit_ui(
                                 resource_name(&requisite.resource, &resources)
                             ));
                         }
+                    }
+
+                    if product.cost > 0.0 {
+                        ui.label(format!("It costs: {} {}", product.cost, CURRENCY));
                     }
 
                     if !product.enhancers.is_empty() {

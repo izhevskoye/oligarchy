@@ -1,0 +1,14 @@
+"vineyard":
+  name: Vineyard
+  tile: 102
+  products:
+    - resource: grapes
+      rate: 0.5
+      enhancers:
+        - resource: fertilizer
+          rate: 0.15
+          modifier: 2.5
+
+  group: Agriculture
+  cost:
+    base: 1500

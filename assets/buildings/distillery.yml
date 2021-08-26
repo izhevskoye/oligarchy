@@ -1,15 +1,17 @@
-"Distillery":
+"distillery":
   name: Distillery
   tile: 75
   products:
     - resource: vodka
       rate: 1
+      cost: 30
       requisites:
         - resource: rye
           rate: 3
 
     - resource: vodka
       rate: 1
+      cost: 30
       requisites:
         - resource: wheat
           rate: 4

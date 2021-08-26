@@ -5,3 +5,15 @@
         small: 1000
         medium: 3000
         large: 5000
+
+    - resource: beer
+      amount:
+        small: 500
+        medium: 1500
+        large: 2500
+
+    - resource: wine
+      amount:
+        small: 500
+        medium: 1500
+        large: 2500

@@ -81,11 +81,20 @@
     vertical: 221
   cost: 5
 
-"vodka":
-  name: Vodka
-  storage_tile: 76
+"grapes":
+  name: Grapes
+  storage_tile: 118
   group: Agriculture
   car_tile:
-    horizontal: 346
-    vertical: 378
-  cost: 27
+    horizontal: 253
+    vertical: 221
+  cost: 7
+
+"hops":
+  name: Hops
+  storage_tile: 89
+  group: Agriculture
+  car_tile:
+    horizontal: 253
+    vertical: 221
+  cost: 5

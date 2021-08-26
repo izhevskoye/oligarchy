@@ -46,6 +46,8 @@ pub struct Product {
     pub resource: String,
     pub rate: f64,
     #[serde(default)]
+    pub cost: f64,
+    #[serde(default)]
     pub requisites: Vec<ProductDependency>,
     #[serde(default)]
     pub byproducts: Vec<ProductDependency>,
