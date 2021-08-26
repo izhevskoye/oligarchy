@@ -29,6 +29,13 @@
         - resource: fertilizer
           rate: 0.15
           modifier: 3.0
+
+    - resource: sugar_beet
+      rate: 1.0
+      enhancers:
+        - resource: fertilizer
+          rate: 0.15
+          modifier: 3.5
   group: Agriculture
   cost:
     base: 1500
