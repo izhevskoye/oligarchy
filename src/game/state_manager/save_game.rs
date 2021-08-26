@@ -22,6 +22,7 @@ use crate::game::{
     statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
+    ui::state::SaveGameList,
 };
 
 use super::VehicleController;
@@ -63,6 +64,7 @@ pub fn save_game(
     account: Res<Account>,
     state_name: Res<StateName>,
     deleted_export_statistics: Res<StatisticTracker>,
+    mut save_game_list: ResMut<SaveGameList>,
 ) {
     let (
         name_query,
@@ -281,5 +283,6 @@ pub fn save_game(
         let mut file = File::create(&path).unwrap();
 
         let _ = file.write_all(serde_yaml::to_string(&state).unwrap().as_bytes());
+        save_game_list.update_list();
     }
 }
