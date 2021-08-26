@@ -2,12 +2,13 @@ use std::collections::HashMap;
 
 use super::*;
 use crate::game::{
+    account::AccountTransaction,
     assets::resource_specifications::ResourceSpecification,
     production::{Product, ProductDependency, ProductEnhancer},
     statistics::Statistics,
     storage::Storage,
 };
-use bevy::prelude::*;
+use bevy::{app::Events, prelude::*};
 
 const COKE: &str = "coke";
 const SLUG: &str = "slug";
@@ -76,6 +77,26 @@ impl TestSetup {
         );
     }
 
+    fn assert_event_sum(&self, amount: i64) {
+        let events = self
+            .world
+            .get_resource::<Events<AccountTransaction>>()
+            .unwrap();
+        let mut reader = events.get_reader();
+
+        let mut sum = 0;
+        for event in reader.iter(&events) {
+            sum += event.amount;
+        }
+
+        assert!(
+            sum == amount,
+            "expected event sum {} but was {}",
+            amount,
+            sum
+        );
+    }
+
     fn new() -> Self {
         let mut world = World::default();
 
@@ -98,6 +119,7 @@ impl TestSetup {
         );
 
         world.insert_resource(resource_specifications);
+        world.insert_resource(Events::<AccountTransaction>::default());
 
         let mut stage = SystemStage::parallel();
         stage.add_system(production_building.system());
@@ -264,6 +286,7 @@ fn increases_production_with_enhancers() {
                 Product {
                     resource: COKE.to_owned(),
                     rate: 1.0,
+                    cost: 0.0,
                     requisites: vec![ProductDependency {
                         resource: COAL.to_owned(),
                         rate: 2.0,
@@ -341,6 +364,7 @@ fn increases_production_with_enhancer_substitute() {
                 Product {
                     resource: COKE.to_owned(),
                     rate: 1.0,
+                    cost: 0.0,
                     requisites: vec![ProductDependency {
                         resource: COAL.to_owned(),
                         rate: 2.0,
@@ -502,4 +526,35 @@ fn ignores_under_construction() {
 
     setup.assert_storage_amount(coal_storage_id, 0.0);
     setup.assert_production_statistic(COAL, building_id, 0.0);
+}
+
+#[test]
+fn with_cost() {
+    let mut setup = TestSetup::new();
+
+    let coke_storage_id = setup.add_storage(COKE, 0.0);
+
+    setup
+        .world
+        .spawn()
+        .insert(Statistics::default())
+        .insert(ProductionBuilding {
+            products: vec![(
+                Product {
+                    resource: COKE.to_owned(),
+                    cost: 10.0,
+                    rate: 1.0,
+                    requisites: vec![],
+                    ..Default::default()
+                },
+                true,
+            )],
+        })
+        .insert(StorageConsolidator {
+            connected_storage: vec![coke_storage_id],
+        });
+
+    setup.stage.run(&mut setup.world);
+    setup.assert_storage_amount(coke_storage_id, 1.0);
+    setup.assert_event_sum(-10);
 }

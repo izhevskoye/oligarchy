@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use rand::{prelude::SliceRandom, thread_rng};
 
 use crate::game::{
+    account::AccountTransaction,
     assets::resource_specifications::ResourceSpecifications,
     construction::UnderConstruction,
     production::{Idle, ProductionBuilding},
@@ -27,6 +28,7 @@ pub fn production_building(
     >,
     mut storage_query: Query<&mut Storage>,
     resources: Res<ResourceSpecifications>,
+    mut events: EventWriter<AccountTransaction>,
 ) {
     for (entity, building, consolidator, mut statistics, idle) in building_query.iter_mut() {
         let mut available_products = vec![];
@@ -151,6 +153,12 @@ pub fn production_building(
                     .production
                     .track(&byproduct.resource, byproduct.rate * modifier);
             }
+        }
+
+        if product.cost > 0.0 {
+            events.send(AccountTransaction {
+                amount: -product.cost as i64,
+            });
         }
     }
 }
