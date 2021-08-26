@@ -1,0 +1,17 @@
+"flour_mill":
+  name: Flour Mill
+  tile: 109
+  products:
+    - resource: flour
+      rate: 1
+      requisites:
+        - resource: wheat
+          rate: 1.5
+
+  group: Agriculture
+  cost:
+    resources:
+      steel.blooms: 10
+      steel.slabs: 15
+      steel.billets: 10
+    base: 2500

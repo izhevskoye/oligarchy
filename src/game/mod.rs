@@ -41,6 +41,7 @@ use self::{
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
     street::Street,
+    ui::state::{ConfirmDialogState, MainMenuState, SaveGameList},
 };
 
 #[derive(Default)]
@@ -48,7 +49,9 @@ pub struct Game {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub enum Label {
-    Menu,
+    NewGameMenu,
+    SaveGameMenu,
+    LoadGameMenu,
     Update,
     UpdateEnd,
     CurrentSelection,
@@ -91,6 +94,8 @@ impl Game {
             .init_resource::<Account>()
             .init_resource::<StateName>()
             .init_resource::<StatisticTracker>()
+            .init_resource::<ConfirmDialogState>()
+            .init_resource::<SaveGameList>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .insert_resource(WindowDescriptor {
@@ -102,6 +107,7 @@ impl Game {
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_plugin(TilemapPlugin)
             .add_state(AppState::MainMenu)
+            .add_state(MainMenuState::Main)
             .add_event::<NewGameEvent>()
             .add_event::<LoadGameEvent>()
             .add_event::<SaveGameEvent>()
@@ -126,9 +132,27 @@ impl Game {
                     .with_system(setup::title::teardown.system()),
             )
             .add_system_set(
-                SystemSet::new()
-                    .with_system(ui::state::save_ui.system())
-                    .label(Label::Menu),
+                SystemSet::on_update(MainMenuState::ConfirmDialog)
+                    .with_system(ui::state::confirm_dialog.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(MainMenuState::Main)
+                    .with_system(ui::state::main_menu.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(MainMenuState::New)
+                    .with_system(ui::state::new_game_menu.system())
+                    .label(Label::NewGameMenu),
+            )
+            .add_system_set(
+                SystemSet::on_update(MainMenuState::Load)
+                    .with_system(ui::state::load_save_game_menu.system())
+                    .label(Label::LoadGameMenu),
+            )
+            .add_system_set(
+                SystemSet::on_update(MainMenuState::Save)
+                    .with_system(ui::state::load_save_game_menu.system())
+                    .label(Label::SaveGameMenu),
             )
             //
             // GAME
@@ -165,19 +189,19 @@ impl Game {
                     .with_system(
                         state_manager::load_game::load_game
                             .system()
-                            .after(Label::Menu)
+                            .after(Label::LoadGameMenu)
                             .before(Label::Update),
                     )
                     .with_system(
                         ground_tiles::generate_tiles
                             .system()
-                            .after(Label::Menu)
+                            .after(Label::NewGameMenu)
                             .before(Label::Update),
                     )
                     .with_system(
                         state_manager::save_game::save_game
                             .system()
-                            .after(Label::Menu),
+                            .after(Label::SaveGameMenu),
                     ),
             )
             // UI Systems

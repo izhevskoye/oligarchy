@@ -1,0 +1,17 @@
+"sugar_refinery":
+  name: Sugar Refinery
+  tile: 105
+  products:
+    - resource: sugar
+      rate: 1
+      requisites:
+        - resource: sugar_beet
+          rate: 2.5
+
+  group: Agriculture
+  cost:
+    resources:
+      steel.blooms: 30
+      steel.slabs: 15
+      steel.billets: 25
+    base: 1500
