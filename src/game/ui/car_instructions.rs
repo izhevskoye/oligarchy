@@ -5,6 +5,7 @@ use crate::game::{
     assets::{resource_specifications::ResourceSpecifications, ClickedTile, Position},
     car::{Car, CarController, CarInstructions, Destination, UserController, Waypoints},
     current_selection::CurrentlySelected,
+    highlight_tiles::HighlightTilesUpdateEvent,
     storage::Storage,
 };
 
@@ -31,6 +32,7 @@ pub fn program_ui(
     mut edit_instruction: Local<EditInstruction>,
     clicked_tile: Res<ClickedTile>,
     resources: Res<ResourceSpecifications>,
+    mut highlight: EventWriter<HighlightTilesUpdateEvent>,
 ) {
     let mut open = false;
 
@@ -229,7 +231,14 @@ pub fn program_ui(
                 let instructions = car_controller.instructions.clone();
                 egui::Grid::new("instructions").show(ui, |ui| {
                     for (index, instruction) in instructions.iter().enumerate() {
-                        ui.label(instruction.format(&resources));
+                        if ui.label(instruction.format(&resources)).hovered() {
+                            if let CarInstructions::GoTo(position) = &instruction {
+                                highlight.send(HighlightTilesUpdateEvent::from_position(
+                                    position.clone(),
+                                ));
+                            }
+                        }
+
                         if ui.button("Edit").clicked() {
                             edit_instruction.select_mode = false;
                             edit_instruction.index = Some(index);

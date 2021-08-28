@@ -6,6 +6,7 @@ use crate::game::{
     assets::{ClickedTile, Position},
     car::{Car, CarController, DepotController},
     current_selection::CurrentlySelected,
+    highlight_tiles::HighlightTilesUpdateEvent,
     production::{DeliveryStation, Depot},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -33,6 +34,7 @@ pub fn edit_ui(
     clicked_tile: Res<ClickedTile>,
     mut edit_mode: Local<EditMode>,
     map_query: MapQuery,
+    mut highlight: EventWriter<HighlightTilesUpdateEvent>,
 ) {
     if !currently_selected.editing {
         return;
@@ -101,7 +103,10 @@ pub fn edit_ui(
 
                     for point in depot.deliveries.clone().iter() {
                         ui.horizontal(|ui| {
-                            ui.label(format!("{}", point));
+                            if ui.label(format!("{}", point)).hovered() {
+                                highlight
+                                    .send(HighlightTilesUpdateEvent::from_position(point.clone()));
+                            }
 
                             if ui.button("Delete").clicked() {
                                 depot.deliveries.remove(point);
@@ -118,7 +123,10 @@ pub fn edit_ui(
 
                     for point in depot.pickups.clone().iter() {
                         ui.horizontal(|ui| {
-                            ui.label(format!("{}", point));
+                            if ui.label(format!("{}", point)).hovered() {
+                                highlight
+                                    .send(HighlightTilesUpdateEvent::from_position(point.clone()));
+                            }
 
                             if ui.button("Delete").clicked() {
                                 depot.pickups.remove(point);
