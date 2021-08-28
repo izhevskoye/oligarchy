@@ -233,9 +233,7 @@ pub fn program_ui(
                     for (index, instruction) in instructions.iter().enumerate() {
                         if ui.label(instruction.format(&resources)).hovered() {
                             if let CarInstructions::GoTo(position) = &instruction {
-                                highlight.send(HighlightTilesUpdateEvent::from_position(
-                                    position.clone(),
-                                ));
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*position));
                             }
                         }
 

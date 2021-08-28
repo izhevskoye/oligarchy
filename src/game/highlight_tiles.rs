@@ -40,6 +40,10 @@ impl HighlightTilesUpdateEvent {
             tiles: vec![position],
         }
     }
+
+    pub fn from_positions(positions: Vec<UVec2>) -> Self {
+        Self { tiles: positions }
+    }
 }
 
 pub fn update_highlight(
