@@ -11,6 +11,7 @@ mod goals;
 mod ground_tiles;
 mod helper;
 mod highlight_tiles;
+mod pathfinder;
 mod production;
 mod remove_update;
 mod setup;
@@ -43,6 +44,7 @@ use self::{
     goals::GoalManager,
     ground_tiles::{Forrest, Water},
     highlight_tiles::{HighlightTiles, HighlightTilesUpdateEvent},
+    pathfinder::Pathfinding,
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
     street::Street,
@@ -61,6 +63,7 @@ pub enum Label {
     UpdateEnd,
     CurrentSelection,
     HighlightTiles,
+    Pathfinding,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
@@ -104,6 +107,7 @@ impl Game {
             .init_resource::<ConfirmDialogState>()
             .init_resource::<SaveGameList>()
             .init_resource::<HighlightTiles>()
+            .init_resource::<Pathfinding>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .insert_resource(WindowDescriptor {
@@ -308,12 +312,20 @@ impl Game {
                     .with_system(current_tool::bulldoze::bulldoze.system()),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame).with_system(
-                    car::calculate_destination
-                        .system()
-                        .before(Label::UpdateEnd)
-                        .after(Label::CurrentSelection),
-                ),
+                SystemSet::on_update(AppState::InGame)
+                    .with_system(
+                        pathfinder::update
+                            .system()
+                            .before(Label::UpdateEnd)
+                            .after(Label::CurrentSelection)
+                            .label(Label::Pathfinding),
+                    )
+                    .with_system(
+                        car::calculate_destination
+                            .system()
+                            .after(Label::Pathfinding)
+                            .before(Label::UpdateEnd),
+                    ),
             )
             .add_system_set(
                 SystemSet::new()
