@@ -6,5 +6,6 @@ pub mod import_export_station;
 pub mod info;
 pub mod mouse_pos_to_tile;
 pub mod name;
+pub mod pause;
 pub mod production_building;
 pub mod state;

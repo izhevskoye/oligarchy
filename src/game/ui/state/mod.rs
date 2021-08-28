@@ -28,6 +28,7 @@ impl Default for ConfirmDialogState {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum MainMenuState {
+    None,
     Main,
     New,
     Load,

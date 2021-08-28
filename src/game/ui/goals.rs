@@ -22,7 +22,7 @@ pub fn goals_ui(
         account.value.to_formatted_string(&Locale::en),
         CURRENCY,
     ))
-    .anchor(Align2::LEFT_BOTTOM, [10.0, -10.0])
+    .anchor(Align2::RIGHT_BOTTOM, [-10.0, -10.0])
     .id(egui::Id::new("account_goals"))
     .show(egui_context.ctx(), |ui| {
         egui::Grid::new("goals").show(ui, |ui| {
