@@ -41,9 +41,7 @@ pub fn confirm_dialog(
                             save_game_list.update_list();
                         }
                         ConfirmDialogState::SaveFile(file_name) => {
-                            save_game.send(SaveGameEvent {
-                                file_name: file_name.to_owned(),
-                            });
+                            save_game.send(SaveGameEvent { file_name });
                             let _ = menu_state.pop();
                         }
                         ConfirmDialogState::ExitGame => {
