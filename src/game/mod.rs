@@ -10,6 +10,7 @@ mod current_tool;
 mod goals;
 mod ground_tiles;
 mod helper;
+mod highlight_tiles;
 mod production;
 mod remove_update;
 mod setup;
@@ -41,6 +42,7 @@ use self::{
     current_tool::SelectedTool,
     goals::GoalManager,
     ground_tiles::{Forrest, Water},
+    highlight_tiles::{HighlightTiles, HighlightTilesUpdateEvent},
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
     street::Street,
@@ -58,6 +60,7 @@ pub enum Label {
     Update,
     UpdateEnd,
     CurrentSelection,
+    HighlightTiles,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
@@ -100,6 +103,7 @@ impl Game {
             .init_resource::<StatisticTracker>()
             .init_resource::<ConfirmDialogState>()
             .init_resource::<SaveGameList>()
+            .init_resource::<HighlightTiles>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .insert_resource(WindowDescriptor {
@@ -120,6 +124,7 @@ impl Game {
             .add_event::<CarLoadInstructionEvent>()
             .add_event::<CarUnloadInstructionEvent>()
             .add_event::<CarGoToInstructionEvent>()
+            .add_event::<HighlightTilesUpdateEvent>()
             .add_startup_system(assets::integrity::integrity_check.system())
             .add_startup_system(setup::setup.system())
             //
@@ -221,6 +226,11 @@ impl Game {
                             .after(Label::CurrentSelection),
                     )
                     .with_system(
+                        highlight_tiles::update_highlight
+                            .system()
+                            .label(Label::HighlightTiles),
+                    )
+                    .with_system(
                         current_selection::current_selection
                             .system()
                             .after(UILabel::UIEnd)
@@ -250,7 +260,12 @@ impl Game {
                             .system()
                             .after(UILabel::InfoUI),
                     )
-                    .with_system(ui::depot::edit_ui.system().after(UILabel::InfoUI))
+                    .with_system(
+                        ui::depot::edit_ui
+                            .system()
+                            .after(UILabel::InfoUI)
+                            .before(Label::HighlightTiles),
+                    )
                     .with_system(
                         ui::production_building::edit_ui
                             .system()
@@ -259,7 +274,8 @@ impl Game {
                     .with_system(
                         ui::car_instructions::program_ui
                             .system()
-                            .after(UILabel::InfoUI),
+                            .after(UILabel::InfoUI)
+                            .before(Label::HighlightTiles),
                     )
                     .with_system(ui::construction::construction_ui.system())
                     .with_system(ui::name::name_ui.system()),

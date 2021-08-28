@@ -6,6 +6,7 @@ use crate::game::{
     assets::{ClickedTile, Position},
     car::{Car, CarController, DepotController},
     current_selection::CurrentlySelected,
+    highlight_tiles::HighlightTilesUpdateEvent,
     production::{DeliveryStation, Depot},
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
@@ -33,6 +34,7 @@ pub fn edit_ui(
     clicked_tile: Res<ClickedTile>,
     mut edit_mode: Local<EditMode>,
     map_query: MapQuery,
+    mut highlight: EventWriter<HighlightTilesUpdateEvent>,
 ) {
     if !currently_selected.editing {
         return;
@@ -94,34 +96,64 @@ pub fn edit_ui(
                 }
 
                 egui::CollapsingHeader::new("Deliveries").show(ui, |ui| {
-                    if ui.button("Add").clicked() {
+                    let button = ui.button("Add");
+
+                    if button.clicked() {
                         *edit_mode = EditMode::AddDelivery;
                         currently_selected.locked = true;
                     }
 
+                    if button.hovered() {
+                        let positions: Vec<UVec2> = depot.deliveries.iter().cloned().collect();
+                        highlight.send(HighlightTilesUpdateEvent::from_positions(positions));
+                    }
+
                     for point in depot.deliveries.clone().iter() {
                         ui.horizontal(|ui| {
-                            ui.label(format!("{}", point));
+                            if ui.label(format!("{}", point)).hovered() {
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*point));
+                            }
 
-                            if ui.button("Delete").clicked() {
+                            let button = ui.button("Delete");
+
+                            if button.clicked() {
                                 depot.deliveries.remove(point);
+                            }
+
+                            if button.hovered() {
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*point));
                             }
                         });
                     }
                 });
 
                 egui::CollapsingHeader::new("Pickups").show(ui, |ui| {
-                    if ui.button("Add").clicked() {
+                    let button = ui.button("Add");
+
+                    if button.clicked() {
                         *edit_mode = EditMode::AddPickup;
                         currently_selected.locked = true;
                     }
 
+                    if button.hovered() {
+                        let positions: Vec<UVec2> = depot.pickups.iter().cloned().collect();
+                        highlight.send(HighlightTilesUpdateEvent::from_positions(positions));
+                    }
+
                     for point in depot.pickups.clone().iter() {
                         ui.horizontal(|ui| {
-                            ui.label(format!("{}", point));
+                            if ui.label(format!("{}", point)).hovered() {
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*point));
+                            }
 
-                            if ui.button("Delete").clicked() {
+                            let button = ui.button("Delete");
+
+                            if button.clicked() {
                                 depot.pickups.remove(point);
+                            }
+
+                            if button.hovered() {
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*point));
                             }
                         });
                     }

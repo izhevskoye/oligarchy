@@ -4,7 +4,9 @@ use bevy_ecs_tilemap::prelude::*;
 use super::{
     assets::{ClickedTile, Position},
     car::Car,
-    constants::{TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_SELECTION_INDICATOR},
+    constants::{
+        MapTile, VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_SELECTION_INDICATOR,
+    },
     setup::{BUILDING_LAYER_ID, MAP_ID},
     street::Street,
 };
@@ -56,6 +58,7 @@ pub fn spawn_selected(
     mut commands: Commands,
     position_query: Query<(&Position, Option<&Car>, Option<&Street>)>,
     assets: Res<AssetServer>,
+    // TODO: add more and more??
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     currently_selected: Res<CurrentlySelected>,
     mut selection_marker: Local<Option<(Entity, UVec2)>>,
@@ -113,9 +116,9 @@ pub fn spawn_selected(
             };
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
             let sprite = if car.is_none() {
-                TextureAtlasSprite::new(79)
+                TextureAtlasSprite::new(MapTile::Selection as u32)
             } else {
-                TextureAtlasSprite::new(285)
+                TextureAtlasSprite::new(VehicleTile::Selection as u32)
             };
             let mut transform = Transform::default();
             let tile_position = Vec2::new(

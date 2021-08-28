@@ -31,10 +31,12 @@ pub enum MapTile {
     StreetEastEnd,
     StreetWestEnd,
     DeliveryStation = 77,
+    Selection = 79,
     Construction = 80,
     ConstructionStreet,
     Depot,
     ImportStation = 88,
+    HoverIndicator = 95,
     WaterTilesOffset = 96,
     ForrestTilesOffset = 144,
 }
@@ -63,4 +65,5 @@ pub enum VariantOffsets {
 pub enum VehicleTile {
     BlueVertical = 84,
     BlueHorizontal = 114,
+    Selection = 285,
 }
