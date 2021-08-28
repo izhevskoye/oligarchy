@@ -20,7 +20,10 @@ mod street;
 mod texture;
 mod ui;
 
-use bevy::{core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
+use bevy::{
+    core::FixedTimestep, diagnostic::FrameTimeDiagnosticsPlugin, ecs::schedule::ShouldRun,
+    prelude::*,
+};
 use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiPlugin;
 
@@ -77,6 +80,7 @@ pub enum CarLabel {
 pub enum AppState {
     MainMenu,
     InGame,
+    Paused,
 }
 
 impl Game {
@@ -164,8 +168,19 @@ impl Game {
                     .with_system(goals::generate_goals.system()),
             )
             .add_system_set(
-                SystemSet::on_enter(AppState::InGame)
-                    .with_run_criteria(FixedTimestep::step(GOAL_UPDATE_TICK_SPEED))
+                SystemSet::new()
+                    .with_run_criteria(
+                        FixedTimestep::step(GOAL_UPDATE_TICK_SPEED as f64).chain(
+                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
+                                if state.current() == &AppState::InGame {
+                                    input
+                                } else {
+                                    ShouldRun::No
+                                }
+                            })
+                            .system(),
+                        ),
+                    )
                     .with_system(goals::update_goals.system()),
             )
             .add_system_set(
@@ -206,8 +221,14 @@ impl Game {
             )
             // UI Systems
             .add_system_set(
+                SystemSet::on_update(AppState::Paused)
+                    .before(UILabel::UIEnd)
+                    .with_system(ui::pause::pause_menu.system()),
+            )
+            .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .before(UILabel::UIEnd)
+                    .with_system(ui::pause::pause_menu.system())
                     .with_system(ui::info::info_ui.system().label(UILabel::InfoUI))
                     .with_system(ui::goals::goals_ui.system().after(UILabel::InfoUI))
                     .with_system(
@@ -265,9 +286,20 @@ impl Game {
                 ),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame)
+                SystemSet::new()
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(PRODUCTION_TICK_SPEED))
+                    .with_run_criteria(
+                        FixedTimestep::step(PRODUCTION_TICK_SPEED as f64).chain(
+                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
+                                if state.current() == &AppState::InGame {
+                                    input
+                                } else {
+                                    ShouldRun::No
+                                }
+                            })
+                            .system(),
+                        ),
+                    )
                     .with_system(production::import_export_station::import_export_station.system())
                     .with_system(production::storage_management::storage_management.system())
                     .with_system(
@@ -284,15 +316,37 @@ impl Game {
                     .with_system(construction::construction.system()),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame)
+                SystemSet::new()
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(CAR_DRIVE_TICK_SPEED))
+                    .with_run_criteria(
+                        FixedTimestep::step(CAR_DRIVE_TICK_SPEED as f64).chain(
+                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
+                                if state.current() == &AppState::InGame {
+                                    input
+                                } else {
+                                    ShouldRun::No
+                                }
+                            })
+                            .system(),
+                        ),
+                    )
                     .with_system(car::drive_to_destination::drive_to_destination.system()),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame)
+                SystemSet::new()
                     .before(Label::Update)
-                    .with_run_criteria(FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED))
+                    .with_run_criteria(
+                        FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED as f64).chain(
+                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
+                                if state.current() == &AppState::InGame {
+                                    input
+                                } else {
+                                    ShouldRun::No
+                                }
+                            })
+                            .system(),
+                        ),
+                    )
                     .with_system(
                         car::instructions::car_instruction
                             .system()

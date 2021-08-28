@@ -6,6 +6,7 @@ use crate::game::{
     car::Car,
     constants::{MapTile, CHUNK_SIZE, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE},
     current_tool::SelectedTool,
+    ui::state::MainMenuState,
 };
 
 use super::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID};
@@ -15,6 +16,7 @@ pub fn teardown(
     mut map_query: MapQuery,
     car_query: Query<Entity, With<Car>>,
     sprite_query: Query<Entity, With<TextureAtlasSprite>>,
+    mut menu_state: ResMut<State<MainMenuState>>,
 ) {
     map_query.depsawn_map(&mut commands, MAP_ID);
 
@@ -25,6 +27,8 @@ pub fn teardown(
     for entity in car_query.iter() {
         commands.entity(entity).despawn_recursive();
     }
+
+    let _ = menu_state.set(MainMenuState::Main);
 }
 
 pub fn setup(
@@ -34,7 +38,10 @@ pub fn setup(
     mut map_query: MapQuery,
     map_settings: Res<MapSettings>,
     camera_query: Query<Entity, With<Camera>>,
+    mut menu_state: ResMut<State<MainMenuState>>,
 ) {
+    let _ = menu_state.set(MainMenuState::None);
+
     commands.insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)));
 
     // reset tools

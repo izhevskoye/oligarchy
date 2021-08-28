@@ -39,9 +39,7 @@ pub fn confirm_dialog(
                             save_game_list.update_list();
                         }
                         ConfirmDialogState::ExitGame => {
-                            if let AppState::InGame = app_state.current() {
-                                let _ = app_state.pop();
-                            }
+                            let _ = app_state.overwrite_replace(AppState::MainMenu);
                         }
                         ConfirmDialogState::ExitProgram => {
                             std::process::exit(0);
