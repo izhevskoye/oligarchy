@@ -16,6 +16,7 @@ pub use save_game_list::SaveGameList;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum ConfirmDialogState {
     DeleteFile(String),
+    SaveFile(String),
     ExitGame,
     ExitProgram,
 }

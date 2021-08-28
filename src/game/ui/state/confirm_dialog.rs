@@ -1,4 +1,5 @@
 use crate::game::{
+    state_manager::SaveGameEvent,
     ui::state::{ConfirmDialogState, MainMenuState, SaveGameList},
     AppState,
 };
@@ -16,6 +17,7 @@ pub fn confirm_dialog(
     mut menu_state: ResMut<State<MainMenuState>>,
     mut save_game_list: ResMut<SaveGameList>,
     confirm_dialog: Res<ConfirmDialogState>,
+    mut save_game: EventWriter<SaveGameEvent>,
 ) {
     egui::Window::new("Confirmation")
         .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
@@ -30,13 +32,17 @@ pub fn confirm_dialog(
                     menu_state.pop().unwrap();
                 }
                 if ui.small_button("Yes").clicked() {
-                    menu_state.pop().unwrap();
+                    let _ = menu_state.pop();
 
                     match confirm_dialog.clone() {
                         ConfirmDialogState::DeleteFile(file_name) => {
                             let _ = remove_file(&file_name);
 
                             save_game_list.update_list();
+                        }
+                        ConfirmDialogState::SaveFile(file_name) => {
+                            save_game.send(SaveGameEvent { file_name });
+                            let _ = menu_state.pop();
                         }
                         ConfirmDialogState::ExitGame => {
                             let _ = app_state.overwrite_replace(AppState::MainMenu);
