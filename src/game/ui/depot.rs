@@ -143,8 +143,7 @@ pub fn edit_ui(
                     for point in depot.pickups.clone().iter() {
                         ui.horizontal(|ui| {
                             if ui.label(format!("{}", point)).hovered() {
-                                highlight
-                                    .send(HighlightTilesUpdateEvent::from_position(point.clone()));
+                                highlight.send(HighlightTilesUpdateEvent::from_position(*point));
                             }
 
                             let button = ui.button("Delete");
