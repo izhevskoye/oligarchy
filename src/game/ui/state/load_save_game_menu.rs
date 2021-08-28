@@ -11,6 +11,8 @@ use bevy_egui::{
 };
 use uuid::Uuid;
 
+const DEFAULT_NAME: &str = "Untitled Game";
+
 pub fn load_save_game_menu(
     mut commands: Commands,
     egui_context: ResMut<EguiContext>,
@@ -19,7 +21,7 @@ pub fn load_save_game_menu(
     mut load_game: EventWriter<LoadGameEvent>,
     mut save_game: EventWriter<SaveGameEvent>,
     mut state_name: ResMut<StateName>,
-    mut save_game_list: ResMut<SaveGameList>,
+    save_game_list: Res<SaveGameList>,
     mut confirm_dialog: ResMut<ConfirmDialogState>,
 ) {
     let (title, button_title) = match menu_state.current() {
@@ -27,8 +29,6 @@ pub fn load_save_game_menu(
         MainMenuState::Save => ("Save Game", "Save"),
         _ => unreachable!("cannot happen"),
     };
-
-    let mut invalidate_files = false;
 
     egui::Window::new(title)
         .anchor(Align2::CENTER_CENTER, [0.0, 0.0])
@@ -51,11 +51,12 @@ pub fn load_save_game_menu(
                             Uuid::new_v4().to_string()
                         );
 
-                        if !state_name.name.is_empty() {
-                            save_game.send(SaveGameEvent { file_name });
-                            menu_state.pop().unwrap();
-                            invalidate_files = true;
+                        if state_name.name.is_empty() {
+                            state_name.name = DEFAULT_NAME.to_owned();
                         }
+
+                        save_game.send(SaveGameEvent { file_name });
+                        menu_state.pop().unwrap();
                     }
                 });
             }
@@ -71,24 +72,24 @@ pub fn load_save_game_menu(
                             if MainMenuState::Load == *menu_state.current() {
                                 app_state.push(AppState::InGame).unwrap();
                                 emit_load_game(&mut commands, &mut load_game, &file_name);
+
+                                menu_state.pop().unwrap();
                             }
 
-                            if MainMenuState::Save == *menu_state.current()
-                                && !state_name.name.is_empty()
-                            {
-                                save_game.send(SaveGameEvent {
-                                    file_name: file_name.to_owned(),
-                                });
-                                invalidate_files = true;
-                            }
+                            if MainMenuState::Save == *menu_state.current() {
+                                if state_name.name.is_empty() {
+                                    state_name.name = DEFAULT_NAME.to_owned();
+                                }
 
-                            menu_state.pop().unwrap();
+                                *confirm_dialog =
+                                    ConfirmDialogState::SaveFile(file_name.to_owned());
+                                menu_state.push(MainMenuState::ConfirmDialog).unwrap();
+                            }
                         }
 
                         if ui.button("Delete").clicked() {
                             *confirm_dialog = ConfirmDialogState::DeleteFile(file_name.to_owned());
                             menu_state.push(MainMenuState::ConfirmDialog).unwrap();
-                            invalidate_files = true;
                         }
 
                         ui.end_row();
@@ -102,8 +103,4 @@ pub fn load_save_game_menu(
                 menu_state.pop().unwrap();
             }
         });
-
-    if invalidate_files {
-        save_game_list.update_list();
-    }
 }

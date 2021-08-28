@@ -53,8 +53,8 @@ pub struct Game {}
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub enum Label {
     NewGameMenu,
-    SaveGameMenu,
-    LoadGameMenu,
+    ProcessLoad,
+    ProcessSave,
     Update,
     UpdateEnd,
     CurrentSelection,
@@ -137,7 +137,8 @@ impl Game {
             )
             .add_system_set(
                 SystemSet::on_update(MainMenuState::ConfirmDialog)
-                    .with_system(ui::state::confirm_dialog.system()),
+                    .with_system(ui::state::confirm_dialog.system())
+                    .before(Label::ProcessSave),
             )
             .add_system_set(
                 SystemSet::on_update(MainMenuState::Main)
@@ -151,12 +152,12 @@ impl Game {
             .add_system_set(
                 SystemSet::on_update(MainMenuState::Load)
                     .with_system(ui::state::load_save_game_menu.system())
-                    .label(Label::LoadGameMenu),
+                    .before(Label::ProcessLoad),
             )
             .add_system_set(
                 SystemSet::on_update(MainMenuState::Save)
                     .with_system(ui::state::load_save_game_menu.system())
-                    .label(Label::SaveGameMenu),
+                    .before(Label::ProcessSave),
             )
             //
             // GAME
@@ -186,6 +187,30 @@ impl Game {
             .add_system_set(
                 SystemSet::on_exit(AppState::InGame).with_system(setup::game::teardown.system()),
             )
+            // save / load
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .with_system(
+                        state_manager::load_game::load_game
+                            .system()
+                            .label(Label::ProcessLoad)
+                            .before(Label::Update),
+                    )
+                    .with_system(
+                        state_manager::save_game::save_game
+                            .system()
+                            .label(Label::ProcessSave),
+                    ),
+            )
+            // bevy has a dumb bug or else we could make the above on_in_stack_update
+            // https://github.com/bevyengine/bevy/pull/2211
+            .add_system_set(
+                SystemSet::on_update(AppState::Paused).with_system(
+                    state_manager::save_game::save_game
+                        .system()
+                        .label(Label::ProcessSave),
+                ),
+            )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
                     .with_system(camera::movement.system())
@@ -202,21 +227,10 @@ impl Game {
                             .label(Label::CurrentSelection),
                     )
                     .with_system(
-                        state_manager::load_game::load_game
-                            .system()
-                            .after(Label::LoadGameMenu)
-                            .before(Label::Update),
-                    )
-                    .with_system(
                         ground_tiles::generate_tiles
                             .system()
                             .after(Label::NewGameMenu)
                             .before(Label::Update),
-                    )
-                    .with_system(
-                        state_manager::save_game::save_game
-                            .system()
-                            .after(Label::SaveGameMenu),
                     ),
             )
             // UI Systems
@@ -370,6 +384,12 @@ impl Game {
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
+                    .before(Label::UpdateEnd)
+                    .with_system(storage::update_consolidators.system())
+                    .with_system(car::update_car.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
                     .label(Label::Update)
                     .before(Label::UpdateEnd)
                     .with_system(asset_tiles::construction_update.system())
@@ -384,9 +404,7 @@ impl Game {
                     .with_system(helper::neighbor_structure::update_tile::<Water>.system())
                     .with_system(helper::neighbor_structure::update_tile::<Forrest>.system())
                     .with_system(helper::neighbor_structure::update_tile::<Street>.system())
-                    .with_system(storage::update_consolidators.system())
-                    .with_system(car::spawn_car.system())
-                    .with_system(car::update_car.system()),
+                    .with_system(car::spawn_car.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::InGame)
