@@ -27,7 +27,7 @@ impl Default for EditMode {
 
 pub fn edit_ui(
     egui_context: ResMut<EguiContext>,
-    mut depot_query: Query<(Entity, &mut Depot)>,
+    mut depot_query: Query<&mut Depot>,
     delivery_query: Query<(), With<DeliveryStation>>,
     mut car_query: Query<(&mut Car, &Position)>,
     mut currently_selected: ResMut<CurrentlySelected>,
@@ -45,7 +45,7 @@ pub fn edit_ui(
     }
 
     if let Some(entity) = currently_selected.entity {
-        if let Ok((entity, mut depot)) = depot_query.get_mut(entity) {
+        if let Ok(mut depot) = depot_query.get_mut(entity) {
             if clicked_tile.occupied_building {
                 if let Some(pos) = clicked_tile.pos {
                     if let Ok(entity) = map_query.get_tile_entity(pos, MAP_ID, BUILDING_LAYER_ID) {

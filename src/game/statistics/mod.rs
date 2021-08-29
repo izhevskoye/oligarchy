@@ -30,6 +30,14 @@ impl StatisticTracker {
     pub fn get(&self, resource: &str) -> f64 {
         *self.data.get(resource).unwrap_or(&0.0)
     }
+
+    pub fn get_all(&self) -> &HashMap<String, f64> {
+        &self.data
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
 }
 
 #[derive(Serialize, Deserialize, Default, Clone)]

@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
-use crate::game::helper::neighbor_structure::LayerIndex;
+use crate::game::{
+    constants::MapTile, helper::neighbor_structure::LayerIndex, setup::GROUND_LAYER_ID,
+};
 use resource_specifications::ResourceSpecifications;
-
-use super::{constants::MapTile, setup::GROUND_LAYER_ID};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StateName {

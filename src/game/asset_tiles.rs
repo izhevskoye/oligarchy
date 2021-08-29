@@ -9,6 +9,7 @@ use crate::game::{
     },
     constants::MapTile,
     construction::UnderConstruction,
+    helper::get_entity::get_entity,
     production::{
         DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
     },
@@ -16,8 +17,6 @@ use crate::game::{
     storage::Storage,
     street::Street,
 };
-
-use super::helper::get_entity::get_entity;
 
 pub fn construction_update(
     mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,

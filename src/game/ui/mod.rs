@@ -9,3 +9,4 @@ pub mod name;
 pub mod pause;
 pub mod production_building;
 pub mod state;
+pub mod statistics;

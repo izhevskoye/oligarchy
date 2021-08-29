@@ -288,6 +288,11 @@ impl Game {
                             .before(Label::HighlightTiles),
                     )
                     .with_system(
+                        ui::statistics::statistics_ui
+                            .system()
+                            .after(UILabel::InfoUI),
+                    )
+                    .with_system(
                         ui::production_building::edit_ui
                             .system()
                             .after(UILabel::InfoUI),

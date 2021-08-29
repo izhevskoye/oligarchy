@@ -10,6 +10,7 @@ use crate::game::{
     construction::UnderConstruction,
     current_selection::CurrentlySelected,
     production::{Depot, ImportExportStation},
+    statistics::Statistics,
     storage::Storage,
 };
 
@@ -28,6 +29,7 @@ pub fn info_ui(
     queries: (
         Query<&Building>,
         Query<&Editable>,
+        Query<&Statistics>,
         Query<&Name>,
         Query<&Car>,
         Query<&Storage>,
@@ -47,12 +49,12 @@ pub fn info_ui(
             items.push(building);
         }
 
-        query_resolve(&mut items, queries.2.get(entity));
         query_resolve(&mut items, queries.3.get(entity));
         query_resolve(&mut items, queries.4.get(entity));
         query_resolve(&mut items, queries.5.get(entity));
         query_resolve(&mut items, queries.6.get(entity));
         query_resolve(&mut items, queries.7.get(entity));
+        query_resolve(&mut items, queries.8.get(entity));
 
         if !items.is_empty() {
             egui::SidePanel::left("side_panel")
@@ -77,7 +79,7 @@ pub fn info_ui(
 
                     let label = if currently_selected.renaming {
                         "Rename (Close)"
-                    } else if queries.2.get(entity).is_err() {
+                    } else if queries.3.get(entity).is_err() {
                         "Give Name"
                     } else {
                         "Rename"
@@ -85,6 +87,17 @@ pub fn info_ui(
                     if ui.button(label).clicked() {
                         currently_selected.renaming = !currently_selected.renaming;
                         currently_selected.locked = !currently_selected.locked;
+                    }
+
+                    if queries.2.get(entity).is_ok() {
+                        let label = if currently_selected.statistics {
+                            "Statistics (Close)"
+                        } else {
+                            "Statistics"
+                        };
+                        if ui.button(label).clicked() {
+                            currently_selected.statistics = !currently_selected.statistics;
+                        }
                     }
                 });
         }
