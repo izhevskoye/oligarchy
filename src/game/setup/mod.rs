@@ -25,8 +25,10 @@ pub fn new_game_setup(
     mut generate_tiles: EventWriter<GenerateGroundTilesEvent>,
     mut setup: ResMut<Option<NewGameSetup>>,
 ) {
-    for _ in events.iter() {
-        *setup = Some(NewGameSetup::default());
+    if setup.is_none() {
+        for _ in events.iter() {
+            *setup = Some(NewGameSetup::default());
+        }
         return;
     }
 
