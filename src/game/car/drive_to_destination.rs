@@ -5,10 +5,9 @@ use bevy_ecs_tilemap::prelude::*;
 use rand::{thread_rng, Rng};
 
 use crate::game::{
-    assets::{CanDriveOver, Direction, Occupied, Position, RequiresUpdate},
+    assets::{BlockedForBuilding, CanDriveOver, Direction, Occupied, Position, RequiresUpdate},
     car::{Car, Waypoints},
     construction::UnderConstruction,
-    ground_tiles::BlockedForBuilding,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 

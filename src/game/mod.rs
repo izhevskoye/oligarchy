@@ -8,9 +8,9 @@ mod construction;
 mod current_selection;
 mod current_tool;
 mod goals;
-mod ground_tiles;
 mod helper;
 mod highlight_tiles;
+mod pathfinder;
 mod production;
 mod remove_update;
 mod setup;
@@ -30,7 +30,7 @@ use bevy_egui::EguiPlugin;
 
 use self::{
     account::{Account, AccountTransaction},
-    assets::{ClickedTile, MapSettings, RemovedBuildingEvent, StateName},
+    assets::{ClickedTile, Forrest, MapSettings, RemovedBuildingEvent, StateName, Water},
     car::instructions::{
         CarGoToInstructionEvent, CarLoadInstructionEvent, CarUnloadInstructionEvent,
     },
@@ -41,13 +41,22 @@ use self::{
     current_selection::CurrentlySelected,
     current_tool::SelectedTool,
     goals::GoalManager,
-    ground_tiles::{Forrest, Water},
     highlight_tiles::{HighlightTiles, HighlightTilesUpdateEvent},
+    pathfinder::Pathfinding,
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
     street::Street,
     ui::state::{ConfirmDialogState, MainMenuState, SaveGameList},
 };
+
+#[derive(Default, Debug)]
+pub struct NewGameSetup {
+    ground_tiles: bool,
+    street: bool,
+}
+
+pub struct GenerateStreetEvent;
+pub struct GenerateGroundTilesEvent;
 
 #[derive(Default)]
 pub struct Game {}
@@ -61,6 +70,8 @@ pub enum Label {
     UpdateEnd,
     CurrentSelection,
     HighlightTiles,
+    Pathfinding,
+    NewGameHandling,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
@@ -104,6 +115,8 @@ impl Game {
             .init_resource::<ConfirmDialogState>()
             .init_resource::<SaveGameList>()
             .init_resource::<HighlightTiles>()
+            .init_resource::<Pathfinding>()
+            .init_resource::<Option<NewGameSetup>>()
             .insert_resource(assets::building_specifications::load_specifications())
             .insert_resource(assets::resource_specifications::load_specifications())
             .insert_resource(WindowDescriptor {
@@ -125,6 +138,8 @@ impl Game {
             .add_event::<CarUnloadInstructionEvent>()
             .add_event::<CarGoToInstructionEvent>()
             .add_event::<HighlightTilesUpdateEvent>()
+            .add_event::<GenerateStreetEvent>()
+            .add_event::<GenerateGroundTilesEvent>()
             .add_startup_system(assets::integrity::integrity_check.system())
             .add_startup_system(setup::setup.system())
             //
@@ -236,11 +251,17 @@ impl Game {
                             .after(UILabel::UIEnd)
                             .label(Label::CurrentSelection),
                     )
+                    .with_system(setup::new_game_setup.system().label(Label::NewGameHandling)),
+            )
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .after(Label::NewGameHandling)
+                    .before(Label::Update)
+                    .with_system(setup::ground_tiles::generate_tiles.system())
                     .with_system(
-                        ground_tiles::generate_tiles
+                        setup::street::generate_street
                             .system()
-                            .after(Label::NewGameMenu)
-                            .before(Label::Update),
+                            .after(Label::Pathfinding),
                     ),
             )
             // UI Systems
@@ -308,12 +329,20 @@ impl Game {
                     .with_system(current_tool::bulldoze::bulldoze.system()),
             )
             .add_system_set(
-                SystemSet::on_update(AppState::InGame).with_system(
-                    car::calculate_destination
-                        .system()
-                        .before(Label::UpdateEnd)
-                        .after(Label::CurrentSelection),
-                ),
+                SystemSet::on_update(AppState::InGame)
+                    .with_system(
+                        pathfinder::update
+                            .system()
+                            .before(Label::UpdateEnd)
+                            .after(Label::CurrentSelection)
+                            .label(Label::Pathfinding),
+                    )
+                    .with_system(
+                        car::calculate_destination
+                            .system()
+                            .after(Label::Pathfinding)
+                            .before(Label::UpdateEnd),
+                    ),
             )
             .add_system_set(
                 SystemSet::new()

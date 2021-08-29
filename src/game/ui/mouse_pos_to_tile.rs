@@ -3,10 +3,9 @@ use bevy_ecs_tilemap::prelude::*;
 use bevy_egui::EguiContext;
 
 use crate::game::{
-    assets::{ClickedTile, MapSettings, Occupied, Position},
+    assets::{BlockedForBuilding, ClickedTile, MapSettings, Occupied, Position},
     car::Car,
     constants::{CHUNK_SIZE, TILE_SIZE},
-    ground_tiles::BlockedForBuilding,
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
 };
 
