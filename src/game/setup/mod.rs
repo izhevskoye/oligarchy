@@ -42,4 +42,8 @@ pub fn new_game_setup(
             return;
         }
     }
+
+    if setup.is_some() {
+        *setup = None;
+    }
 }
