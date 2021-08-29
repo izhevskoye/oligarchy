@@ -119,7 +119,6 @@ pub fn movement(
 
     // fix scan lines in render when position is not rounded
     transform.translation = transform.translation.as_i32().as_f32();
-    // transform.scale = (transform.scale * 20.0).as_i32().as_f32() / 20.0;
     transform.scale = (transform.scale * 50.0).as_i32().as_f32() / 50.0;
 
     let mut world_transform = query.single_mut().unwrap();

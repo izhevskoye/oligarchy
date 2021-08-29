@@ -69,7 +69,7 @@ pub fn update(
             cost_fn(&map_query, &street_query, &occupied_query, &blocked_query),
             ManhattanNeighborhood::new(size.x as usize, size.y as usize),
             PathCacheConfig {
-                chunk_size: 5,
+                chunk_size: 2,
                 ..Default::default()
             },
         );
