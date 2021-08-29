@@ -21,13 +21,19 @@ pub fn movement(
     mut query: Query<&mut Transform, With<Camera>>,
     egui_context: ResMut<EguiContext>,
     selected_tool: Res<SelectedTool>,
+    mut real_transform: Local<Option<Transform>>,
 ) {
     if egui_context.ctx().wants_pointer_input() || egui_context.ctx().wants_keyboard_input() {
         return;
     }
 
     let win = windows.get_primary().expect("no primary window");
-    let mut transform = query.single_mut().unwrap();
+    if real_transform.is_none() {
+        let transform = query.single_mut().unwrap().clone();
+        *real_transform = Some(transform);
+    }
+
+    let mut transform = real_transform.clone().unwrap();
 
     // scroll
 
@@ -74,8 +80,6 @@ pub fn movement(
 
     // move by mouse
 
-    let mut transform = query.single_mut().unwrap();
-
     let mut direction = Vec3::ZERO;
 
     let mut delta_since = Vec2::ZERO;
@@ -111,7 +115,14 @@ pub fn movement(
 
     transform.translation += time.delta_seconds() * direction * 500.;
 
+    *real_transform = Some(transform);
+
     // fix scan lines in render when position is not rounded
     transform.translation = transform.translation.as_i32().as_f32();
-    transform.scale = (transform.scale * 20.0).as_i32().as_f32() / 20.0;
+    // transform.scale = (transform.scale * 20.0).as_i32().as_f32() / 20.0;
+    transform.scale = (transform.scale * 50.0).as_i32().as_f32() / 50.0;
+
+    let mut world_transform = query.single_mut().unwrap();
+    world_transform.scale = transform.scale;
+    world_transform.translation = transform.translation;
 }
