@@ -17,6 +17,8 @@ use crate::game::{
     street::Street,
 };
 
+use super::helper::get_entity::get_entity;
+
 pub fn construction_update(
     mut query: Query<(&mut Tile, Option<&Street>), (With<RequiresUpdate>, With<UnderConstruction>)>,
 ) {
@@ -121,6 +123,7 @@ pub fn storage_management_update(
 }
 
 pub fn ground_update(
+    mut commands: Commands,
     query: Query<
         &Position,
         (
@@ -133,12 +136,24 @@ pub fn ground_update(
     mut map_query: MapQuery,
 ) {
     for position in query.iter() {
-        let entity = map_query
-            .get_tile_entity(position.position, MAP_ID, GROUND_LAYER_ID)
-            .unwrap();
+        let entity = get_entity(
+            &mut commands,
+            &mut map_query,
+            position.position,
+            GROUND_LAYER_ID,
+        );
 
-        let mut tile = tile_query.get_mut(entity).unwrap();
-        tile.texture_index = MapTile::GroundFactory as u16;
+        match tile_query.get_mut(entity) {
+            Ok(mut tile) => {
+                tile.texture_index = MapTile::GroundFactory as u16;
+            }
+            Err(_) => {
+                commands.entity(entity).insert(Tile {
+                    texture_index: MapTile::GroundFactory as u16,
+                    ..Default::default()
+                });
+            }
+        };
 
         map_query.notify_chunk_for_tile(position.position, MAP_ID, GROUND_LAYER_ID);
     }

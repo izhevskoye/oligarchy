@@ -6,11 +6,10 @@ use uuid::Uuid;
 
 use crate::game::{
     account::Account,
-    assets::{Building, MapSettings, Name, Position, StateName},
+    assets::{Building, Forrest, MapSettings, Name, Position, StateName, Water},
     car::{Car, CarController},
     construction::UnderConstruction,
     goals::GoalManager,
-    ground_tiles::{Forrest, Water},
     production::{
         DeliveryStation, Depot, ImportExportStation, ProductionBuilding, StorageManagement,
     },

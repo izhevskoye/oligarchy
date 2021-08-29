@@ -7,12 +7,11 @@ use crate::game::{
     account::{Account, MaintenanceCost, PurchaseCost},
     assets::{
         building_specifications::BuildingSpecifications,
-        resource_specifications::ResourceSpecifications, Building, CanDriveOver, Editable,
-        Occupied, Position, RequiresUpdate, StateName,
+        resource_specifications::ResourceSpecifications, BlockedForBuilding, Building,
+        CanDriveOver, Editable, Forrest, Occupied, Position, RequiresUpdate, StateName, Water,
     },
     car::{Car, CarController, DepotController},
     goals::GoalManager,
-    ground_tiles::{BlockedForBuilding, Forrest, Water},
     production::{Product, ProductionBuilding},
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     state_manager::{

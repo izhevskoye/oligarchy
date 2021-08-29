@@ -3,8 +3,9 @@ use bevy_ecs_tilemap::prelude::*;
 use hierarchical_pathfinding::prelude::*;
 
 use crate::game::{
-    assets::{CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate},
-    ground_tiles::BlockedForBuilding,
+    assets::{
+        BlockedForBuilding, CanDriveOver, Occupied, Position, RemovedBuildingEvent, RequiresUpdate,
+    },
     setup::{BUILDING_LAYER_ID, GROUND_LAYER_ID, MAP_ID},
     street::Street,
 };
@@ -59,14 +60,16 @@ pub fn update(
     if pathfinding.cache.is_none() {
         log::info!("Building pathfinding cache");
         let (_entity, layer) = map_query.get_layer(MAP_ID, BUILDING_LAYER_ID).unwrap();
-        let size = layer.get_layer_size_in_tiles();
+        let mut size = layer.get_layer_size_in_tiles();
+        size.x -= 1;
+        size.y -= 1;
 
         let cache = PathCache::new(
             (size.x as usize, size.y as usize),
             cost_fn(&map_query, &street_query, &occupied_query, &blocked_query),
             ManhattanNeighborhood::new(size.x as usize, size.y as usize),
             PathCacheConfig {
-                chunk_size: 2,
+                chunk_size: 5,
                 ..Default::default()
             },
         );

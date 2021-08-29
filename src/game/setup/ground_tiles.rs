@@ -4,52 +4,21 @@ use noise::{NoiseFn, Perlin, Seedable};
 use rand::{thread_rng, Rng};
 
 use crate::game::{
-    assets::{MapSettings, Position, RequiresUpdate},
-    constants::{MapTile, CHUNK_SIZE},
-    helper::{get_entity::get_entity, neighbor_structure::LayerIndex},
+    assets::{BlockedForBuilding, Forrest, MapSettings, Position, RequiresUpdate, Water},
+    constants::CHUNK_SIZE,
+    helper::get_entity::get_entity,
     setup::GROUND_LAYER_ID,
-    state_manager::NewGameEvent,
+    GenerateGroundTilesEvent,
 };
-
-pub struct BlockedForBuilding;
-
-#[derive(Default)]
-pub struct Forrest;
-
-impl From<Forrest> for MapTile {
-    fn from(_: Forrest) -> MapTile {
-        MapTile::ForrestTilesOffset
-    }
-}
-
-impl From<Forrest> for LayerIndex {
-    fn from(_: Forrest) -> LayerIndex {
-        LayerIndex::new(GROUND_LAYER_ID)
-    }
-}
-
-#[derive(Default)]
-pub struct Water;
-
-impl From<Water> for MapTile {
-    fn from(_: Water) -> MapTile {
-        MapTile::WaterTilesOffset
-    }
-}
-
-impl From<Water> for LayerIndex {
-    fn from(_: Water) -> LayerIndex {
-        LayerIndex::new(GROUND_LAYER_ID)
-    }
-}
 
 pub fn generate_tiles(
     mut commands: Commands,
     mut map_query: MapQuery,
     map_settings: Res<MapSettings>,
-    mut events: EventReader<NewGameEvent>,
+    mut events: EventReader<GenerateGroundTilesEvent>,
 ) {
     for _ in events.iter() {
+        log::info!("Generating ground tiles");
         let mut random = thread_rng();
         let perlin = Perlin::new();
         let seed = random.gen();

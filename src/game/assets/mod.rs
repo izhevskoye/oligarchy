@@ -7,7 +7,10 @@ use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 
+use crate::game::helper::neighbor_structure::LayerIndex;
 use resource_specifications::ResourceSpecifications;
+
+use super::{constants::MapTile, setup::GROUND_LAYER_ID};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StateName {
@@ -93,5 +96,37 @@ pub trait InfoUI {
 impl InfoUI for Name {
     fn ui(&self, ui: &mut Ui, _resources: &ResourceSpecifications) {
         ui.label(&self.name);
+    }
+}
+
+pub struct BlockedForBuilding;
+
+#[derive(Default)]
+pub struct Forrest;
+
+impl From<Forrest> for MapTile {
+    fn from(_: Forrest) -> MapTile {
+        MapTile::ForrestTilesOffset
+    }
+}
+
+impl From<Forrest> for LayerIndex {
+    fn from(_: Forrest) -> LayerIndex {
+        LayerIndex::new(GROUND_LAYER_ID)
+    }
+}
+
+#[derive(Default)]
+pub struct Water;
+
+impl From<Water> for MapTile {
+    fn from(_: Water) -> MapTile {
+        MapTile::WaterTilesOffset
+    }
+}
+
+impl From<Water> for LayerIndex {
+    fn from(_: Water) -> LayerIndex {
+        LayerIndex::new(GROUND_LAYER_ID)
     }
 }

@@ -2,8 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::game::{
-    assets::{CanDriveOver, Occupied, Position},
-    ground_tiles::BlockedForBuilding,
+    assets::{BlockedForBuilding, CanDriveOver, Occupied, Position},
     pathfinder::{cost_fn, Pathfinding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
     street::Street,
