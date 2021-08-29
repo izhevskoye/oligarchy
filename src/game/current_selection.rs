@@ -17,6 +17,7 @@ pub struct CurrentlySelected {
     pub locked: bool,
     pub editing: bool,
     pub renaming: bool,
+    pub statistics: bool,
 }
 
 pub fn current_selection(

@@ -13,13 +13,13 @@ use crate::game::{
         resource_specifications::{CarTileDefinition, ResourceSpecifications},
         Direction, InfoUI, Position,
     },
-    constants::{VehicleTile, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_CAR},
+    constants::{
+        VehicleTile, CAR_DRIVE_TICK_SPEED, TILE_MAP_HEIGHT, TILE_MAP_WIDTH, TILE_SIZE, Z_CAR,
+    },
     storage::Storage,
 };
 
 pub use calculate_destination::calculate_destination;
-
-use super::constants::CAR_DRIVE_TICK_SPEED;
 
 pub struct Destination {
     pub destination: UVec2,

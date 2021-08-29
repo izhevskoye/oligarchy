@@ -4,9 +4,7 @@ mod tests;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::game::constants::CURRENCY;
-
-use super::assets::resource_specifications::ResourceSpecifications;
+use crate::game::{assets::resource_specifications::ResourceSpecifications, constants::CURRENCY};
 
 const START_VALUE: i64 = 250000;
 
