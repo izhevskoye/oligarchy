@@ -29,11 +29,11 @@ pub fn movement(
 
     let win = windows.get_primary().expect("no primary window");
     if real_transform.is_none() {
-        let transform = query.single_mut().unwrap().clone();
+        let transform = *query.single_mut().unwrap();
         *real_transform = Some(transform);
     }
 
-    let mut transform = real_transform.clone().unwrap();
+    let mut transform = (*real_transform).unwrap();
 
     // scroll
 
