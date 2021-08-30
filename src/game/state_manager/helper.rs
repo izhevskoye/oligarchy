@@ -2,7 +2,7 @@ use directories_next::ProjectDirs;
 use std::fs::create_dir_all;
 
 const QUALIFIER: &str = "game";
-const ORGANIZATION: &str = "xqyz";
+const ORGANIZATION: &str = "izhevskoye";
 const APPLICATION: &str = "oligarchy";
 
 pub fn generate_save_game_path() -> String {
