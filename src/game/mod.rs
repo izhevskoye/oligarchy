@@ -30,7 +30,7 @@ use bevy_egui::EguiPlugin;
 
 use self::{
     account::{Account, AccountTransaction},
-    assets::{ClickedTile, Forrest, MapSettings, RemovedBuildingEvent, StateName, Water},
+    assets::{ClickedTile, Forest, MapSettings, RemovedBuildingEvent, StateName, Water},
     car::instructions::{
         CarGoToInstructionEvent, CarLoadInstructionEvent, CarUnloadInstructionEvent,
     },
@@ -452,7 +452,7 @@ impl Game {
                     .with_system(asset_tiles::ground_update.system())
                     .with_system(street::update_streets.system())
                     .with_system(helper::neighbor_structure::update_tile::<Water>.system())
-                    .with_system(helper::neighbor_structure::update_tile::<Forrest>.system())
+                    .with_system(helper::neighbor_structure::update_tile::<Forest>.system())
                     .with_system(helper::neighbor_structure::update_tile::<Street>.system())
                     .with_system(car::spawn_car.system()),
             )

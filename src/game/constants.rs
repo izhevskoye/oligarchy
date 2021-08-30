@@ -38,7 +38,7 @@ pub enum MapTile {
     ImportStation = 88,
     HoverIndicator = 95,
     WaterTilesOffset = 96,
-    ForrestTilesOffset = 144,
+    ForestTilesOffset = 144,
 }
 
 #[derive(FromPrimitive, ToPrimitive, Copy, Clone)]

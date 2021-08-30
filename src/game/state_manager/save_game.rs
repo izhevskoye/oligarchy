@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::game::{
     account::Account,
-    assets::{Building, Forrest, MapSettings, Name, Position, StateName, Water},
+    assets::{Building, Forest, MapSettings, Name, Position, StateName, Water},
     car::{Car, CarController},
     construction::UnderConstruction,
     goals::GoalManager,
@@ -53,7 +53,7 @@ pub fn save_game(
         Query<&Depot>,
         Query<&Street>,
         Query<(), With<Water>>,
-        Query<(), With<Forrest>>,
+        Query<(), With<Forest>>,
         Query<(&Building, Option<&ProductionBuilding>)>,
     ),
     map_query: MapQuery,
@@ -77,7 +77,7 @@ pub fn save_game(
         depot_query,
         street_query,
         water_query,
-        forrest_query,
+        forest_query,
         building_query,
     ) = queries;
 
@@ -111,12 +111,12 @@ pub fn save_game(
                         });
                     }
 
-                    if forrest_query.get(entity).is_ok() {
+                    if forest_query.get(entity).is_ok() {
                         state.entities.push(GameEntity {
                             uuid: uuids.get(entity),
                             pos,
                             name: None,
-                            entity: GameEntityType::Forrest,
+                            entity: GameEntityType::Forest,
                             statistics: None,
                             under_construction: None,
                         });

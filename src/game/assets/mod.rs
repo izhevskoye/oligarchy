@@ -102,16 +102,16 @@ impl InfoUI for Name {
 pub struct BlockedForBuilding;
 
 #[derive(Default)]
-pub struct Forrest;
+pub struct Forest;
 
-impl From<Forrest> for MapTile {
-    fn from(_: Forrest) -> MapTile {
-        MapTile::ForrestTilesOffset
+impl From<Forest> for MapTile {
+    fn from(_: Forest) -> MapTile {
+        MapTile::ForestTilesOffset
     }
 }
 
-impl From<Forrest> for LayerIndex {
-    fn from(_: Forrest) -> LayerIndex {
+impl From<Forest> for LayerIndex {
+    fn from(_: Forest) -> LayerIndex {
         LayerIndex::new(GROUND_LAYER_ID)
     }
 }

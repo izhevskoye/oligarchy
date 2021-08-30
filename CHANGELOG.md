@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Show statistics in UI
 - Allow pausing of the game
 - Generate a street when launching a game
-- Added forrest and water tiles when launching a game
+- Added forest and water tiles when launching a game
 
 ### Changed
 

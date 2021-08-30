@@ -4,7 +4,7 @@ use noise::{NoiseFn, Perlin, Seedable};
 use rand::{thread_rng, Rng};
 
 use crate::game::{
-    assets::{BlockedForBuilding, Forrest, MapSettings, Position, RequiresUpdate, Water},
+    assets::{BlockedForBuilding, Forest, MapSettings, Position, RequiresUpdate, Water},
     constants::CHUNK_SIZE,
     helper::get_entity::get_entity,
     setup::GROUND_LAYER_ID,
@@ -43,7 +43,7 @@ pub fn generate_tiles(
                         let entity =
                             get_entity(&mut commands, &mut map_query, position, GROUND_LAYER_ID);
 
-                        commands.entity(entity).insert(Forrest);
+                        commands.entity(entity).insert(Forest);
 
                         Some(entity)
                     } else {

@@ -8,7 +8,7 @@ use crate::game::{
     assets::{
         building_specifications::BuildingSpecifications,
         resource_specifications::ResourceSpecifications, BlockedForBuilding, Building,
-        CanDriveOver, Editable, Forrest, Occupied, Position, RequiresUpdate, StateName, Water,
+        CanDriveOver, Editable, Forest, Occupied, Position, RequiresUpdate, StateName, Water,
     },
     car::{Car, CarController, DepotController},
     goals::GoalManager,
@@ -84,9 +84,9 @@ fn load_state(
                     commands.entity(entity).insert(Water);
                 }
             }
-            GameEntityType::Forrest => {
+            GameEntityType::Forest => {
                 if let Some(entity) = insert_ground_tile(commands, &game_entity, map_query) {
-                    commands.entity(entity).insert(Forrest);
+                    commands.entity(entity).insert(Forest);
                 }
             }
         }

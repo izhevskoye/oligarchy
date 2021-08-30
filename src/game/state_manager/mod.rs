@@ -55,7 +55,7 @@ pub enum GameEntityType {
     Building(BuildingEntity),
     Vehicle(Vehicle),
     Water,
-    Forrest,
+    Forest,
 }
 
 #[derive(Serialize, Deserialize)]
