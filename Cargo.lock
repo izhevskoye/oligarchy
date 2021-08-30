@@ -2876,7 +2876,7 @@ dependencies = [
 
 [[package]]
 name = "oligarchy"
-version = "0.1.6"
+version = "0.1.7-dev"
 dependencies = [
  "bevy",
  "bevy_ecs_tilemap",
