@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.6
+
+### Added
+
+- Added import stations
+- Added storage management to balance resources between storage units
+- Added sugar business
+- Added bakery business
+- Added flour processing business
+- Added beer and wine making business
+- Added coal ore as a prerequisite of coal
+- Show statistics in UI
+- Allow pausing of the game
+- Generate a street when launching a game
+- Added forrest and water tiles when launching a game
+
+### Changed
+
+- Sorted save games by name
+- Highlight connected delivery stations when hovering over depots
+- Added confirmation dialog to overwrite of save files
+
+### Fixed
+
+- Game now properly resets selected tools when exiting
+- When an export station is deleted, its statistics continue to count towards the goals
+- Prevent delivery station to be used while still under construction
+- Prevent multiple 'go to' instructions stopping a car indefinitely
+
 ## 0.1.5
 
 ### Added
