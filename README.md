@@ -1,5 +1,6 @@
 ![](https://user-images.githubusercontent.com/89811191/131446776-e2e6c31f-6e84-47f5-bacc-2ff6544fd135.png)
 
+[![](https://github.com/izhevskoye/oligarchy/actions/workflows/ci.yml/badge.svg)](https://github.com/izhevskoye/oligarchy)
 [![](https://tokei.rs/b1/github/izhevskoye/oligarchy)](https://github.com/izhevskoye/oligarchy)
 [![](https://img.shields.io/github/license/izhevskoye/oligarchy)](https://github.com/izhevskoye/oligarchy)
 
