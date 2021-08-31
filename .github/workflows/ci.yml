@@ -2,9 +2,6 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches-ignore:
-      - "dependabot/**"
 
 env:
   CARGO_TERM_COLOR: always

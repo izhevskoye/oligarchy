@@ -70,7 +70,7 @@ pub fn edit_ui(
                                     ))
                                     .clicked()
                                 {
-                                    if station.goods.contains(&id) {
+                                    if station.goods.contains(id) {
                                         station.goods = station
                                             .goods
                                             .iter()
