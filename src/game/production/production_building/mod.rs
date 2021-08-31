@@ -44,7 +44,7 @@ pub fn production_building(
             let mut has_requisites = true;
             for requisite in product.requisites.iter() {
                 if !has_in_storage(
-                    &consolidator,
+                    consolidator,
                     &mut storage_query,
                     &requisite.resource,
                     requisite.rate,
@@ -76,18 +76,18 @@ pub fn production_building(
                     if has_in_storage(
                         consolidator,
                         &mut storage_query,
-                        &substitute,
+                        substitute,
                         enhancer.rate / rate,
                     ) {
                         modifier *= enhancer.modifier;
-                        consumed_resources.push((&substitute, enhancer.rate / rate));
+                        consumed_resources.push((substitute, enhancer.rate / rate));
                         continue;
                     }
                 }
             }
 
             if has_space_in_storage(
-                &consolidator,
+                consolidator,
                 &mut storage_query,
                 &product.resource,
                 product.rate * modifier,
@@ -113,12 +113,12 @@ pub fn production_building(
         let consumed_resources = &available_products[0].2;
 
         for (resource, amount) in consumed_resources {
-            fetch_from_storage(consolidator, &mut storage_query, &resource, *amount);
-            statistics.consumption.track(&resource, *amount);
+            fetch_from_storage(consolidator, &mut storage_query, resource, *amount);
+            statistics.consumption.track(resource, *amount);
         }
 
         distribute_to_storage(
-            &consolidator,
+            consolidator,
             &mut storage_query,
             &product.resource,
             product.rate * modifier,

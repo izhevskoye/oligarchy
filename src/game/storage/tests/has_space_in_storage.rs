@@ -7,8 +7,7 @@ fn has_space_in_storage_test_system(
     params: Res<TestAmount>,
 ) {
     for consolidator in consolidator_query.iter() {
-        result.result =
-            has_space_in_storage(&consolidator, &mut storage_query, COKE, params.amount);
+        result.result = has_space_in_storage(consolidator, &mut storage_query, COKE, params.amount);
     }
 }
 

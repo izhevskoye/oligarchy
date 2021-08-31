@@ -29,13 +29,13 @@ fn button(
     resources: &ResourceSpecifications,
     account: &Account,
 ) -> Response {
-    let price = item.price(&resources);
+    let price = item.price(resources);
 
     let button = ui.small_button(name);
 
     let mut hover_text = format!(
         "{}\n---\nTotal Cost: {} {}",
-        item.price_description(&resources),
+        item.price_description(resources),
         price.to_formatted_string(&Locale::en),
         CURRENCY
     );
@@ -101,7 +101,7 @@ pub fn construction_ui(
             ui.separator();
 
             egui::containers::ScrollArea::from_max_height(max_height).show(ui, |ui| {
-                let building_names: Vec<&str> = vec![
+                if vec![
                     "Street",
                     "Export Station",
                     "Import Station",
@@ -110,10 +110,8 @@ pub fn construction_ui(
                     "Storage Management",
                 ]
                 .into_iter()
-                .filter(|item| filter.match_name(item))
-                .collect();
-
-                if !building_names.is_empty() {
+                .any(|item| filter.match_name(item))
+                {
                     let group_title = "Building: General";
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
                         ui.vertical_centered_justified(|ui| {

@@ -71,7 +71,7 @@ pub fn load_save_game_menu(
                         if ui.button(&button_title).clicked() {
                             if MainMenuState::Load == *menu_state.current() {
                                 app_state.push(AppState::InGame).unwrap();
-                                emit_load_game(&mut commands, &mut load_game, &file_name);
+                                emit_load_game(&mut commands, &mut load_game, file_name);
 
                                 menu_state.pop().unwrap();
                             }
