@@ -32,7 +32,7 @@ pub fn import_export_station(
                     amount_in_storage(consolidator, &mut storage_query, resource).min(MAX_AMOUNT);
 
                 if amount > 0.0
-                    && fetch_from_storage(&consolidator, &mut storage_query, &resource, amount)
+                    && fetch_from_storage(consolidator, &mut storage_query, resource, amount)
                 {
                     statistics.export.track(resource, amount);
                     let resource = resources.get(resource).unwrap();
@@ -52,7 +52,7 @@ pub fn import_export_station(
                     space_in_storage(consolidator, &mut storage_query, resource).min(MAX_AMOUNT);
 
                 if amount > 0.0 {
-                    distribute_to_storage(&consolidator, &mut storage_query, &resource, amount);
+                    distribute_to_storage(consolidator, &mut storage_query, resource, amount);
 
                     statistics.import.track(resource, amount);
                     let resource = resources.get(resource).unwrap();

@@ -80,12 +80,12 @@ fn load_state(
                 }
             }
             GameEntityType::Water => {
-                if let Some(entity) = insert_ground_tile(commands, &game_entity, map_query) {
+                if let Some(entity) = insert_ground_tile(commands, game_entity, map_query) {
                     commands.entity(entity).insert(Water);
                 }
             }
             GameEntityType::Forest => {
-                if let Some(entity) = insert_ground_tile(commands, &game_entity, map_query) {
+                if let Some(entity) = insert_ground_tile(commands, game_entity, map_query) {
                     commands.entity(entity).insert(Forest);
                 }
             }
