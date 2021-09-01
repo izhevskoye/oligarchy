@@ -8,7 +8,7 @@
         - resource: sugar_beet
           rate: 2.5
 
-  group: Agriculture
+  group: Food
   cost:
     resources:
       steel.blooms: 30

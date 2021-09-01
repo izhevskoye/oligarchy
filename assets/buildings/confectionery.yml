@@ -1,0 +1,33 @@
+"confectionery":
+  name: Confectionery
+  tile: 123
+  products:
+    - resource: confections
+      rate: 1
+      cost: 15
+      requisites:
+        - resource: sugar
+          rate: 0.5
+
+        - resource: flour
+          rate: 0.5
+
+        - resource: eggs
+          rate: 0.1
+
+    - resource: confections
+      rate: 1
+      cost: 15
+      requisites:
+        - resource: sugar
+          rate: 0.7
+
+        - resource: flour
+          rate: 0.7
+  group: Food
+  cost:
+    resources:
+      steel.blooms: 20
+      steel.slabs: 17
+      steel.billets: 17
+    base: 1500

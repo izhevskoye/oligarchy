@@ -8,7 +8,7 @@
         - resource: wheat
           rate: 1.5
 
-  group: Agriculture
+  group: Food
   cost:
     resources:
       steel.blooms: 10

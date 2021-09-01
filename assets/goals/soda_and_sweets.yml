@@ -1,12 +1,12 @@
-- name: Oil and Meat Production
+- name: Soda and Sweets
   goals:
-    - resource: pork
+    - resource: soda
       amount:
         small: 1000
         medium: 3000
         large: 5000
 
-    - resource: sunflower.oil
+    - resource: confections
       amount:
         small: 1000
         medium: 3000

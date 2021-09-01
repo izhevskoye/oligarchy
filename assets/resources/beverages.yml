@@ -1,26 +1,35 @@
 "vodka":
   name: Vodka
   storage_tile: 76
-  group: Alcohol
+  group: Beverages
   car_tile:
     horizontal: 346
     vertical: 378
-  cost: 27
+  cost: 67
 
 "wine":
   name: Wine
   storage_tile: 119
-  group: Alcohol
+  group: Beverages
   car_tile:
     horizontal: 346
     vertical: 378
-  cost: 57
+  cost: 97
 
 "beer":
   name: Beer
   storage_tile: 120
-  group: Alcohol
+  group: Beverages
   car_tile:
     horizontal: 346
     vertical: 378
-  cost: 24
+  cost: 64
+
+"soda":
+  name: Soda
+  storage_tile: 121
+  group: Beverages
+  car_tile:
+    horizontal: 346
+    vertical: 378
+  cost: 43

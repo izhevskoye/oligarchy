@@ -1,0 +1,20 @@
+"soda_plant":
+  name: Soda Plant
+  tile: 122
+  products:
+    - resource: soda
+      rate: 1
+      cost: 30
+      requisites:
+        - resource: sugar
+          rate: 0.3
+
+        - resource: phosphoric_acid
+          rate: 0.1
+  group: Beverages
+  cost:
+    resources:
+      steel.blooms: 10
+      steel.slabs: 15
+      steel.billets: 25
+    base: 1000
