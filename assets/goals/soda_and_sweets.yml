@@ -5,3 +5,9 @@
         small: 1000
         medium: 3000
         large: 5000
+
+    - resource: confections
+      amount:
+        small: 1000
+        medium: 3000
+        large: 5000

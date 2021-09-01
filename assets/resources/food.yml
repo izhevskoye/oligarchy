@@ -1,0 +1,26 @@
+"bread":
+  name: Bread
+  storage_tile: 92
+  group: Food
+  car_tile:
+    horizontal: 346
+    vertical: 378
+  cost: 23
+
+"pastry":
+  name: Pastry
+  storage_tile: 107
+  group: Food
+  car_tile:
+    horizontal: 346
+    vertical: 378
+  cost: 25
+
+"confections":
+  name: Confections
+  storage_tile: 124
+  group: Food
+  car_tile:
+    horizontal: 346
+    vertical: 378
+  cost: 28
