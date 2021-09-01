@@ -9,7 +9,7 @@
         - resource: grapes
           rate: 6
 
-  group: Alcohol
+  group: Beverages
   cost:
     resources:
       steel.blooms: 4

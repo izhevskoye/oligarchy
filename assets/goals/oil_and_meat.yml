@@ -1,4 +1,4 @@
-- name: Oil and  Meat Production
+- name: Oil and Meat Production
   goals:
     - resource: pork
       amount:

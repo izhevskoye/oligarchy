@@ -9,7 +9,7 @@
         - resource: hops
           rate: 3.5
 
-  group: Alcohol
+  group: Beverages
   cost:
     resources:
       steel.blooms: 4

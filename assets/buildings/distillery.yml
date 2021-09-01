@@ -15,7 +15,7 @@
       requisites:
         - resource: wheat
           rate: 4
-  group: Agriculture
+  group: Beverages
   cost:
     resources:
       steel.blooms: 10
