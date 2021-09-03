@@ -6,7 +6,7 @@ fn distribute_to_storage_test_system(
     params: Res<TestAmount>,
 ) {
     for consolidator in consolidator_query.iter() {
-        distribute_to_storage(&consolidator, &mut storage_query, COKE, params.amount);
+        distribute_to_storage(consolidator, &mut storage_query, COKE, params.amount);
     }
 }
 

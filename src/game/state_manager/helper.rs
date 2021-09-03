@@ -6,7 +6,7 @@ const ORGANIZATION: &str = "izhevskoye";
 const APPLICATION: &str = "oligarchy";
 
 pub fn generate_save_game_path() -> String {
-    let proj_dirs = ProjectDirs::from(&QUALIFIER, &ORGANIZATION, &APPLICATION)
+    let proj_dirs = ProjectDirs::from(QUALIFIER, ORGANIZATION, APPLICATION)
         .expect("Could not find project directories");
 
     let save_game_path = proj_dirs.config_dir().join("saves");

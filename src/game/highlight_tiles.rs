@@ -14,13 +14,13 @@ impl HighlightTiles {
         let current: Vec<UVec2> = self.tiles.clone().into_iter().map(|(pos, _)| pos).collect();
 
         for pos in event.tiles.iter() {
-            if !current.contains(&pos) {
+            if !current.contains(pos) {
                 return true;
             }
         }
 
         for pos in current.iter() {
-            if !event.tiles.contains(&pos) {
+            if !event.tiles.contains(pos) {
                 return true;
             }
         }
@@ -57,7 +57,7 @@ pub fn update_highlight(
     for event in events.iter() {
         updated = true;
 
-        if !tiles.needs_update(&event) {
+        if !tiles.needs_update(event) {
             continue;
         }
 

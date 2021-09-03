@@ -19,7 +19,7 @@ use crate::game::{
         DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
     },
     storage::Storage,
-    street::Street,
+    street::{Path, Street},
 };
 
 fn button(
@@ -29,13 +29,13 @@ fn button(
     resources: &ResourceSpecifications,
     account: &Account,
 ) -> Response {
-    let price = item.price(&resources);
+    let price = item.price(resources);
 
     let button = ui.small_button(name);
 
     let mut hover_text = format!(
         "{}\n---\nTotal Cost: {} {}",
-        item.price_description(&resources),
+        item.price_description(resources),
         price.to_formatted_string(&Locale::en),
         CURRENCY
     );
@@ -101,8 +101,9 @@ pub fn construction_ui(
             ui.separator();
 
             egui::containers::ScrollArea::from_max_height(max_height).show(ui, |ui| {
-                let building_names: Vec<&str> = vec![
-                    "Street",
+                if vec![
+                    "Street (Road)",
+                    "Street (Dirt)",
                     "Export Station",
                     "Import Station",
                     "Delivery Station",
@@ -110,17 +111,23 @@ pub fn construction_ui(
                     "Storage Management",
                 ]
                 .into_iter()
-                .filter(|item| filter.match_name(item))
-                .collect();
-
-                if !building_names.is_empty() {
+                .any(|item| filter.match_name(item))
+                {
                     let group_title = "Building: General";
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
                         ui.vertical_centered_justified(|ui| {
-                            if filter.match_name("Street")
-                                && button(ui, "Street", &Street, &resources, &account).clicked()
+                            if filter.match_name("Street (Road)")
+                                && button(ui, "Street (Road)", &Street, &resources, &account)
+                                    .clicked()
                             {
                                 selected_tool.tool = Tool::Street;
+                            }
+
+                            if filter.match_name("Street (Dirt)")
+                                && button(ui, "Street (Dirt)", &Path, &resources, &account)
+                                    .clicked()
+                            {
+                                selected_tool.tool = Tool::Path;
                             }
 
                             if filter.match_name("Export Station")

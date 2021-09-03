@@ -20,6 +20,10 @@ use crate::game::{
 #[serde(deny_unknown_fields)]
 pub struct Street;
 
+#[derive(Clone, Serialize, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Path;
+
 impl From<Street> for MapTile {
     fn from(_: Street) -> MapTile {
         MapTile::ExportStation
@@ -32,31 +36,47 @@ impl From<Street> for LayerIndex {
     }
 }
 
+impl From<Path> for MapTile {
+    fn from(_: Path) -> MapTile {
+        MapTile::PathTilesOffset
+    }
+}
+
+impl From<Path> for LayerIndex {
+    fn from(_: Path) -> LayerIndex {
+        LayerIndex::new(BUILDING_LAYER_ID)
+    }
+}
+
 impl PurchaseCost for Street {
     fn price(&self, _resources: &ResourceSpecifications) -> i64 {
         100
     }
 }
 
-pub fn update_streets(
+impl PurchaseCost for Path {
+    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
+        0
+    }
+}
+
+pub fn update_streets<T: 'static + Send + Sync + Default>(
     mut tile_query: Query<
         (&mut Tile, &Position),
-        (
-            With<Street>,
-            With<RequiresUpdate>,
-            Without<UnderConstruction>,
-        ),
+        (With<T>, With<RequiresUpdate>, Without<UnderConstruction>),
     >,
-    street_query: Query<(), With<Street>>,
+    street_query: Query<(), With<T>>,
     map_query: MapQuery,
     map_settings: Res<MapSettings>,
-) {
+) where
+    MapTile: From<T>,
+{
     for (mut tile, position) in tile_query.iter_mut() {
         let mut ns = NeighborStructure::default();
         let pos = UVec2::new(position.position.x, position.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
         // N, S, W, E, NW, NE, SW, SE.
-        let en = EvalNeighbor {
+        let en: EvalNeighbor<T> = EvalNeighbor {
             map_settings: &map_settings,
             query: &street_query,
         };
@@ -67,7 +87,7 @@ pub fn update_streets(
         ns.east = en.eval_neighbor(neighbors[3]);
 
         let ns_index: u16 = ns.clone().into();
-        tile.texture_index = ns_index + MapTile::from(Street::default()) as u16;
+        tile.texture_index = ns_index + MapTile::from(T::default()) as u16;
         tile.visible = true;
     }
 }

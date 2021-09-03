@@ -80,7 +80,7 @@ impl TestSetup {
         let mut reader = events.get_reader();
 
         let mut sum = 0;
-        for event in reader.iter(&events) {
+        for event in reader.iter(events) {
             sum += event.amount;
         }
 
