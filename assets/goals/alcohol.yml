@@ -1,4 +1,4 @@
-- name: Vodka
+- name: Alcoholic Beverages
   goals:
     - resource: vodka
       amount:

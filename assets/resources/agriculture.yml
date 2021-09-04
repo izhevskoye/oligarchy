@@ -108,24 +108,6 @@
     vertical: 379
   cost: 8
 
-"bread":
-  name: Bread
-  storage_tile: 92
-  group: Agriculture
-  car_tile:
-    horizontal: 346
-    vertical: 378
-  cost: 23
-
-"pastry":
-  name: Pastry
-  storage_tile: 107
-  group: Agriculture
-  car_tile:
-    horizontal: 346
-    vertical: 378
-  cost: 25
-
 "sugar_beet":
   name: Sugar Beet
   storage_tile: 90
