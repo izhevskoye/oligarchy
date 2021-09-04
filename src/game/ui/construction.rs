@@ -19,7 +19,7 @@ use crate::game::{
         DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
     },
     storage::Storage,
-    street::{Path, Street},
+    street::{Street, StreetType},
 };
 
 fn button(
@@ -117,15 +117,31 @@ pub fn construction_ui(
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
                         ui.vertical_centered_justified(|ui| {
                             if filter.match_name("Street (Road)")
-                                && button(ui, "Street (Road)", &Street, &resources, &account)
-                                    .clicked()
+                                && button(
+                                    ui,
+                                    "Street (Road)",
+                                    &Street {
+                                        street_type: StreetType::Asphalt,
+                                    },
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
                             {
                                 selected_tool.tool = Tool::Street;
                             }
 
                             if filter.match_name("Street (Dirt)")
-                                && button(ui, "Street (Dirt)", &Path, &resources, &account)
-                                    .clicked()
+                                && button(
+                                    ui,
+                                    "Street (Dirt)",
+                                    &Street {
+                                        street_type: StreetType::Dirt,
+                                    },
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
                             {
                                 selected_tool.tool = Tool::Path;
                             }

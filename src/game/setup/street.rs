@@ -12,7 +12,7 @@ use crate::game::{
     helper::get_entity::get_entity,
     pathfinder::{cost_fn, Pathfinding},
     setup::{BUILDING_LAYER_ID, MAP_ID},
-    street::Street,
+    street::{Street, StreetType},
     GenerateStreetEvent, NewGameSetup,
 };
 
@@ -77,14 +77,17 @@ pub fn generate_street(
                     }
 
                     for pos in fixed_points {
-                        let price = Street::default().price(&resources);
+                        let street = Street {
+                            street_type: StreetType::Asphalt,
+                        };
+                        let price = street.price(&resources);
                         let entity =
                             get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
                         // TODO: bundle
                         commands
                             .entity(entity)
-                            .insert(Street)
+                            .insert(street)
                             .insert(RequiresUpdate)
                             .insert(MaintenanceCost::new_from_cost(price))
                             .insert(Position { position: pos })

@@ -10,7 +10,7 @@ use crate::game::{
     construction::UnderConstruction,
     helper::get_entity::get_entity,
     setup::BUILDING_LAYER_ID,
-    street::{Path, Street},
+    street::{Street, StreetType},
 };
 
 use super::{update_neighbor_streets, SelectedTool, Tool};
@@ -33,7 +33,9 @@ pub fn street_placement(
     if let Some(pos) = clicked_tile.pos {
         let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
-        let street = Street::default();
+        let street = Street {
+            street_type: StreetType::Asphalt,
+        };
         let price = street.price(&resources);
 
         commands
@@ -52,7 +54,7 @@ pub fn street_placement(
 
 pub fn path_placement(
     mut commands: Commands,
-    street_query: Query<&Path>,
+    street_query: Query<&Street>,
     mut map_query: MapQuery,
     selected_tool: Res<SelectedTool>,
     clicked_tile: Res<ClickedTile>,
@@ -66,7 +68,9 @@ pub fn path_placement(
     if let Some(pos) = clicked_tile.pos {
         let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
-        let street = Path::default();
+        let street = Street {
+            street_type: StreetType::Dirt,
+        };
         let price = street.price(&resources);
 
         commands

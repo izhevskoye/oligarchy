@@ -101,7 +101,7 @@ impl InfoUI for Name {
 
 pub struct BlockedForBuilding;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Forest;
 
 impl From<Forest> for MapTile {
@@ -116,7 +116,7 @@ impl From<Forest> for LayerIndex {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Water;
 
 impl From<Water> for MapTile {

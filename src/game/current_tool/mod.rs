@@ -42,7 +42,7 @@ impl Default for SelectedTool {
     }
 }
 
-fn update_neighbor_streets<T: 'static + Send + Sync + Default>(
+fn update_neighbor_streets<T: 'static + Send + Sync>(
     commands: &mut Commands,
     map_query: &mut MapQuery,
     pos: UVec2,

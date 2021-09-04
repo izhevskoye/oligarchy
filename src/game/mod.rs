@@ -45,7 +45,7 @@ use self::{
     pathfinder::Pathfinding,
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
-    street::{Path, Street},
+    street::Street,
     ui::state::{ConfirmDialogState, MainMenuState, SaveGameList},
 };
 
@@ -451,8 +451,7 @@ impl Game {
                     .with_system(asset_tiles::delivery_station_update.system())
                     .with_system(asset_tiles::storage_management_update.system())
                     .with_system(asset_tiles::ground_update.system())
-                    .with_system(street::update_streets::<Street>.system())
-                    .with_system(street::update_streets::<Path>.system())
+                    .with_system(street::update_streets.system())
                     .with_system(helper::neighbor_structure::update_tile::<Water>.system())
                     .with_system(helper::neighbor_structure::update_tile::<Forest>.system())
                     .with_system(helper::neighbor_structure::update_tile::<Street>.system())

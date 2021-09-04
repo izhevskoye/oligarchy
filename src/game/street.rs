@@ -16,17 +16,24 @@ use crate::game::{
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-#[derive(Clone, Serialize, Deserialize, Default)]
-#[serde(deny_unknown_fields)]
-pub struct Street;
+#[derive(Clone, Serialize, Deserialize)]
+pub enum StreetType {
+    Asphalt,
+    Dirt,
+}
 
-#[derive(Clone, Serialize, Deserialize, Default)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Path;
+pub struct Street {
+    pub street_type: StreetType,
+}
 
 impl From<Street> for MapTile {
-    fn from(_: Street) -> MapTile {
-        MapTile::ExportStation
+    fn from(street: Street) -> MapTile {
+        match street.street_type {
+            StreetType::Asphalt => MapTile::ExportStation,
+            StreetType::Dirt => MapTile::PathTilesOffset,
+        }
     }
 }
 
@@ -36,47 +43,30 @@ impl From<Street> for LayerIndex {
     }
 }
 
-impl From<Path> for MapTile {
-    fn from(_: Path) -> MapTile {
-        MapTile::PathTilesOffset
-    }
-}
-
-impl From<Path> for LayerIndex {
-    fn from(_: Path) -> LayerIndex {
-        LayerIndex::new(BUILDING_LAYER_ID)
-    }
-}
-
 impl PurchaseCost for Street {
     fn price(&self, _resources: &ResourceSpecifications) -> i64 {
-        100
+        match self.street_type {
+            StreetType::Asphalt => 100,
+            StreetType::Dirt => 0,
+        }
     }
 }
 
-impl PurchaseCost for Path {
-    fn price(&self, _resources: &ResourceSpecifications) -> i64 {
-        0
-    }
-}
-
-pub fn update_streets<T: 'static + Send + Sync + Default>(
+pub fn update_streets(
     mut tile_query: Query<
-        (&mut Tile, &Position),
-        (With<T>, With<RequiresUpdate>, Without<UnderConstruction>),
+        (&Street, &mut Tile, &Position),
+        (With<RequiresUpdate>, Without<UnderConstruction>),
     >,
-    street_query: Query<(), With<T>>,
+    street_query: Query<(), With<Street>>,
     map_query: MapQuery,
     map_settings: Res<MapSettings>,
-) where
-    MapTile: From<T>,
-{
-    for (mut tile, position) in tile_query.iter_mut() {
+) {
+    for (street, mut tile, position) in tile_query.iter_mut() {
         let mut ns = NeighborStructure::default();
         let pos = UVec2::new(position.position.x, position.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
         // N, S, W, E, NW, NE, SW, SE.
-        let en: EvalNeighbor<T> = EvalNeighbor {
+        let en: EvalNeighbor<Street> = EvalNeighbor {
             map_settings: &map_settings,
             query: &street_query,
         };
@@ -87,7 +77,7 @@ pub fn update_streets<T: 'static + Send + Sync + Default>(
         ns.east = en.eval_neighbor(neighbors[3]);
 
         let ns_index: u16 = ns.clone().into();
-        tile.texture_index = ns_index + MapTile::from(T::default()) as u16;
+        tile.texture_index = ns_index + MapTile::from(street.clone()) as u16;
         tile.visible = true;
     }
 }
