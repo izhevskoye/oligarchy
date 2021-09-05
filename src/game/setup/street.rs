@@ -76,10 +76,14 @@ pub fn generate_street(
                         i += 1;
                     }
 
+                    let street_type = if random.gen_range(0..10) < 4 {
+                        StreetType::Asphalt
+                    } else {
+                        StreetType::Dirt
+                    };
+
                     for pos in fixed_points {
-                        let street = Street {
-                            street_type: StreetType::Asphalt,
-                        };
+                        let street = Street { street_type };
                         let price = street.price(&resources);
                         let entity =
                             get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);

@@ -43,7 +43,6 @@ pub fn street_placement(
             .insert(street)
             .insert(RequiresUpdate)
             .insert(MaintenanceCost::new_from_cost(price))
-            .insert(UnderConstruction::from_fixed_cost(price))
             .insert(Position { position: pos })
             .insert(CanDriveOver)
             .insert(Occupied);

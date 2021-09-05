@@ -16,7 +16,7 @@ use crate::game::{
     setup::{BUILDING_LAYER_ID, MAP_ID},
 };
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum StreetType {
     Asphalt,
     Dirt,
