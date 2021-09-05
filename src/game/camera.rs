@@ -7,6 +7,8 @@ use bevy::{
 use bevy_egui::EguiContext;
 
 use super::{
+    assets::MapSettings,
+    constants::{CHUNK_SIZE, TILE_SIZE},
     current_tool::{SelectedTool, Tool},
     NewGameSetup,
 };
@@ -39,6 +41,7 @@ pub fn movement(
     mut query: Query<&mut Transform, With<Camera>>,
     selected_tool: Res<SelectedTool>,
     mut real_transform: Local<Option<Transform>>,
+    map_settings: Res<MapSettings>,
 ) {
     let win = windows.get_primary().expect("no primary window");
     if real_transform.is_none() {
@@ -127,6 +130,24 @@ pub fn movement(
     }
 
     transform.translation += time.delta_seconds() * direction * 500.;
+
+    if transform.translation.x < 0.0 {
+        transform.translation.x = 0.0;
+    }
+
+    let max_width = TILE_SIZE * (map_settings.width * CHUNK_SIZE - 1) as f32;
+    if transform.translation.x > max_width {
+        transform.translation.x = max_width;
+    }
+
+    if transform.translation.y < 0.0 {
+        transform.translation.y = 0.0;
+    }
+
+    let max_height = TILE_SIZE * (map_settings.height * CHUNK_SIZE - 1) as f32;
+    if transform.translation.y > max_height {
+        transform.translation.y = max_height;
+    }
 
     *real_transform = Some(transform);
 
