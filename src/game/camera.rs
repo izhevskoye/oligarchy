@@ -1,14 +1,32 @@
 use bevy::{
+    ecs::schedule::ShouldRun,
     input::mouse::{MouseMotion, MouseWheel},
     prelude::*,
     render::camera::Camera,
 };
 use bevy_egui::EguiContext;
 
-use super::current_tool::{SelectedTool, Tool};
+use super::{
+    current_tool::{SelectedTool, Tool},
+    NewGameSetup,
+};
 
 const MAX_ZOOM_OUT: f32 = 0.1;
 const MAX_ZOOM_IN: f32 = 1.5;
+
+pub fn movement_allowed(
+    egui_context: ResMut<EguiContext>,
+    setup: Res<Option<NewGameSetup>>,
+) -> ShouldRun {
+    if egui_context.ctx().wants_pointer_input()
+        || egui_context.ctx().wants_keyboard_input()
+        || setup.is_some()
+    {
+        return ShouldRun::No;
+    }
+
+    ShouldRun::Yes
+}
 
 // A simple camera system for moving and zooming the camera.
 pub fn movement(
@@ -19,14 +37,9 @@ pub fn movement(
     mut ev_scroll: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: Query<&mut Transform, With<Camera>>,
-    egui_context: ResMut<EguiContext>,
     selected_tool: Res<SelectedTool>,
     mut real_transform: Local<Option<Transform>>,
 ) {
-    if egui_context.ctx().wants_pointer_input() || egui_context.ctx().wants_keyboard_input() {
-        return;
-    }
-
     let win = windows.get_primary().expect("no primary window");
     if real_transform.is_none() {
         let transform = *query.single_mut().unwrap();
