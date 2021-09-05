@@ -97,6 +97,14 @@ pub enum AppState {
     Paused,
 }
 
+fn and_is_in_game(In(input): In<ShouldRun>, state: Res<State<AppState>>) -> ShouldRun {
+    if state.current() == &AppState::InGame {
+        input
+    } else {
+        ShouldRun::No
+    }
+}
+
 impl Game {
     pub fn run(&self) {
         env_logger::Builder::from_default_env()
@@ -191,16 +199,8 @@ impl Game {
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(
-                        FixedTimestep::step(GOAL_UPDATE_TICK_SPEED as f64).chain(
-                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
-                                if state.current() == &AppState::InGame {
-                                    input
-                                } else {
-                                    ShouldRun::No
-                                }
-                            })
-                            .system(),
-                        ),
+                        FixedTimestep::step(GOAL_UPDATE_TICK_SPEED as f64)
+                            .chain(and_is_in_game.system()),
                     )
                     .with_system(goals::update_goals.system()),
             )
@@ -232,8 +232,16 @@ impl Game {
                 ),
             )
             .add_system_set(
+                SystemSet::new()
+                    .with_run_criteria(
+                        camera::movement_allowed
+                            .system()
+                            .chain(and_is_in_game.system()),
+                    )
+                    .with_system(camera::movement.system()),
+            )
+            .add_system_set(
                 SystemSet::on_update(AppState::InGame)
-                    .with_system(camera::movement.system())
                     .with_system(texture::set_texture_filters_to_nearest.system())
                     .with_system(
                         current_selection::spawn_selected
@@ -354,16 +362,8 @@ impl Game {
                 SystemSet::new()
                     .before(Label::Update)
                     .with_run_criteria(
-                        FixedTimestep::step(PRODUCTION_TICK_SPEED as f64).chain(
-                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
-                                if state.current() == &AppState::InGame {
-                                    input
-                                } else {
-                                    ShouldRun::No
-                                }
-                            })
-                            .system(),
-                        ),
+                        FixedTimestep::step(PRODUCTION_TICK_SPEED as f64)
+                            .chain(and_is_in_game.system()),
                     )
                     .with_system(production::import_export_station::import_export_station.system())
                     .with_system(production::storage_management::storage_management.system())
@@ -384,16 +384,8 @@ impl Game {
                 SystemSet::new()
                     .before(Label::Update)
                     .with_run_criteria(
-                        FixedTimestep::step(CAR_DRIVE_TICK_SPEED as f64).chain(
-                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
-                                if state.current() == &AppState::InGame {
-                                    input
-                                } else {
-                                    ShouldRun::No
-                                }
-                            })
-                            .system(),
-                        ),
+                        FixedTimestep::step(CAR_DRIVE_TICK_SPEED as f64)
+                            .chain(and_is_in_game.system()),
                     )
                     .with_system(car::drive_to_destination::drive_to_destination.system()),
             )
@@ -401,16 +393,8 @@ impl Game {
                 SystemSet::new()
                     .before(Label::Update)
                     .with_run_criteria(
-                        FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED as f64).chain(
-                            (|In(input): In<ShouldRun>, state: Res<State<AppState>>| {
-                                if state.current() == &AppState::InGame {
-                                    input
-                                } else {
-                                    ShouldRun::No
-                                }
-                            })
-                            .system(),
-                        ),
+                        FixedTimestep::step(CAR_INSTRUCTION_TICK_SPEED as f64)
+                            .chain(and_is_in_game.system()),
                     )
                     .with_system(
                         car::instructions::car_instruction

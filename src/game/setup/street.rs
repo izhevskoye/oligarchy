@@ -16,6 +16,10 @@ use crate::game::{
     GenerateStreetEvent, NewGameSetup,
 };
 
+// sometimes the noise generates a map where it is impossible to place a street
+const MAX_ATTEMPTS: i64 = 20;
+const BORDER: u32 = 5;
+
 pub fn generate_street(
     mut commands: Commands,
     street_query: Query<(), With<Street>>,
@@ -37,9 +41,11 @@ pub fn generate_street(
                 setup.street = true;
             }
 
+            let mut attempts = 0;
+
             loop {
-                let s_y = random.gen_range(1..map_settings.height * CHUNK_SIZE - 2);
-                let d_y = random.gen_range(1..map_settings.height * CHUNK_SIZE - 2);
+                let s_y = random.gen_range(BORDER..map_settings.height * CHUNK_SIZE - 1 - BORDER);
+                let d_y = random.gen_range(BORDER..map_settings.height * CHUNK_SIZE - 1 - BORDER);
                 let max_x = map_settings.width * CHUNK_SIZE - 2;
 
                 let path = pathfinding.find_path(
@@ -101,6 +107,11 @@ pub fn generate_street(
                         map_query.notify_chunk_for_tile(pos, MAP_ID, BUILDING_LAYER_ID);
                     }
 
+                    break;
+                }
+
+                attempts += 1;
+                if attempts > MAX_ATTEMPTS {
                     break;
                 }
             }
