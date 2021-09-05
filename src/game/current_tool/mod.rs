@@ -15,7 +15,6 @@ use super::{
     assets::RequiresUpdate,
     production::ImportExportDirection,
     setup::{BUILDING_LAYER_ID, MAP_ID},
-    street::Street,
 };
 
 #[derive(PartialEq, Eq, Debug)]
@@ -23,6 +22,7 @@ pub enum Tool {
     None,
     Bulldoze,
     Street,
+    Path,
     Storage(String),
     ImportExportStation(ImportExportDirection),
     DeliveryStation,
@@ -42,11 +42,11 @@ impl Default for SelectedTool {
     }
 }
 
-fn update_neighbor_streets(
+fn update_neighbor_streets<T: 'static + Send + Sync>(
     commands: &mut Commands,
     map_query: &mut MapQuery,
     pos: UVec2,
-    street_query: Query<&Street>,
+    street_query: Query<&T>,
 ) {
     let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, BUILDING_LAYER_ID);
     for (_pos, neighbor) in neighbors[0..4].iter() {

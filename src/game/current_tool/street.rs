@@ -10,7 +10,7 @@ use crate::game::{
     construction::UnderConstruction,
     helper::get_entity::get_entity,
     setup::BUILDING_LAYER_ID,
-    street::Street,
+    street::{Street, StreetType},
 };
 
 use super::{update_neighbor_streets, SelectedTool, Tool};
@@ -33,11 +33,48 @@ pub fn street_placement(
     if let Some(pos) = clicked_tile.pos {
         let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
 
-        let price = Street::default().price(&resources);
+        let street = Street {
+            street_type: StreetType::Asphalt,
+        };
+        let price = street.price(&resources);
 
         commands
             .entity(entity)
-            .insert(Street)
+            .insert(street)
+            .insert(RequiresUpdate)
+            .insert(MaintenanceCost::new_from_cost(price))
+            .insert(Position { position: pos })
+            .insert(CanDriveOver)
+            .insert(Occupied);
+
+        update_neighbor_streets(&mut commands, &mut map_query, pos, street_query);
+    }
+}
+
+pub fn path_placement(
+    mut commands: Commands,
+    street_query: Query<&Street>,
+    mut map_query: MapQuery,
+    selected_tool: Res<SelectedTool>,
+    clicked_tile: Res<ClickedTile>,
+    resources: Res<ResourceSpecifications>,
+) {
+    if selected_tool.tool != Tool::Path || clicked_tile.occupied_building || !clicked_tile.can_build
+    {
+        return;
+    }
+
+    if let Some(pos) = clicked_tile.pos {
+        let entity = get_entity(&mut commands, &mut map_query, pos, BUILDING_LAYER_ID);
+
+        let street = Street {
+            street_type: StreetType::Dirt,
+        };
+        let price = street.price(&resources);
+
+        commands
+            .entity(entity)
+            .insert(street)
             .insert(RequiresUpdate)
             .insert(MaintenanceCost::new_from_cost(price))
             .insert(UnderConstruction::from_fixed_cost(price))

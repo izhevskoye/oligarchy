@@ -317,6 +317,7 @@ impl Game {
                     .after(Label::CurrentSelection)
                     .before(Label::Update)
                     .with_system(current_tool::street::street_placement.system())
+                    .with_system(current_tool::street::path_placement.system())
                     .with_system(current_tool::depot::depot_placement.system())
                     .with_system(current_tool::storage::storage_placement.system())
                     .with_system(

@@ -19,7 +19,7 @@ use crate::game::{
         DeliveryStation, Depot, ImportExportDirection, ImportExportStation, StorageManagement,
     },
     storage::Storage,
-    street::Street,
+    street::{Street, StreetType},
 };
 
 fn button(
@@ -102,7 +102,8 @@ pub fn construction_ui(
 
             egui::containers::ScrollArea::from_max_height(max_height).show(ui, |ui| {
                 if vec![
-                    "Street",
+                    "Street (Road)",
+                    "Street (Dirt)",
                     "Export Station",
                     "Import Station",
                     "Delivery Station",
@@ -115,10 +116,34 @@ pub fn construction_ui(
                     let group_title = "Building: General";
                     let items: Box<dyn FnOnce(&mut Ui)> = Box::new(|ui| {
                         ui.vertical_centered_justified(|ui| {
-                            if filter.match_name("Street")
-                                && button(ui, "Street", &Street, &resources, &account).clicked()
+                            if filter.match_name("Street (Road)")
+                                && button(
+                                    ui,
+                                    "Street (Road)",
+                                    &Street {
+                                        street_type: StreetType::Asphalt,
+                                    },
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
                             {
                                 selected_tool.tool = Tool::Street;
+                            }
+
+                            if filter.match_name("Street (Dirt)")
+                                && button(
+                                    ui,
+                                    "Street (Dirt)",
+                                    &Street {
+                                        street_type: StreetType::Dirt,
+                                    },
+                                    &resources,
+                                    &account,
+                                )
+                                .clicked()
+                            {
+                                selected_tool.tool = Tool::Path;
                             }
 
                             if filter.match_name("Export Station")

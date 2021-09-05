@@ -90,8 +90,8 @@ impl From<NeighborStructure> for u16 {
     }
 }
 
-pub fn update_tile<T: 'static + Send + Sync + Default>(
-    mut tile_query: Query<(&mut Tile, &Position), (With<T>, With<RequiresUpdate>)>,
+pub fn update_tile<T: 'static + Send + Sync + Clone>(
+    mut tile_query: Query<(&T, &mut Tile, &Position), With<RequiresUpdate>>,
     query: Query<(), With<T>>,
     map_query: MapQuery,
     map_settings: Res<MapSettings>,
@@ -99,9 +99,8 @@ pub fn update_tile<T: 'static + Send + Sync + Default>(
     MapTile: From<T>,
     LayerIndex: From<T>,
 {
-    let layer = LayerIndex::from(T::default()).0;
-
-    for (mut tile, position) in tile_query.iter_mut() {
+    for (item, mut tile, position) in tile_query.iter_mut() {
+        let layer = LayerIndex::from(item.clone()).0;
         let mut ns = NeighborStructure::default();
         let pos = UVec2::new(position.position.x, position.position.y);
         let neighbors = map_query.get_tile_neighbors(pos, MAP_ID, layer);
@@ -117,7 +116,7 @@ pub fn update_tile<T: 'static + Send + Sync + Default>(
         ns.east = en.eval_neighbor(neighbors[3]);
 
         let ns_index: u16 = ns.clone().into();
-        tile.texture_index = MapTile::from(T::default()) as u16 + ns_index;
+        tile.texture_index = MapTile::from(item.clone()) as u16 + ns_index;
 
         tile.visible = true;
     }
