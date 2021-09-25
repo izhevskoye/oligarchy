@@ -19,6 +19,7 @@ use crate::game::{
     },
     statistics::StatisticTracker,
     storage::StorageConsolidator,
+    time::PlayTime,
 };
 
 use super::VehicleController;
@@ -31,6 +32,7 @@ pub fn load_game(
     mut goals: ResMut<GoalManager>,
     mut account: ResMut<Account>,
     mut state_name: ResMut<StateName>,
+    mut play_time: ResMut<PlayTime>,
     mut deleted_export_statistics: ResMut<StatisticTracker>,
     resources: Res<ResourceSpecifications>,
 ) {
@@ -38,6 +40,7 @@ pub fn load_game(
         goals.goals = event.state.goals.clone();
         *account = event.state.account.clone();
         *state_name = event.state.state_name.clone();
+        *play_time = event.state.play_time.clone();
         *deleted_export_statistics = event.state.deleted_export_statistics.clone();
 
         load_state(

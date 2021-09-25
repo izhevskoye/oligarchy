@@ -17,6 +17,7 @@ use crate::game::{
     statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
+    time::PlayTime,
 };
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -71,6 +72,7 @@ pub struct GameEntity {
 #[derive(Default, Serialize, Deserialize)]
 pub struct GameState {
     pub state_name: StateName,
+    pub play_time: PlayTime,
     #[serde(default)]
     pub deleted_export_statistics: StatisticTracker,
     pub settings: MapSettings,

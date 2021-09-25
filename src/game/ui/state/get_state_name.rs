@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::prelude::*, path::Path};
 
-use crate::game::assets::StateName;
+use crate::game::{assets::StateName, time::PlayTime};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct SaveGameState {
     pub state_name: StateName,
+    pub play_time: PlayTime,
 }
 
 pub fn get_state_name(file_name: &str) -> Option<String> {
@@ -24,7 +25,15 @@ pub fn get_state_name(file_name: &str) -> Option<String> {
     let state: Result<SaveGameState, serde_yaml::Error> = serde_yaml::from_str(&content);
 
     match state {
-        Ok(state) => Some(state.state_name.name),
+        Ok(state) => {
+            let time = state.play_time.seconds;
+            let hours = (time as f64 / 60.0 / 60.0).floor() as i64;
+            let minutes = (time as f64 / 60.0).floor() as i64 % 60;
+
+            let time = format!("{}:{:02}", hours, minutes);
+
+            Some(format!("{} ({}h)", state.state_name.name, time))
+        }
         Err(why) => {
             log::error!("Could not load state: {}", why);
             None
