@@ -19,6 +19,7 @@ mod statistics;
 mod storage;
 mod street;
 mod texture;
+mod time;
 mod ui;
 
 use bevy::{
@@ -46,6 +47,7 @@ use self::{
     state_manager::{LoadGameEvent, NewGameEvent, SaveGameEvent},
     statistics::StatisticTracker,
     street::Street,
+    time::PlayTime,
     ui::state::{ConfirmDialogState, MainMenuState, SaveGameList},
 };
 
@@ -111,6 +113,7 @@ impl Game {
             .init_resource::<GoalManager>()
             .init_resource::<Account>()
             .init_resource::<StateName>()
+            .init_resource::<PlayTime>()
             .init_resource::<StatisticTracker>()
             .init_resource::<ConfirmDialogState>()
             .init_resource::<SaveGameList>()
@@ -461,6 +464,11 @@ impl Game {
                     .with_system(remove_update::remove_update.system())
                     .with_system(account::account_transactions.system())
                     .label(Label::UpdateEnd),
+            )
+            .add_system_set(
+                SystemSet::new()
+                    .with_run_criteria(FixedTimestep::step(1.0).chain(and_is_in_game.system()))
+                    .with_system(time::track_time.system()),
             )
             .run();
     }

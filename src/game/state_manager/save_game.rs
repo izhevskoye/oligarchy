@@ -21,6 +21,7 @@ use crate::game::{
     statistics::{StatisticTracker, Statistics},
     storage::Storage,
     street::Street,
+    time::PlayTime,
     ui::state::SaveGameList,
 };
 
@@ -62,6 +63,7 @@ pub fn save_game(
     goals: Res<GoalManager>,
     account: Res<Account>,
     state_name: Res<StateName>,
+    play_time: Res<PlayTime>,
     deleted_export_statistics: Res<StatisticTracker>,
     mut save_game_list: ResMut<SaveGameList>,
 ) {
@@ -87,6 +89,7 @@ pub fn save_game(
             goals: goals.goals.clone(),
             account: account.clone(),
             state_name: state_name.clone(),
+            play_time: play_time.clone(),
             deleted_export_statistics: deleted_export_statistics.clone(),
             ..Default::default()
         };
